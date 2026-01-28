@@ -10,6 +10,18 @@
 * **RND Mode (Résultat Non Disponible):** Allows students to skip modules that are not yet graded or not applicable to their specific path.
 * **Integrated Help System:** Clear documentation on module codes (Ressources vs. SAÉ) and manual calculation methods.
 
+## 📥 How to Use
+
+This tool is designed as a "Portable Web App." No installation or server is required.
+
+1. **Download** the `index.html` file from this repository.
+2. **Locate** the file on your computer.
+3. **Double-click** the file to open it in your preferred web browser (Chrome, Firefox, Edge, etc.).
+
+## 🖥️ System Requirements
+
+* **Device:** **PC/Desktop highly recommended.** * **Note:** The visualization and PDF generation features are optimized for larger screens. Using this tool on a smartphone may result in display bugs or layout issues.
+
 ## 📊 Logic & Calculation
 
 The simulator calculates the weighted average based on the official coefficients:
@@ -23,14 +35,9 @@ $$Moyenne = \frac{\sum (Note \times Coefficient)}{\sum Coefficient}$$
     * [html2pdf.js](https://ekoopmans.github.io/html2pdf.js/) for high-fidelity PDF generation.
 * **Fonts:** Plus Jakarta Sans via Google Fonts.
 
-## 📂 Project Structure
-
-* `index.html` - Contains the logic, styling, and structure of the application.
-* `assets/` - (Optional) Store logos or background images here.
-
 ## ⚖️ Disclaimer
 
-**Document Non Officiel.** This tool is intended for simulation purposes only. Official results are provided exclusively by the IUT administration.
+**Not official affiliation to the IUT Paul Sabatier University** This tool is intended for simulation purposes only. Official results are provided exclusively by the IUT administration.
 
 ## 👤 Author
 
