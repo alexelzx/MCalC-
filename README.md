@@ -54,6 +54,12 @@ $$Moyenne = \frac{\sum (Note \times Coefficient)}{\sum Coefficient}$$
     * [html2pdf.js](https://ekoopmans.github.io/html2pdf.js/) for high-fidelity PDF generation.
 * **Fonts:** Plus Jakarta Sans via Google Fonts.
 
+## Walkthrough
+
+https://github.com/user-attachments/assets/f895e66e-ce4a-400f-9160-423a6a8531f8
+
+
+
 ## ⚖️ Disclaimer
 
 **Not official affiliation to the IUT Paul Sabatier University** This tool is intended for simulation purposes only. Official results are provided exclusively by the IUT administration.
