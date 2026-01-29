@@ -13,6 +13,11 @@
             --gemini-primary: #4daafc;
             --gemini-secondary: #9aa0a6;
             --gemini-glow: 0 0 20px rgba(77, 170, 252, 0.15);
+            
+            /* Status Colors */
+            --st-valid: #22c55e;
+            --st-warning: #f59e0b;
+            --st-inactive: #ef4444;
         }
 
         body {
@@ -30,128 +35,88 @@
 
         /* LOGO STYLES */
         .corner-logo {
-            position: fixed;
-            top: 25px;
-            height: 45px;
-            width: auto;
-            z-index: 100;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 8px 20px;
-            border-radius: 50px;
-            box-shadow: 0 0 15px rgba(77, 170, 252, 0.2);
-            transition: 0.3s;
+            position: fixed; top: 25px; height: 45px; width: auto; z-index: 100;
+            background: rgba(255, 255, 255, 0.95); padding: 8px 20px; border-radius: 50px;
+            box-shadow: 0 0 15px rgba(77, 170, 252, 0.2); transition: 0.3s;
         }
         .corner-logo:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(77, 170, 252, 0.5); }
         .logo-left { left: 30px; }
         .logo-right { right: 30px; }
 
-        /* Branding */
+        /* BRANDING */
         .brand-glow {
-            font-size: 3.5rem;
-            font-weight: 700;
+            font-size: 3.5rem; font-weight: 700;
             background: linear-gradient(135deg, #FFF, #4daafc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 0 15px rgba(77, 170, 252, 0.4));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 10px; filter: drop-shadow(0 0 15px rgba(77, 170, 252, 0.4));
             letter-spacing: -1px;
         }
+        .landing-subtitle { color: var(--gemini-secondary); font-size: 1rem; margin-bottom: 50px; letter-spacing: 1px; text-transform: uppercase; }
 
-        .landing-subtitle {
-            color: var(--gemini-secondary);
-            font-size: 1rem;
-            margin-bottom: 50px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
+        /* GRID LAYOUT */
+        .selection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; width: 90%; }
 
-        /* Grid Layout */
-        .selection-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            max-width: 900px;
-            width: 90%;
-        }
-
-        /* Card Styles */
+        /* CARD STYLES */
         .year-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            height: 150px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px; padding: 40px 20px; text-align: center; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: visible;
+            height: 160px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-
-        .year-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--gemini-primary);
-            box-shadow: var(--gemini-glow);
-            transform: translateY(-5px);
-        }
+        .year-card:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--gemini-primary); box-shadow: var(--gemini-glow); transform: translateY(-5px); }
 
         .year-title { font-size: 1.8rem; font-weight: 600; color: white; margin-bottom: 5px; }
-        .year-desc { font-size: 0.9rem; color: var(--gemini-secondary); }
+        .year-desc { font-size: 0.9rem; color: var(--gemini-secondary); margin-bottom: 15px; }
 
-        /* Semester Overlay */
+        /* SEMESTER OVERLAY */
         .semester-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #131314;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.3s ease;
-            z-index: 10;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #131314; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: 0.3s ease; z-index: 20;
+            border-radius: 20px;
         }
-
         .year-card.active .semester-overlay { opacity: 1; pointer-events: all; }
 
-        /* Buttons */
+        /* BUTTONS */
+        .sem-btn-wrapper { position: relative; width: 85%; margin: 6px 0; }
+
         .sem-btn {
-            background: transparent;
-            border: 1px solid var(--gemini-primary);
-            color: var(--gemini-primary);
-            padding: 10px 20px;
-            margin: 5px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            width: 80%;
-            transition: 0.2s;
-            text-decoration: none;
-            display: inline-block;
-            box-sizing: border-box;
-            font-size: 0.9rem;
+            background: transparent; border: 1px solid var(--gemini-primary); color: var(--gemini-primary);
+            padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: 600;
+            width: 100%; transition: 0.2s; text-decoration: none; display: flex; justify-content: space-between; align-items: center;
+            box-sizing: border-box; font-size: 0.9rem;
         }
 
-        .sem-btn:hover {
-            background: var(--gemini-primary);
-            color: black;
-            box-shadow: 0 0 15px rgba(77, 170, 252, 0.6);
-        }
+        .sem-btn:hover { background: var(--gemini-primary); color: black; box-shadow: 0 0 15px rgba(77, 170, 252, 0.6); }
 
-        .back-btn {
-            margin-top: 10px;
-            font-size: 0.8rem;
-            color: #666;
-            cursor: pointer;
-            background: none;
-            border: none;
-            text-decoration: underline;
+        /* Inactive Button */
+        .btn-inactive { border-color: #333; color: #666; cursor: not-allowed; }
+        .btn-inactive:hover { background: transparent; color: #666; box-shadow: none; border-color: #444; }
+
+        /* SVG ICONS */
+        .status-svg { width: 18px; height: 18px; }
+
+        /* TOOLTIPS */
+        .tooltip {
+            visibility: hidden; width: 220px; background-color: rgba(15, 23, 42, 0.95); color: #fff;
+            text-align: center; border-radius: 8px; padding: 10px; position: absolute; z-index: 100;
+            bottom: 115%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
+            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px); font-size: 0.8rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); pointer-events: none;
         }
+        .tooltip::after {
+            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+            border-width: 5px; border-style: solid; border-color: rgba(15, 23, 42, 0.95) transparent transparent transparent;
+        }
+        .sem-btn-wrapper:hover .tooltip { visibility: visible; opacity: 1; }
+        
+        /* Tooltip Colors */
+        .t-valid { color: var(--st-valid); font-weight: bold; }
+        .t-warn { color: var(--st-warning); font-weight: bold; }
+        .t-inactive { color: var(--st-inactive); font-weight: bold; }
+
+        .back-btn { margin-top: 10px; font-size: 0.8rem; color: #666; cursor: pointer; background: none; border: none; text-decoration: underline; }
         .back-btn:hover { color: #888; }
 
         @media (max-width: 768px) {
@@ -173,9 +138,24 @@
         <div class="year-card" id="card-but1">
             <div class="year-title">BUT 1</div>
             <div class="year-desc">Première Année</div>
+            
             <div class="semester-overlay">
-                <a href="but1-s1.html" class="sem-btn">Semestre 1</a>
-                <a href="but1-s2" class="sem-btn">Semestre 2</a>
+                <div class="sem-btn-wrapper">
+                    <a href="but1-s1.html" class="sem-btn">
+                        Semestre 1 
+                        <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-valid)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </a>
+                    <div class="tooltip">Statut : <span class="t-valid">Validé</span><br>Coefficients à jour (Officiel)</div>
+                </div>
+
+                <div class="sem-btn-wrapper">
+                    <a href="but1-s2.html" class="sem-btn">
+                        Semestre 2
+                        <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-warning)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    </a>
+                    <div class="tooltip">Statut : <span class="t-warn">Sujet à modification</span><br>Coefficients provisoires</div>
+                </div>
+
                 <button class="back-btn" onclick="resetSelection(event)">Retour</button>
             </div>
         </div>
@@ -183,9 +163,24 @@
         <div class="year-card" id="card-but2">
             <div class="year-title">BUT 2</div>
             <div class="year-desc">Deuxième Année</div>
+
             <div class="semester-overlay">
-                <a href="soon.html" class="sem-btn">Semestre 3</a>
-                <a href="soon.html" class="sem-btn">Semestre 4</a>
+                <div class="sem-btn-wrapper">
+                    <a href="soon.html" class="sem-btn btn-inactive">
+                        Semestre 3
+                        <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-inactive)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </a>
+                    <div class="tooltip">Statut : <span class="t-inactive">En Développement</span><br>Non disponible</div>
+                </div>
+
+                <div class="sem-btn-wrapper">
+                    <a href="soon.html" class="sem-btn btn-inactive">
+                        Semestre 4
+                        <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-inactive)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </a>
+                    <div class="tooltip">Statut : <span class="t-inactive">En Développement</span><br>Non disponible</div>
+                </div>
+
                 <button class="back-btn" onclick="resetSelection(event)">Retour</button>
             </div>
         </div>
@@ -193,9 +188,24 @@
         <div class="year-card" id="card-but3">
             <div class="year-title">BUT 3</div>
             <div class="year-desc">Troisième Année</div>
+
             <div class="semester-overlay">
-                <a href="soon.html" class="sem-btn">Semestre 5</a>
-                <a href="soon.html" class="sem-btn">Semestre 6</a>
+                <div class="sem-btn-wrapper">
+                    <a href="soon.html" class="sem-btn btn-inactive">
+                        Semestre 5
+                        <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-inactive)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </a>
+                    <div class="tooltip">Statut : <span class="t-inactive">En Développement</span><br>Non disponible</div>
+                </div>
+
+                <div class="sem-btn-wrapper">
+                    <a href="soon.html" class="sem-btn btn-inactive">
+                        Semestre 6
+                        <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-inactive)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </a>
+                    <div class="tooltip">Statut : <span class="t-inactive">En Développement</span><br>Non disponible</div>
+                </div>
+
                 <button class="back-btn" onclick="resetSelection(event)">Retour</button>
             </div>
         </div>
@@ -206,7 +216,7 @@
         cards.forEach(id => {
             const card = document.getElementById(id);
             card.addEventListener('click', function(e) {
-                if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') {
+                if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('.sem-btn')) {
                     cards.forEach(c => document.getElementById(c).classList.remove('active'));
                     this.classList.add('active');
                 }
@@ -218,5 +228,4 @@
         }
     </script>
 </body>
-
 </html>
