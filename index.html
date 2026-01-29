@@ -18,6 +18,11 @@
             --st-valid: #22c55e;
             --st-warning: #f59e0b;
             --st-inactive: #ef4444;
+
+            /* Neon Palette for Timeline */
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --neon-yellow: #ffea00;
         }
 
         body {
@@ -32,6 +37,34 @@
             align-items: center;
             overflow: hidden;
         }
+
+        /* --- LOADER STYLES --- */
+        .loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000000; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.4s ease;
+        }
+        .loader-active { opacity: 1; visibility: visible; }
+
+        .gemini-spinner {
+            width: 60px; height: 60px; border-radius: 50%;
+            position: relative;
+            background: conic-gradient(from 0deg, transparent 0%, #4daafc 50%, #bc13fe 100%);
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+            box-shadow: 0 0 30px rgba(77, 170, 252, 0.3);
+        }
+        .gemini-spinner::after {
+            content: ''; position: absolute; inset: 4px; background: #000; border-radius: 50%;
+        }
+        .loader-text {
+            font-size: 0.9rem; color: #fff; letter-spacing: 2px; text-transform: uppercase;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
         /* LOGO STYLES */
         .corner-logo {
@@ -119,14 +152,102 @@
         .back-btn { margin-top: 10px; font-size: 0.8rem; color: #666; cursor: pointer; background: none; border: none; text-decoration: underline; }
         .back-btn:hover { color: #888; }
 
+        /* --- FOOTER NAV STYLES --- */
+        .footer-nav {
+            position: fixed; bottom: 25px;
+            display: flex; gap: 20px; z-index: 100;
+        }
+        .footer-link {
+            color: var(--gemini-secondary);
+            text-decoration: none; font-size: 0.85rem; cursor: pointer;
+            transition: 0.3s; display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.05); padding: 10px 20px;
+            border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+        .footer-link:hover {
+            background: rgba(255,255,255,0.1); color: white;
+            border-color: var(--gemini-primary); box-shadow: 0 0 15px rgba(77, 170, 252, 0.2);
+        }
+        .footer-icon { width: 16px; height: 16px; opacity: 0.8; }
+
+        /* --- MODAL & TIMELINE STYLES --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 200; justify-content: center; align-items: center; padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .modal-card {
+            background: #131314; padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1);
+            max-width: 900px; width: 95%; position: relative; color: #cbd5e1;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow-x: hidden;
+        }
+        .modal-title { font-size: 1.5rem; color: white; margin: 0 0 30px 0; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+
+        /* HORIZONTAL TIMELINE */
+        .timeline-wrapper {
+            display: flex; gap: 40px; overflow-x: auto; padding-bottom: 20px;
+            position: relative; scrollbar-width: thin; scrollbar-color: var(--gemini-primary) #333;
+        }
+        .timeline-wrapper::-webkit-scrollbar { height: 6px; }
+        .timeline-wrapper::-webkit-scrollbar-thumb { background: var(--gemini-primary); border-radius: 3px; }
+        .timeline-wrapper::-webkit-scrollbar-track { background: #333; }
+        
+        .timeline-wrapper::before {
+            content: ''; position: absolute; top: 24px; left: 0; right: 0; height: 2px;
+            background: rgba(255,255,255,0.1); z-index: 0; width: 200%;
+        }
+
+        .t-item {
+            min-width: 170px; position: relative; text-align: center; z-index: 1;
+            display: flex; flex-direction: column; align-items: center; opacity: 0.5; transition: 0.3s;
+        }
+        .t-item:hover { opacity: 1; }
+        .t-item.done { opacity: 1; }
+        
+        .t-dot {
+            width: 12px; height: 12px; background: #131314; border: 2px solid #666; border-radius: 50%;
+            margin-bottom: 15px; position: relative; z-index: 2; transition: 0.3s;
+            margin-top: 18px;
+        }
+        
+        /* STATUS: RELEASED (Green) */
+        .t-item.done .t-dot { background: var(--st-valid); border-color: var(--st-valid); box-shadow: 0 0 15px var(--st-valid); }
+        .t-item.done .t-date { color: var(--st-valid); }
+
+        /* STATUS: BREATHING YELLOW (Active) */
+        .t-item.breathing { opacity: 1; }
+        .t-item.breathing .t-dot {
+            background: var(--neon-yellow); border-color: var(--neon-yellow);
+            animation: breathe-yellow 2s infinite;
+        }
+        .t-item.breathing .t-date { color: var(--neon-yellow); }
+
+        @keyframes breathe-yellow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 234, 0, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 234, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 234, 0, 0); }
+        }
+
+        /* FUTURE ITEMS (Neon Blue) */
+        .t-date { font-size: 0.75rem; color: var(--neon-blue); font-weight: 700; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .t-title { font-size: 0.9rem; font-weight: 600; color: white; line-height: 1.3; }
+        .t-desc { font-size: 0.75rem; color: #888; margin-top: 5px; }
+
         @media (max-width: 768px) {
             .selection-grid { grid-template-columns: 1fr; }
             .corner-logo { height: 35px; top: 15px; }
             .logo-left { left: 15px; } .logo-right { right: 15px; }
+            .footer-nav { flex-direction: column; bottom: 15px; gap: 10px; }
         }
     </style>
 </head>
 <body>
+
+    <div id="loader" class="loader-overlay">
+        <div class="gemini-spinner"></div>
+        <div class="loader-text">Initialisation MCalC+ ...</div>
+    </div>
 
     <img src="https://www.univ-tlse3.fr/medias/photo/logo-ut-site_1747041194008-png" class="corner-logo logo-left" alt="UT3">
     <img src="https://iut.univ-tlse3.fr/uas/iut/LOGO/Logo_IUT_ACT_couleurs.png" class="corner-logo logo-right" alt="IUT">
@@ -141,7 +262,7 @@
             
             <div class="semester-overlay">
                 <div class="sem-btn-wrapper">
-                    <a href="but1-s1.html" class="sem-btn">
+                    <a href="#" onclick="navigateWithLoader(event, 'but1-s1.html')" class="sem-btn">
                         Semestre 1 
                         <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-valid)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </a>
@@ -149,11 +270,11 @@
                 </div>
 
                 <div class="sem-btn-wrapper">
-                    <a href="but1-s2.html" class="sem-btn">
+                    <a href="#" onclick="navigateWithLoader(event, 'but1-s2.html')" class="sem-btn">
                         Semestre 2
                         <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-valid)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </a>
-                    <div class="tooltip">Statut : <span class="t-valid">Validé</span><br>Coefficients à jour (Officiel)</div>
+                    <div class="tooltip">Statut : <span class="t-valid">Validé</span><br>Sujet à modification</div>
                 </div>
 
                 <button class="back-btn" onclick="resetSelection(event)">Retour</button>
@@ -211,11 +332,110 @@
         </div>
     </div>
 
+    <div class="footer-nav">
+        <button class="footer-link" onclick="openModal('roadmapModal')">
+            <svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Roadmap & Changelog
+        </button>
+        <a href="mailto:alexios.elizalde-xirokosta@etu.iut-tlse3.fr" class="footer-link">
+            <svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            Signaler un bug / Aide
+        </a>
+    </div>
+
+    <div class="modal-overlay" id="roadmapModal">
+        <div class="modal-card">
+            <span onclick="closeModal('roadmapModal')" style="position:absolute; top:20px; right:20px; cursor:pointer; font-size:1.5rem;">&times;</span>
+            <div class="modal-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gemini-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                Roadmap 2026
+            </div>
+            
+            <div class="timeline-wrapper">
+                
+                <div class="t-item done">
+                    <div class="t-date">29 JAN</div>
+                    <div class="t-dot"></div>
+                    <div class="t-title">Sortie BUT 1 S2</div>
+                    <div class="t-desc">Sortie (Beta)</div>
+                </div>
+
+                <div class="t-item breathing">
+                    <div class="t-date">DÉBUT FÉV</div>
+                    <div class="t-dot"></div>
+                    <div class="t-title">Design UI/UX</div>
+                    <div class="t-desc" style="color:var(--neon-yellow);">Actuellement en développement</div>
+                </div>
+
+                <div class="t-item">
+                    <div class="t-date">FIN FÉV</div>
+                    <div class="t-dot"></div>
+                    <div class="t-title">MCalC+ 360</div>
+                    <div class="t-desc">Data Browser Module</div>
+                </div>
+
+                <div class="t-item">
+                    <div class="t-date">DÉBUT MARS</div>
+                    <div class="t-dot"></div>
+                    <div class="t-title">Sortie BUT 2</div>
+                    <div class="t-desc">Semestres S3-S4</div>
+                </div>
+
+                <div class="t-item">
+                    <div class="t-date">FIN MARS</div>
+                    <div class="t-dot"></div>
+                    <div class="t-title">Sortie BUT 3</div>
+                    <div class="t-desc">Semestres S5-S6</div>
+                </div>
+
+                <div class="t-item">
+                    <div class="t-date">DÉBUT AVRIL</div>
+                    <div class="t-dot"></div>
+                    <div class="t-title">Système Profil</div>
+                    <div class="t-desc">Save & Load Grade</div>
+                </div>
+
+                <div class="t-item">
+                    <div class="t-date">FIN AVRIL</div>
+                    <div class="t-dot"></div>
+                    <div class="t-title">Import Notes</div>
+                    <div class="t-desc">Consolidation Fichiers</div>
+                </div>
+
+                <div class="t-item">
+                    <div class="t-date">DÉBUT MAI</div>
+                    <div class="t-dot"></div>
+                    <div class="t-title">Calendrier IUT</div>
+                    <div class="t-desc">Expérimental (BUT 1)</div>
+                </div>
+
+                <div class="t-item">
+                    <div class="t-date">MI-MAI</div>
+                    <div class="t-dot"></div>
+                    <div class="t-title">Dashboard Global</div>
+                    <div class="t-desc">Vue d'ensemble</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Modal Logic
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('roadmapModal');
+            if (event.target == modal) { modal.style.display = "none"; }
+        }
+
+        // Card Selection Logic
         const cards = ['card-but1', 'card-but2', 'card-but3'];
         cards.forEach(id => {
             const card = document.getElementById(id);
             card.addEventListener('click', function(e) {
+                // Open overlay only if not clicking button/link
                 if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('.sem-btn')) {
                     cards.forEach(c => document.getElementById(c).classList.remove('active'));
                     this.classList.add('active');
@@ -225,6 +445,18 @@
         function resetSelection(e) {
             e.stopPropagation();
             cards.forEach(c => document.getElementById(c).classList.remove('active'));
+        }
+
+        // LOADER TRANSITION
+        function navigateWithLoader(event, url) {
+            event.preventDefault(); // Stop instant jump
+            const loader = document.getElementById('loader');
+            loader.classList.add('loader-active'); // Fade in loader
+            
+            // Wait 1.5s then go
+            setTimeout(() => {
+                window.location.href = url;
+            }, 1500);
         }
     </script>
 </body>
