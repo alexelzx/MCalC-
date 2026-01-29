@@ -2,22 +2,20 @@
 
 **McalC+** is a polished, web-based grade simulator specifically designed for students in the **BUT Information-Communication (Semester 1)** at **IUT Toulouse III - Paul Sabatier**. It provides a clear, three-step interface to help students project their academic performance and visualize their competence profile.
 
-> [!WARNING]
-> **🚧 DEVELOPMENT STATUS / STATUT DE DÉVELOPPEMENT**
+> > [!IMPORTANT]
+> **📅 DEPLOYMENT ROADMAP & STATUS**
 >
-> Please note that **BUT 1 (Semester 2)**, **BUT 2 (All Semesters)**, and **BUT 3 (All Semesters)** are currently in active development.
+> **Current Status:** BUT 1 (S2), BUT 2, and BUT 3 modules are currently under construction.
 >
-> **📅 PROJECT ROADMAP 2026**
->
-> * **Early February:** UI tweaks and visual improvements (animations, design).
-> * **Mid-February:** Release of **BUT 1 S2** Calculator.
-> * **Late February:** MCalC+ 360 Data Browser Module (Enhanced analytics, graphics, percentages).
-> * **Early March:** Release of **BUT 2** (S1 & S2).
-> * **Late March:** Release of **BUT 3** (S1 & S2).
-> * **Early April:** "Save & Load" Profile System (Enabling grade tracking and cross-semester comparison).
-> * **Late April:** Bulk Grade Import Consolidation (File upload support).
-> * **Early May:** *Experimental/Early Access* — Digital IUT Calendar for BUT 1.
-> * **Mid/Late May:** Global Dashboard Implementation.
+> * **Feb 2026 (Early):** UI & UX Polishing.
+> * **Feb 2026 (Mid):** **BUT 1 S2** Release.
+> * **Feb 2026 (Late):** **MCalC+ 360** (Advanced Analytics View).
+> * **Mar 2026 (Early):** **BUT 2** (S1/S2) Release.
+> * **Mar 2026 (Late):** **BUT 3** (S1/S2) Release.
+> * **Apr 2026 (Early):** Profile Save/Upload System.
+> * **Apr 2026 (Late):** Smart Grade Import (File Upload).
+> * **May 2026 (Early):** Digital IUT Calendar (Experimental).
+> * **May 2026 (Mid/Late):** Global Dashboard.
 
 ## 🚀 Key Features
 
