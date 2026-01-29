@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCalC+ | Portail Étudiant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gemini-bg: #000000;
+            --gemini-surface: #131314;
+            --gemini-primary: #4daafc;
+            --gemini-secondary: #9aa0a6;
+            --gemini-glow: 0 0 20px rgba(77, 170, 252, 0.15);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 50% 10%, #1e1f20, #000000);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* LOGO STYLES */
+        .corner-logo {
+            position: fixed;
+            top: 25px;
+            height: 45px;
+            width: auto;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 20px;
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(77, 170, 252, 0.2);
+            transition: 0.3s;
+        }
+        .corner-logo:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(77, 170, 252, 0.5); }
+        .logo-left { left: 30px; }
+        .logo-right { right: 30px; }
+
+        /* Branding */
+        .brand-glow {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #FFF, #4daafc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 0 15px rgba(77, 170, 252, 0.4));
+            letter-spacing: -1px;
+        }
+
+        .landing-subtitle {
+            color: var(--gemini-secondary);
+            font-size: 1rem;
+            margin-bottom: 50px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Grid Layout */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 900px;
+            width: 90%;
+        }
+
+        /* Card Styles */
+        .year-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .year-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--gemini-primary);
+            box-shadow: var(--gemini-glow);
+            transform: translateY(-5px);
+        }
+
+        .year-title { font-size: 1.8rem; font-weight: 600; color: white; margin-bottom: 5px; }
+        .year-desc { font-size: 0.9rem; color: var(--gemini-secondary); }
+
+        /* Semester Overlay */
+        .semester-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #131314;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s ease;
+            z-index: 10;
+        }
+
+        .year-card.active .semester-overlay { opacity: 1; pointer-events: all; }
+
+        /* Buttons */
+        .sem-btn {
+            background: transparent;
+            border: 1px solid var(--gemini-primary);
+            color: var(--gemini-primary);
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 80%;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+        }
+
+        .sem-btn:hover {
+            background: var(--gemini-primary);
+            color: black;
+            box-shadow: 0 0 15px rgba(77, 170, 252, 0.6);
+        }
+
+        .back-btn {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #666;
+            cursor: pointer;
+            background: none;
+            border: none;
+            text-decoration: underline;
+        }
+        .back-btn:hover { color: #888; }
+
+        @media (max-width: 768px) {
+            .selection-grid { grid-template-columns: 1fr; }
+            .corner-logo { height: 35px; top: 15px; }
+            .logo-left { left: 15px; } .logo-right { right: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <img src="https://www.univ-tlse3.fr/medias/photo/logo-ut-site_1747041194008-png" class="corner-logo logo-left" alt="UT3">
+    <img src="https://iut.univ-tlse3.fr/uas/iut/LOGO/Logo_IUT_ACT_couleurs.png" class="corner-logo logo-right" alt="IUT">
+
+    <div class="brand-glow">MCalC+</div>
+    <div class="landing-subtitle">SÉLECTIONNEZ VOTRE ANNÉE</div>
+    
+    <div class="selection-grid">
+        <div class="year-card" id="card-but1">
+            <div class="year-title">BUT 1</div>
+            <div class="year-desc">Première Année</div>
+            <div class="semester-overlay">
+                <a href="but1-s1.html" class="sem-btn">Semestre 1</a>
+                <a href="soon.html" class="sem-btn">Semestre 2</a>
+                <button class="back-btn" onclick="resetSelection(event)">Retour</button>
+            </div>
+        </div>
+
+        <div class="year-card" id="card-but2">
+            <div class="year-title">BUT 2</div>
+            <div class="year-desc">Deuxième Année</div>
+            <div class="semester-overlay">
+                <a href="soon.html" class="sem-btn">Semestre 3</a>
+                <a href="soon.html" class="sem-btn">Semestre 4</a>
+                <button class="back-btn" onclick="resetSelection(event)">Retour</button>
+            </div>
+        </div>
+
+        <div class="year-card" id="card-but3">
+            <div class="year-title">BUT 3</div>
+            <div class="year-desc">Troisième Année</div>
+            <div class="semester-overlay">
+                <a href="soon.html" class="sem-btn">Semestre 5</a>
+                <a href="soon.html" class="sem-btn">Semestre 6</a>
+                <button class="back-btn" onclick="resetSelection(event)">Retour</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const cards = ['card-but1', 'card-but2', 'card-but3'];
+        cards.forEach(id => {
+            const card = document.getElementById(id);
+            card.addEventListener('click', function(e) {
+                if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') {
+                    cards.forEach(c => document.getElementById(c).classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+        function resetSelection(e) {
+            e.stopPropagation();
+            cards.forEach(c => document.getElementById(c).classList.remove('active'));
+        }
+    </script>
+</body>
+</html>
