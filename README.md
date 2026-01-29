@@ -5,7 +5,8 @@
 > [!WARNING]
 > **🚧 DEVELOPMENT STATUS / STATUT DE DÉVELOPPEMENT**
 >
-> Please note that **BUT 1 (Semester 2)**, **BUT 2 (All Semesters)**, and **BUT 3 (All Semesters)** are currently in active development.
+> Please note that **BUT 2 (All Semesters)**, and **BUT 3 (All Semesters)** are currently in active development.
+> BUT 1 (S1, S2) are live. **Please note that S2 calculations and multiplicators (coefficients) are subject to change. A notice will be posted**
 >
 > **📅 PROJECT ROADMAP 2026**
 >
