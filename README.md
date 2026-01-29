@@ -1,6 +1,6 @@
 # MCalC+ | Simulateur de Résultats BUT Info-Com
 
-**McalC+** is a polished, web-based grade simulator specifically designed for students in the **BUT Information-Communication (Semester 1)** at **IUT Toulouse III - Paul Sabatier**. It provides a clear, three-step interface to help students project their academic performance and visualize their competence profile.
+**McalC+** is a polished, web-based grade simulator specifically designed for students in the **BUT Information-Communication** at **IUT Toulouse III - Paul Sabatier**. It provides a clear, three-step interface to help students project their academic performance and visualize their competence profile.
 
 > [!WARNING]
 > **🚧 DEVELOPMENT STATUS / STATUT DE DÉVELOPPEMENT**
