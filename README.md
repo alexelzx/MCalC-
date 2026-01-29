@@ -21,6 +21,7 @@ This tool is designed as a "Portable Web App." No installation or server is requ
 ## 🖥️ System Requirements
 
 * **Device:** **PC/Desktop highly recommended.** * **Note:** The visualization and PDF generation features are optimized for larger screens. Using this tool on a smartphone may result in display bugs or layout issues.
+* **Direct use:** You can access https://alexelzx.github.io/MCalC-/index.html and directly use the app, on the web. ****PC Recommended.**
 
 ## 📊 Logic & Calculation
 
