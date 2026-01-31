@@ -6,14 +6,12 @@
 > **Status:** 🔒 SmartST (Closed Alpha) | ✅ Calculator (Public Beta)
 
 ## 🚧 DEVELOPMENT STATUS / STATUT
-* **SmartST OS (Dashboard & Calendar):** **Closed Alpha**. Requires an access key to enter.
-* **Calculator (BUT 1):** **Live**. S1 & S2 coefficients are active.
-* **Calculator (BUT 2 & 3):** **In Development**. Modules are being integrated.
+* 🔒 **SmartST OS (Dashboard & Calendar):** **Closed Alpha**. Requires an access key to enter.
+* ✅ **Calculator (BUT 1, BUT 2, BUT 3):** **Live**. S1 & S2 coefficients are active.
 
 ## 📅 PROJECT ROADMAP 2026
 * **Jan 2026:** Launch of MCalC+ Base (Calculator).
 * **Early Feb:** Release of **SmartST** (Student OS) & **Smart Calendar**. *(*Only for BUT 1 C1 and C2*)
-* **Early/Mid-Feb** Expansion of Calculator support to BUT 2 & BUT 3.
 * **Early March:** New features to the SmartST system and global redesign. Possibility to switch between dark/white theme.
 * **May:** Mobile Native PWA & Global Dashboard.
 
