@@ -55,9 +55,7 @@ $$Moyenne = \frac{\sum (Note \times Coefficient)}{\sum Coefficient}$$
 * **Fonts:** Plus Jakarta Sans via Google Fonts.
 
 ## Walkthrough
-
-https://github.com/user-attachments/assets/f895e66e-ce4a-400f-9160-423a6a8531f8
-
+https://github.com/user-attachments/assets/185e459e-5c52-4a3a-bbcc-a6fa3bf7a317
 
 
 ## ⚖️ Disclaimer
