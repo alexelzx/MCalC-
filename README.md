@@ -20,7 +20,7 @@
 ---
 
 ## 🚀 NEW: SmartST Ecosystem (Cloud)
-*Powered by Google Firebase & Cloudflare*
+*Powered by Google Firebase & Google Cloud*
 
 ### 1. Smart Calendar (Live Schedule)
 * **IUT Rhythm:** A specialized grid adapted to the 4-block daily structure (09h00 - 18h00).
