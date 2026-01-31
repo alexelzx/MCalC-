@@ -59,6 +59,9 @@ The project has shifted to a **Serverless JAMstack** architecture.
 🔗 **Official Deployment:** [https://alexelzx.github.io/MCalC-/index.html](https://alexelzx.github.io/MCalC-/index.html)  
 *(Note: SmartST features require an Alpha Key).*
 
+## Quick Preview
+https://github.com/user-attachments/assets/8b20eb6f-cf21-4703-9275-07213d6f4498
+
 ## ⚖️ Disclaimer
 **Unofficial Tool.** This project is not affiliated with IUT Paul Sabatier or Université Toulouse III. It is a student-led initiative for simulation and organization purposes. Official grades and schedules are provided exclusively by the IUT administration.
 
