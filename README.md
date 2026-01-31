@@ -66,4 +66,7 @@ https://github.com/user-attachments/assets/8b20eb6f-cf21-4703-9275-07213d6f4498
 **Unofficial Tool.** This project is not affiliated with IUT Paul Sabatier or Université Toulouse III. It is a student-led initiative for simulation and organization purposes. Official grades and schedules are provided exclusively by the IUT administration.
 
 ## 👤 Author
-**Alexios ELIZALDE XIROKOSTA** *CEO, EFPRP | Representative at the IUT Council (2026-2028)* *BUT Info-Com Student | IUT Paul Sabatier* 📧 Contact: `alexios.elizalde-xirokosta@etu.iut-tlse3.fr`
+**Alexios ELIZALDE XIROKOSTA** 
+* *CEO, EFPRP | Representative at the IUT Council (2026-2028)* 
+* **BUT Info-Com Student | IUT Paul Sabatier**
+* 📧 Contact: `alexios.elizalde-xirokosta@etu.iut-tlse3.fr`
