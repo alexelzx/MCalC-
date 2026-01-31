@@ -19,12 +19,12 @@
             --gemini-green: #10b981;
             --gemini-red: #f43f5e;
             --gemini-gold: #fbbf24;
+            --gemini-yellow: #ffe600;
             --gemini-orange: #f97316;
+            --gemini-pink: #d946ef;
             
             --text-main: #f8fafc;
             --text-mute: #94a3b8;
-            
-            --glow-hover: 0 0 40px rgba(59, 130, 246, 0.15);
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -55,9 +55,9 @@
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        /* --- LOGOS (RESIZED) --- */
+        /* --- LOGOS --- */
         .corner-logo {
-            position: fixed; top: 30px; height: 70px; width: auto; z-index: 100; /* Increased Height */
+            position: fixed; top: 30px; height: 70px; width: auto; z-index: 100;
             background: rgba(255, 255, 255, 0.95); padding: 10px 25px; border-radius: 50px;
             box-shadow: 0 0 25px rgba(0,0,0,0.5); transition: 0.3s;
         }
@@ -87,7 +87,7 @@
             content: ''; position: absolute; inset: 0; opacity: 0; transition: 0.4s;
             background: radial-gradient(circle at center, rgba(34, 211, 238, 0.1), transparent 70%);
         }
-        .portal-card:hover { transform: translateY(-10px); border-color: rgba(255,255,255,0.3); box-shadow: var(--glow-hover); }
+        .portal-card:hover { transform: translateY(-10px); border-color: rgba(255,255,255,0.3); box-shadow: 0 0 40px rgba(59, 130, 246, 0.15); }
         .portal-card:hover::before { opacity: 1; }
 
         .p-icon { width: 60px; height: 60px; margin-bottom: 25px; color: var(--text-main); transition: 0.3s; }
@@ -105,7 +105,6 @@
 
         /* --- CALCULATOR VIEW --- */
         #calc-view { display: none; width: 90%; max-width: 1000px; animation: slideUp 0.5s ease-out; text-align: center; }
-        
         .selection-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
         
         .year-card {
@@ -114,10 +113,8 @@
             display: flex; flex-direction: column; align-items: center;
         }
         .year-card:hover { border-color: var(--gemini-cyan); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
         .year-head { font-size: 2rem; font-weight: 800; color: white; margin-bottom: 5px; }
         .year-sub { color: var(--text-mute); font-size: 0.9rem; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; }
-        
         .btn-wrapper { width: 100%; display: flex; flex-direction: column; gap: 12px; justify-content: center; }
 
         .sem-btn {
@@ -141,9 +138,7 @@
         .back-link:hover { color: white; }
 
         /* --- FOOTER --- */
-        .footer-nav {
-            position: fixed; bottom: 30px; display: flex; gap: 20px; z-index: 10;
-        }
+        .footer-nav { position: fixed; bottom: 30px; display: flex; gap: 20px; z-index: 10; }
         .f-link {
             background: rgba(255,255,255,0.03); border: var(--border-glass); padding: 10px 20px;
             border-radius: 30px; color: var(--text-mute); font-size: 0.8rem; font-weight: 600;
@@ -163,59 +158,104 @@
         /* ALPHA ACCESS MODAL */
         .alpha-title { color: var(--gemini-gold); margin: 0 0 10px 0; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
         .alpha-desc { color: var(--text-mute); font-size: 0.9rem; line-height: 1.6; margin-bottom: 25px; }
-        
         .alpha-input {
             width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
             border-radius: 12px; color: white; font-size: 1.5rem; letter-spacing: 5px; text-align: center;
             margin-bottom: 20px; text-transform: uppercase; transition: 0.3s;
         }
         .alpha-input:focus { border-color: var(--gemini-gold); box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
-        
         .alpha-btn {
             width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 1rem; font-weight: 800;
             background: var(--gemini-gold); color: black; cursor: pointer; transition: 0.2s;
         }
         .alpha-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(251, 191, 36, 0.4); }
-
         .alpha-error { border-color: var(--gemini-red) !important; animation: shake 0.3s; }
         .alpha-success { border-color: var(--gemini-green) !important; box-shadow: 0 0 30px rgba(16, 185, 129, 0.4) !important; }
 
-        /* ROADMAP MODAL */
+        /* --- ADVANCED ROADMAP STYLES --- */
         .modal-roadmap { max-width: 900px; width: 95%; align-items: flex-start; text-align: left; }
         
-        /* HORIZONTAL TIMELINE */
         .timeline-container {
-            width: 100%; overflow-x: auto; padding: 20px 0; display: flex; position: relative;
+            width: 100%; overflow-x: auto; padding: 40px 0; display: flex; position: relative;
             scrollbar-width: thin; scrollbar-color: var(--gemini-blue) rgba(255,255,255,0.05);
         }
         .timeline-line {
-            position: absolute; top: 48px; left: 0; width: 100%; height: 2px; 
-            background: rgba(255,255,255,0.1); z-index: 0; min-width: 800px;
+            position: absolute; top: 68px; left: 0; height: 2px; 
+            background: rgba(255,255,255,0.1); z-index: 0;
+            /* Width set dynamically by JS */
         }
         .t-item {
-            min-width: 180px; position: relative; z-index: 1; text-align: center;
-            display: flex; flex-direction: column; align-items: center; opacity: 0.6; transition: 0.3s;
+            min-width: 220px; position: relative; z-index: 1; text-align: center;
+            display: flex; flex-direction: column; align-items: center; opacity: 0.5; transition: 0.3s; cursor: pointer;
         }
-        .t-item:hover, .t-item.active { opacity: 1; }
+        .t-item:hover, .t-item.active { opacity: 1; transform: translateY(-5px); }
         
-        .t-date { font-size: 0.75rem; font-weight: 800; margin-bottom: 10px; color: var(--text-mute); }
-        .t-dot { 
-            width: 16px; height: 16px; border-radius: 50%; background: #0f1218; 
-            border: 3px solid var(--text-mute); margin-bottom: 15px; box-shadow: 0 0 0 5px #0f1218;
+        .t-date { font-size: 0.75rem; font-weight: 800; margin-bottom: 10px; color: var(--text-mute); letter-spacing: 1px; }
+        
+        .t-dot-outer {
+            width: 30px; height: 30px; border-radius: 50%; background: #0f1218; 
+            border: 2px solid var(--text-mute); margin-bottom: 15px; display: flex; justify-content: center; align-items: center;
+            transition: 0.3s;
         }
-        .t-title { font-size: 0.95rem; font-weight: 700; color: white; margin-bottom: 5px; }
-        .t-desc { font-size: 0.8rem; color: var(--text-mute); }
+        .t-dot-inner { width: 10px; height: 10px; border-radius: 50%; background: var(--text-mute); transition: 0.3s; }
+        
+        .t-title { font-size: 1rem; font-weight: 700; color: white; margin-bottom: 5px; }
+        .t-desc { font-size: 0.8rem; color: var(--text-mute); max-width: 180px; line-height: 1.4; }
 
-        /* Roadmap States */
-        .t-item.done .t-dot { border-color: var(--gemini-green); background: var(--gemini-green); box-shadow: 0 0 15px var(--gemini-green); }
-        .t-item.done .t-date { color: var(--gemini-green); }
+        /* --- ROADMAP STATES (ALWAYS ON GLOW) --- */
         
-        .t-item.test .t-dot { border-color: var(--gemini-orange); background: var(--gemini-orange); }
-        .t-item.test .t-date { color: var(--gemini-orange); }
-        
-        .t-item.dev .t-dot { border-color: var(--gemini-gold); background: var(--gemini-gold); animation: breathe 2s infinite; }
-        .t-item.dev .t-date { color: var(--gemini-gold); }
-        @keyframes breathe { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
+        /* DONE: Strong Neon Green */
+        .t-item.done { opacity: 1 !important; }
+        .t-item.done .t-dot-outer { border-color: #00ff88; box-shadow: 0 0 25px rgba(0, 255, 136, 0.6); }
+        .t-item.done .t-dot-inner { background: #00ff88; box-shadow: 0 0 10px #00ff88; }
+        .t-item.done .t-date { color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
+
+        /* DEV: Breathing Yellow (En Cours) */
+        .t-item.dev { opacity: 1 !important; }
+        .t-item.dev .t-dot-outer { border-color: var(--gemini-yellow); animation: pulse-yellow 2s infinite; }
+        .t-item.dev .t-dot-inner { background: var(--gemini-yellow); box-shadow: 0 0 15px var(--gemini-yellow); }
+        .t-item.dev .t-date { color: var(--gemini-yellow); text-shadow: 0 0 10px rgba(255, 230, 0, 0.3); }
+
+        /* TEST R: Neon Orange */
+        .t-item.test-r { opacity: 1 !important; }
+        .t-item.test-r .t-dot-outer { border-color: var(--gemini-orange); box-shadow: 0 0 25px rgba(249, 115, 22, 0.6); }
+        .t-item.test-r .t-dot-inner { background: var(--gemini-orange); box-shadow: 0 0 10px var(--gemini-orange); }
+        .t-item.test-r .t-date { color: var(--gemini-orange); text-shadow: 0 0 10px rgba(249, 115, 22, 0.3); }
+
+        /* TEST P: Neon Pink */
+        .t-item.test-p { opacity: 1 !important; }
+        .t-item.test-p .t-dot-outer { border-color: var(--gemini-pink); box-shadow: 0 0 25px rgba(217, 70, 239, 0.6); }
+        .t-item.test-p .t-dot-inner { background: var(--gemini-pink); box-shadow: 0 0 10px var(--gemini-pink); }
+        .t-item.test-p .t-date { color: var(--gemini-pink); text-shadow: 0 0 10px rgba(217, 70, 239, 0.3); }
+
+        /* PLAN: Grey/Ghost (Planned) */
+        .t-item.plan { opacity: 0.5; } /* Keeps it dim */
+        .t-item.plan .t-dot-outer { border-color: #64748b; }
+        .t-item.plan .t-dot-inner { background: #64748b; }
+        .t-item.plan .t-date { color: #94a3b8; }
+
+        /* ANNULEE: Red Strikethrough */
+        .t-item.annulee { opacity: 0.6 !important; }
+        .t-item.annulee .t-dot-outer { border-color: var(--gemini-red); }
+        .t-item.annulee .t-dot-inner { background: var(--gemini-red); }
+        .t-item.annulee .t-date { color: var(--gemini-red); text-decoration: line-through; }
+        .t-item.annulee .t-title { text-decoration: line-through; color: #ef4444; }
+
+        @keyframes pulse-yellow { 
+            0% { box-shadow: 0 0 0 0 rgba(255, 230, 0, 0.7); } 
+            70% { box-shadow: 0 0 0 15px rgba(255, 230, 0, 0); } 
+            100% { box-shadow: 0 0 0 0 rgba(255, 230, 0, 0); } 
+        }
+
+        /* ADMIN PANEL */
+        #adminRoadmapPanel {
+            display: none; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; border: 1px solid var(--gemini-red);
+            margin-top: 20px; width: 100%;
+        }
+        .admin-input { width: 100%; padding: 8px; margin-bottom: 10px; background: #0f1218; border: 1px solid #333; color: white; border-radius: 6px; }
+        .admin-btn { padding: 8px 15px; cursor: pointer; border-radius: 6px; border: none; font-weight: bold; margin-right: 10px; }
+        .btn-add { background: var(--gemini-green); color: black; }
+        .btn-del { background: var(--gemini-red); color: white; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
@@ -226,7 +266,7 @@
             #main-menu { flex-direction: column; }
             .portal-card { min-height: 200px; padding: 30px; }
             .brand-title { font-size: 3rem; }
-            .corner-logo { height: 50px; top: 20px; padding: 8px 15px; } /* Mobile adjust */
+            .corner-logo { height: 50px; top: 20px; padding: 8px 15px; } 
             .logo-left { left: 20px; } .logo-right { right: 20px; }
         }
     </style>
@@ -333,7 +373,7 @@
     </div>
 
     <div class="footer-nav">
-        <button class="f-link" onclick="document.getElementById('roadmapModal').style.display='flex'">
+        <button class="f-link" onclick="openRoadmap()">
             <svg class="icon" style="width:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
             Roadmap
         </button>
@@ -361,116 +401,223 @@
     <div class="modal-overlay" id="roadmapModal" onclick="closeModal('roadmapModal')">
         <div class="modal-box modal-roadmap" onclick="event.stopPropagation()">
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:10px;">
-                <h2 style="margin:0; font-size:1.5rem; color:white;">Roadmap 2026 (v. 2.4.1)</h2>
+                <h2 id="roadmapTitle" style="margin:0; font-size:1.5rem; color:white; cursor:default;" onclick="triggerAdminMode()">Roadmap 2026 (v. 2.4.1)</h2>
                 <span onclick="closeModal('roadmapModal')" style="cursor:pointer; font-size:1.5rem; color:#666;">&times;</span>
             </div>
             
-            <div class="timeline-container">
+            <div class="timeline-container" id="timelineContainer">
                 <div class="timeline-line"></div>
-                
-                <div class="t-item done">
-                    <div class="t-date">JANVIER 2026</div>
-                    <div class="t-dot"></div>
-                    <div class="t-title">Lancement</div>
-                    <div class="t-desc">MCalC+ BUT1</div>
                 </div>
 
-                <div class="t-item test">
-                    <div class="t-date">FÉVRIER 2026</div>
-                    <div class="t-dot"></div>
-                    <div class="t-title">SmartST</div>
-                    <div class="t-desc">Alpha Test (C1/C2)</div>
-                </div>
+            <div id="detailBox" style="display:none; width:100%; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-top:15px; animation:fadeIn 0.3s;">
+                <h3 id="dTitle" style="margin:0; color:white;"></h3>
+                <p id="dDesc" style="color:#aaa; font-size:0.9rem;"></p>
+                <div id="dMeta" style="font-size:0.8rem; color:#666; margin-top:5px;"></div>
+            </div>
 
-                <div class="t-item dev">
-                    <div class="t-date">MARS 2026</div>
-                    <div class="t-dot"></div>
-                    <div class="t-title">Modules</div>
-                    <div class="t-desc">Assiduité Avancée</div>
-                </div>
-
-                <div class="t-item">
-                    <div class="t-date">AVRIL 2026</div>
-                    <div class="t-dot"></div>
-                    <div class="t-title">Expansion</div>
-                    <div class="t-desc">BUT 2 & 3</div>
-                </div>
-
-                <div class="t-item">
-                    <div class="t-date">MAI 2026</div>
-                    <div class="t-dot"></div>
-                    <div class="t-title">Mobile App</div>
-                    <div class="t-desc">PWA Native</div>
-                </div>
+            <div id="adminRoadmapPanel">
+                <h4 style="color:var(--gemini-red); margin-top:0;">ADMINISTRATION</h4>
+                <input type="text" id="newDate" class="admin-input" placeholder="Date (ex: MARS 2026)">
+                <input type="text" id="newTitle" class="admin-input" placeholder="Titre (ex: Mobile App)">
+                <input type="text" id="newDesc" class="admin-input" placeholder="Description">
+                <select id="newStatus" class="admin-input">
+                    <option value="done">Terminé (Vert Neon)</option>
+                    <option value="dev">En Cours (Jaune Pulse)</option>
+                    <option value="test-r">Phase de Test R (Restreint)</option>
+                    <option value="test-p">Phase de Test P (Publique)</option>
+                    <option value="plan">Prévu (Gris)</option>
+                    <option value="annulee">Annulée (Rouge)</option>
+                </select>
+                <button class="admin-btn btn-add" onclick="addRoadmapItem()">AJOUTER</button>
+                <button class="admin-btn btn-del" onclick="deleteSelectedItem()">SUPPRIMER SÉLECTION</button>
             </div>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // 1. FIREBASE SETUP
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, doc, deleteDoc, query, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
+            authDomain: "smartst-os.firebaseapp.com",
+            projectId: "smartst-os",
+            storageBucket: "smartst-os.firebasestorage.app",
+            messagingSenderId: "866980185011",
+            appId: "1:866980185011:web:03006fe6a81634d5dec1c6",
+            measurementId: "G-556P9P719R"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // STATE
+        let roadmapData = [];
+        let clickCount = 0;
+        let selectedItemId = null;
+
+        // INIT
         window.onload = function() {
-            setTimeout(() => {
-                document.getElementById('loader').classList.add('hidden');
-            }, 800);
+            setTimeout(() => document.getElementById('loader').classList.add('hidden'), 800);
+        }
+
+        // --- ROADMAP LOGIC ---
+        window.openRoadmap = async function() {
+            document.getElementById('roadmapModal').style.display = 'flex';
+            await loadRoadmap();
+        }
+
+        async function loadRoadmap() {
+            const container = document.getElementById('timelineContainer');
+            // Reset but keep line
+            container.innerHTML = '<div class="timeline-line"></div>';
+            
+            roadmapData = [];
+            const q = query(collection(db, "roadmap"), orderBy("order", "asc"));
+            
+            try {
+                const snapshot = await getDocs(q);
+                
+                if (snapshot.empty) {
+                    await createDefaultRoadmap(); 
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    roadmapData.push({ id: doc.id, ...data });
+                    renderItem(doc.id, data, container);
+                });
+
+                // DYNAMIC LINE WIDTH CALCULATION
+                // We ensure the line stretches to cover all items
+                setTimeout(() => {
+                    const scrollW = container.scrollWidth;
+                    container.querySelector('.timeline-line').style.width = scrollW + 'px';
+                }, 100);
+
+            } catch(e) { console.error("Firebase Error:", e); }
+        }
+
+        function renderItem(id, data, container) {
+            const el = document.createElement('div');
+            el.className = `t-item ${data.status}`;
+            el.onclick = () => selectItem(id, data);
+            el.innerHTML = `
+                <div class="t-date">${data.date}</div>
+                <div class="t-dot-outer"><div class="t-dot-inner"></div></div>
+                <div class="t-title">${data.title}</div>
+                <div class="t-desc">${data.desc}</div>
+            `;
+            container.appendChild(el);
+        }
+
+        function selectItem(id, data) {
+            selectedItemId = id;
+            document.querySelectorAll('.t-item').forEach(i => i.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            const box = document.getElementById('detailBox');
+            box.style.display = 'block';
+            document.getElementById('dTitle').innerText = data.title;
+            document.getElementById('dDesc').innerText = data.desc;
+            
+            let statusBadge = '';
+            if(data.status === 'done') statusBadge = '<span style="color:#00ff88; font-weight:700;">COMPLÉTÉ</span>';
+            else if(data.status === 'dev') statusBadge = '<span style="color:#ffe600; font-weight:700;">EN COURS</span>';
+            else if(data.status === 'test-r') statusBadge = '<span style="color:#f97316; font-weight:700;">TEST RESTREINT</span>';
+            else if(data.status === 'test-p') statusBadge = '<span style="color:#d946ef; font-weight:700;">TEST PUBLIQUE</span>';
+            else if(data.status === 'annulee') statusBadge = '<span style="color:#ef4444; font-weight:700;">ANNULÉE</span>';
+            else statusBadge = '<span style="color:#94a3b8; font-weight:700;">PRÉVU</span>';
+            
+            document.getElementById('dMeta').innerHTML = `${data.date} • ${statusBadge}`;
+        }
+
+        // --- AUTO-SEEDER ---
+        async function createDefaultRoadmap() {
+            const batch = writeBatch(db);
+            const defaults = [
+                { date: "JAN 2026", title: "Lancement", desc: "MCalC+ BUT1 et Calculateur de base.", status: "done", order: 1 },
+                { date: "FÉV 2026", title: "SmartST", desc: "Alpha Test (C1/C2), Calendrier Live.", status: "done", order: 2 },
+                { date: "MARS 2026", title: "Expansion", desc: "Intégration BUT2 & BUT3, Gestion Absences.", status: "dev", order: 3 },
+                { date: "AVRIL 2026", title: "Cloud Sync", desc: "Sauvegarde profil & Synchronisation.", status: "plan", order: 4 },
+                { date: "MAI 2026", title: "Mobile App", desc: "PWA Native iOS/Android.", status: "plan", order: 5 }
+            ];
+            defaults.forEach(item => {
+                const docRef = doc(collection(db, "roadmap"));
+                batch.set(docRef, item);
+            });
+            await batch.commit();
+            await loadRoadmap();
+        }
+
+        // --- ADMIN FUNCTIONS ---
+        window.triggerAdminMode = function() {
+            clickCount++;
+            if(clickCount === 3) {
+                const pass = prompt("Admin Key:");
+                if(pass === 'nodata') {
+                    document.getElementById('adminRoadmapPanel').style.display = 'block';
+                    document.getElementById('roadmapTitle').style.color = 'var(--gemini-red)';
+                    alert("Mode Édition Activé");
+                }
+                clickCount = 0;
+            }
+        }
+
+        window.addRoadmapItem = async function() {
+            const data = {
+                date: document.getElementById('newDate').value,
+                title: document.getElementById('newTitle').value,
+                desc: document.getElementById('newDesc').value,
+                status: document.getElementById('newStatus').value,
+                order: Date.now()
+            };
+            await addDoc(collection(db, "roadmap"), data);
+            document.getElementById('newDate').value = "";
+            document.getElementById('newTitle').value = "";
+            document.getElementById('newDesc').value = "";
+            loadRoadmap();
+        }
+
+        window.deleteSelectedItem = async function() {
+            if(selectedItemId && confirm("Supprimer cet élément ?")) {
+                await deleteDoc(doc(db, "roadmap", selectedItemId));
+                document.getElementById('detailBox').style.display = 'none';
+                loadRoadmap();
+            }
         }
 
         // --- NAVIGATION ---
-        function openAlphaModal() {
-            openModal('alphaModal');
+        window.openAlphaModal = function() {
+            document.getElementById('alphaModal').style.display = 'flex';
             document.getElementById('alphaCode').focus();
         }
-
-        function closeAlpha() {
-            closeModal('alphaModal');
-            const inp = document.getElementById('alphaCode');
-            inp.value = ''; inp.classList.remove('alpha-error', 'alpha-success');
+        window.closeAlpha = function() {
+            document.getElementById('alphaModal').style.display = 'none';
+            document.getElementById('alphaCode').value = '';
+            document.getElementById('alphaCode').classList.remove('alpha-error', 'alpha-success');
         }
-
-        function checkAlpha() {
+        window.checkAlpha = function() {
             const input = document.getElementById('alphaCode');
-            const code = input.value.trim().toUpperCase();
-            
-            if(code === 'AEX516') {
-                input.classList.remove('alpha-error');
-                input.classList.add('alpha-success');
-                setTimeout(() => {
-                    navTo('smartst.html');
-                }, 800);
+            if(input.value.trim().toUpperCase() === 'AEX516') {
+                input.classList.remove('alpha-error'); input.classList.add('alpha-success');
+                setTimeout(() => navTo('smartst.html'), 800);
             } else {
                 input.classList.add('alpha-error');
                 setTimeout(() => input.classList.remove('alpha-error'), 300);
             }
         }
-
-        document.getElementById('alphaCode').addEventListener('keydown', function(e) {
-            if(e.key === 'Enter') checkAlpha();
-        });
-
-        function showCalculator() {
-            document.getElementById('main-menu').style.display = 'none';
-            document.getElementById('calc-view').style.display = 'block';
-        }
-
-        function hideCalculator() {
-            document.getElementById('calc-view').style.display = 'none';
-            document.getElementById('main-menu').style.display = 'flex';
-        }
-
-        function navTo(url) {
-            const l = document.getElementById('loader');
-            l.classList.remove('hidden');
+        window.showCalculator = function() { document.getElementById('main-menu').style.display='none'; document.getElementById('calc-view').style.display='block'; }
+        window.hideCalculator = function() { document.getElementById('calc-view').style.display='none'; document.getElementById('main-menu').style.display='flex'; }
+        window.navTo = function(url) {
+            document.getElementById('loader').classList.remove('hidden');
             setTimeout(() => window.location.href = url, 800);
         }
-
-        // --- MODAL UTILS ---
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        window.onclick = function(e) {
-            if (e.target.classList.contains('modal-overlay')) {
-                e.target.style.display = 'none';
-                if(e.target.id === 'alphaModal') closeAlpha();
-            }
-        }
+        window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
+        window.onclick = function(e) { if(e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; }
+        document.getElementById('alphaCode').addEventListener('keydown', (e) => { if(e.key==='Enter') checkAlpha(); });
     </script>
 </body>
 </html>
