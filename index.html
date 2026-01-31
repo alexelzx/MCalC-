@@ -4,468 +4,473 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MCalC+ | Portail Étudiant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --gemini-bg: #000000;
-            --gemini-surface: #131314;
-            --gemini-primary: #4daafc;
-            --gemini-secondary: #9aa0a6;
-            --gemini-glow: 0 0 20px rgba(77, 170, 252, 0.15);
+            /* GEMINI LIQUID PALETTE */
+            --bg-deep: #02040a;
+            --surface-glass: rgba(20, 24, 30, 0.7);
+            --border-glass: 1px solid rgba(56, 189, 248, 0.15);
             
-            /* Status Colors */
-            --st-valid: #22c55e;
-            --st-warning: #f59e0b;
-            --st-inactive: #ef4444;
-
-            /* Neon Palette for Timeline */
-            --neon-blue: #00f3ff;
-            --neon-purple: #bc13fe;
-            --neon-yellow: #ffea00;
+            --gemini-cyan: #22d3ee;
+            --gemini-blue: #3b82f6;
+            --gemini-purple: #a855f7;
+            --gemini-green: #10b981;
+            --gemini-red: #f43f5e;
+            --gemini-gold: #fbbf24;
+            --gemini-orange: #f97316;
+            
+            --text-main: #f8fafc;
+            --text-mute: #94a3b8;
+            
+            --glow-hover: 0 0 40px rgba(59, 130, 246, 0.15);
         }
 
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
         body {
-            margin: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: radial-gradient(circle at 50% 10%, #1e1f20, #000000);
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+            margin: 0; font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at 50% -20%, #0f172a 0%, #02040a 80%);
+            color: var(--text-main); min-height: 100vh; overflow-x: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* --- LOADER STYLES --- */
-        .loader-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000; z-index: 9999;
+        /* --- LOADER --- */
+        #loader {
+            position: fixed; inset: 0; background: #02040a; z-index: 10000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; transition: opacity 0.4s ease;
+            transition: opacity 0.4s ease;
         }
-        .loader-active { opacity: 1; visibility: visible; }
-
+        #loader.hidden { opacity: 0; pointer-events: none; }
+        
         .gemini-spinner {
             width: 60px; height: 60px; border-radius: 50%;
-            position: relative;
-            background: conic-gradient(from 0deg, transparent 0%, #4daafc 50%, #bc13fe 100%);
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-            box-shadow: 0 0 30px rgba(77, 170, 252, 0.3);
+            background: conic-gradient(from 0deg, transparent 0%, var(--gemini-cyan) 50%, var(--gemini-purple) 100%);
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+            box-shadow: 0 0 30px rgba(34, 211, 238, 0.2); position: relative;
         }
-        .gemini-spinner::after {
-            content: ''; position: absolute; inset: 4px; background: #000; border-radius: 50%;
-        }
-        .loader-text {
-            font-size: 0.9rem; color: #fff; letter-spacing: 2px; text-transform: uppercase;
-            animation: pulse 1.5s infinite;
-        }
-
+        .gemini-spinner::after { content: ''; position: absolute; inset: 4px; background: #02040a; border-radius: 50%; }
+        .loader-text { font-size: 0.9rem; letter-spacing: 4px; color: white; font-weight: 700; animation: pulse 1.5s infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        /* LOGO STYLES */
+        /* --- LOGOS (RESIZED) --- */
         .corner-logo {
-            position: fixed; top: 25px; height: 45px; width: auto; z-index: 100;
-            background: rgba(255, 255, 255, 0.95); padding: 8px 20px; border-radius: 50px;
-            box-shadow: 0 0 15px rgba(77, 170, 252, 0.2); transition: 0.3s;
+            position: fixed; top: 30px; height: 70px; width: auto; z-index: 100; /* Increased Height */
+            background: rgba(255, 255, 255, 0.95); padding: 10px 25px; border-radius: 50px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.5); transition: 0.3s;
         }
-        .corner-logo:hover { transform: scale(1.05); box-shadow: 0 0 25px rgba(77, 170, 252, 0.5); }
-        .logo-left { left: 30px; }
-        .logo-right { right: 30px; }
+        .corner-logo:hover { transform: scale(1.05); box-shadow: 0 0 35px rgba(255,255,255,0.2); }
+        .logo-left { left: 40px; } .logo-right { right: 40px; }
 
-        /* BRANDING */
-        .brand-glow {
-            font-size: 3.5rem; font-weight: 700;
-            background: linear-gradient(135deg, #FFF, #4daafc);
+        /* --- BRANDING --- */
+        .brand-container { text-align: center; margin-bottom: 50px; animation: slideDown 0.8s ease-out; }
+        .brand-title {
+            font-size: 4rem; font-weight: 800; letter-spacing: -2px; margin: 0;
+            background: linear-gradient(135deg, #fff 0%, var(--gemini-cyan) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 10px; filter: drop-shadow(0 0 15px rgba(77, 170, 252, 0.4));
-            letter-spacing: -1px;
+            text-shadow: 0 0 40px rgba(34, 211, 238, 0.2);
         }
-        .landing-subtitle { color: var(--gemini-secondary); font-size: 1rem; margin-bottom: 50px; letter-spacing: 1px; text-transform: uppercase; }
+        .brand-sub { font-size: 1rem; color: var(--text-mute); letter-spacing: 4px; text-transform: uppercase; font-weight: 600; margin-top: 10px; }
 
-        /* GRID LAYOUT */
-        .selection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; width: 90%; }
+        /* --- MAIN MENU --- */
+        #main-menu { display: flex; gap: 30px; max-width: 900px; width: 90%; animation: fadeIn 1s ease-out; }
+        
+        .portal-card {
+            flex: 1; background: var(--surface-glass); border: var(--border-glass); border-radius: 24px;
+            padding: 40px 30px; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative; overflow: hidden; backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; align-items: center; text-align: center; min-height: 320px;
+        }
+        .portal-card::before {
+            content: ''; position: absolute; inset: 0; opacity: 0; transition: 0.4s;
+            background: radial-gradient(circle at center, rgba(34, 211, 238, 0.1), transparent 70%);
+        }
+        .portal-card:hover { transform: translateY(-10px); border-color: rgba(255,255,255,0.3); box-shadow: var(--glow-hover); }
+        .portal-card:hover::before { opacity: 1; }
 
-        /* CARD STYLES */
+        .p-icon { width: 60px; height: 60px; margin-bottom: 25px; color: var(--text-main); transition: 0.3s; }
+        .portal-card:hover .p-icon { transform: scale(1.1); }
+        
+        .p-title { font-size: 1.8rem; font-weight: 800; color: white; margin-bottom: 10px; letter-spacing: -0.5px; }
+        .p-desc { font-size: 0.95rem; color: var(--text-mute); line-height: 1.6; }
+        
+        .badge-alpha {
+            position: absolute; top: 20px; right: 20px; background: rgba(251, 191, 36, 0.1);
+            color: var(--gemini-gold); font-size: 0.7rem; font-weight: 800; padding: 6px 12px;
+            border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.3); letter-spacing: 1px;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        /* --- CALCULATOR VIEW --- */
+        #calc-view { display: none; width: 90%; max-width: 1000px; animation: slideUp 0.5s ease-out; text-align: center; }
+        
+        .selection-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
+        
         .year-card {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px; padding: 40px 20px; text-align: center; cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: visible;
-            height: 160px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: var(--surface-glass); border: var(--border-glass); border-radius: 20px;
+            padding: 30px; position: relative; overflow: hidden; transition: 0.3s;
+            display: flex; flex-direction: column; align-items: center;
         }
-        .year-card:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--gemini-primary); box-shadow: var(--gemini-glow); transform: translateY(-5px); }
-
-        .year-title { font-size: 1.8rem; font-weight: 600; color: white; margin-bottom: 5px; }
-        .year-desc { font-size: 0.9rem; color: var(--gemini-secondary); margin-bottom: 15px; }
-
-        /* SEMESTER OVERLAY */
-        .semester-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #131314; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: 0.3s ease; z-index: 20;
-            border-radius: 20px;
-        }
-        .year-card.active .semester-overlay { opacity: 1; pointer-events: all; }
-
-        /* BUTTONS */
-        .sem-btn-wrapper { position: relative; width: 85%; margin: 6px 0; }
+        .year-card:hover { border-color: var(--gemini-cyan); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .year-head { font-size: 2rem; font-weight: 800; color: white; margin-bottom: 5px; }
+        .year-sub { color: var(--text-mute); font-size: 0.9rem; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .btn-wrapper { width: 100%; display: flex; flex-direction: column; gap: 12px; justify-content: center; }
 
         .sem-btn {
-            background: transparent; border: 1px solid var(--gemini-primary); color: var(--gemini-primary);
-            padding: 10px 15px; border-radius: 10px; cursor: pointer; font-weight: 600;
-            width: 100%; transition: 0.2s; text-decoration: none; display: flex; justify-content: space-between; align-items: center;
-            box-sizing: border-box; font-size: 0.9rem;
+            width: 100%; padding: 16px 20px; border-radius: 12px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+            color: white; text-decoration: none; font-weight: 600; transition: 0.2s; font-size: 0.95rem;
+            display: flex; justify-content: space-between; align-items: center;
         }
+        .sem-btn:hover { background: rgba(34, 211, 238, 0.1); border-color: var(--gemini-cyan); color: var(--gemini-cyan); }
+        .sem-btn.inactive { opacity: 0.5; cursor: not-allowed; border-style: dashed; }
+        .sem-btn.inactive:hover { background: transparent; color: inherit; border-color: rgba(255,255,255,0.1); }
 
-        .sem-btn:hover { background: var(--gemini-primary); color: black; box-shadow: 0 0 15px rgba(77, 170, 252, 0.6); }
+        .status-icon { width: 20px; height: 20px; }
+        .icon-valid { color: var(--gemini-green); }
+        .icon-lock { color: var(--text-mute); }
 
-        /* Inactive Button */
-        .btn-inactive { border-color: #333; color: #666; cursor: not-allowed; }
-        .btn-inactive:hover { background: transparent; color: #666; box-shadow: none; border-color: #444; }
-
-        /* SVG ICONS */
-        .status-svg { width: 18px; height: 18px; }
-
-        /* TOOLTIPS */
-        .tooltip {
-            visibility: hidden; width: 220px; background-color: rgba(15, 23, 42, 0.95); color: #fff;
-            text-align: center; border-radius: 8px; padding: 10px; position: absolute; z-index: 100;
-            bottom: 115%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s;
-            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(5px); font-size: 0.8rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); pointer-events: none;
+        .back-link {
+            margin-top: 40px; background: none; border: none; color: var(--text-mute); 
+            font-size: 0.9rem; cursor: pointer; text-decoration: underline; transition: 0.2s;
         }
-        .tooltip::after {
-            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
-            border-width: 5px; border-style: solid; border-color: rgba(15, 23, 42, 0.95) transparent transparent transparent;
-        }
-        .sem-btn-wrapper:hover .tooltip { visibility: visible; opacity: 1; }
-        
-        /* Tooltip Colors */
-        .t-valid { color: var(--st-valid); font-weight: bold; }
-        .t-warn { color: var(--st-warning); font-weight: bold; }
-        .t-inactive { color: var(--st-inactive); font-weight: bold; }
+        .back-link:hover { color: white; }
 
-        .back-btn { margin-top: 10px; font-size: 0.8rem; color: #666; cursor: pointer; background: none; border: none; text-decoration: underline; }
-        .back-btn:hover { color: #888; }
-
-        /* --- FOOTER NAV STYLES --- */
+        /* --- FOOTER --- */
         .footer-nav {
-            position: fixed; bottom: 25px;
-            display: flex; gap: 20px; z-index: 100;
+            position: fixed; bottom: 30px; display: flex; gap: 20px; z-index: 10;
         }
-        .footer-link {
-            color: var(--gemini-secondary);
-            text-decoration: none; font-size: 0.85rem; cursor: pointer;
-            transition: 0.3s; display: flex; align-items: center; gap: 8px;
-            background: rgba(255,255,255,0.05); padding: 10px 20px;
-            border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
+        .f-link {
+            background: rgba(255,255,255,0.03); border: var(--border-glass); padding: 10px 20px;
+            border-radius: 30px; color: var(--text-mute); font-size: 0.8rem; font-weight: 600;
+            text-decoration: none; display: flex; align-items: center; gap: 8px; transition: 0.3s;
+            cursor: pointer; backdrop-filter: blur(10px);
         }
-        .footer-link:hover {
-            background: rgba(255,255,255,0.1); color: white;
-            border-color: var(--gemini-primary); box-shadow: 0 0 15px rgba(77, 170, 252, 0.2);
-        }
-        .footer-icon { width: 16px; height: 16px; opacity: 0.8; }
+        .f-link:hover { background: rgba(255,255,255,0.1); color: white; border-color: var(--gemini-cyan); }
 
-        /* --- MODAL & TIMELINE STYLES --- */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 200; justify-content: center; align-items: center; padding: 20px;
-            backdrop-filter: blur(5px);
+        /* --- MODALS --- */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 200; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .modal-box { 
+            background: #0f1218; border: var(--border-glass); padding: 40px; border-radius: 24px; 
+            width: 90%; max-width: 500px; position: relative; text-align: center; box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            display: flex; flex-direction: column; align-items: center;
         }
-        .modal-card {
-            background: #131314; padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1);
-            max-width: 900px; width: 95%; position: relative; color: #cbd5e1;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow-x: hidden;
+        
+        /* ALPHA ACCESS MODAL */
+        .alpha-title { color: var(--gemini-gold); margin: 0 0 10px 0; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .alpha-desc { color: var(--text-mute); font-size: 0.9rem; line-height: 1.6; margin-bottom: 25px; }
+        
+        .alpha-input {
+            width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px; color: white; font-size: 1.5rem; letter-spacing: 5px; text-align: center;
+            margin-bottom: 20px; text-transform: uppercase; transition: 0.3s;
         }
-        .modal-title { font-size: 1.5rem; color: white; margin: 0 0 30px 0; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .alpha-input:focus { border-color: var(--gemini-gold); box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
+        
+        .alpha-btn {
+            width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 1rem; font-weight: 800;
+            background: var(--gemini-gold); color: black; cursor: pointer; transition: 0.2s;
+        }
+        .alpha-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(251, 191, 36, 0.4); }
 
+        .alpha-error { border-color: var(--gemini-red) !important; animation: shake 0.3s; }
+        .alpha-success { border-color: var(--gemini-green) !important; box-shadow: 0 0 30px rgba(16, 185, 129, 0.4) !important; }
+
+        /* ROADMAP MODAL */
+        .modal-roadmap { max-width: 900px; width: 95%; align-items: flex-start; text-align: left; }
+        
         /* HORIZONTAL TIMELINE */
-        .timeline-wrapper {
-            display: flex; gap: 40px; overflow-x: auto; padding-bottom: 20px;
-            position: relative; scrollbar-width: thin; scrollbar-color: var(--gemini-primary) #333;
+        .timeline-container {
+            width: 100%; overflow-x: auto; padding: 20px 0; display: flex; position: relative;
+            scrollbar-width: thin; scrollbar-color: var(--gemini-blue) rgba(255,255,255,0.05);
         }
-        .timeline-wrapper::-webkit-scrollbar { height: 6px; }
-        .timeline-wrapper::-webkit-scrollbar-thumb { background: var(--gemini-primary); border-radius: 3px; }
-        .timeline-wrapper::-webkit-scrollbar-track { background: #333; }
-        
-        .timeline-wrapper::before {
-            content: ''; position: absolute; top: 24px; left: 0; right: 0; height: 2px;
-            background: rgba(255,255,255,0.1); z-index: 0; width: 220%; /* Extended for all items */
+        .timeline-line {
+            position: absolute; top: 48px; left: 0; width: 100%; height: 2px; 
+            background: rgba(255,255,255,0.1); z-index: 0; min-width: 800px;
         }
-
         .t-item {
-            min-width: 180px; position: relative; text-align: center; z-index: 1;
-            display: flex; flex-direction: column; align-items: center; opacity: 0.5; transition: 0.3s;
+            min-width: 180px; position: relative; z-index: 1; text-align: center;
+            display: flex; flex-direction: column; align-items: center; opacity: 0.6; transition: 0.3s;
         }
-        .t-item:hover { opacity: 1; }
-        .t-item.done { opacity: 1; }
+        .t-item:hover, .t-item.active { opacity: 1; }
         
-        .t-dot {
-            width: 12px; height: 12px; background: #131314; border: 2px solid #666; border-radius: 50%;
-            margin-bottom: 15px; position: relative; z-index: 2; transition: 0.3s;
-            margin-top: 18px;
+        .t-date { font-size: 0.75rem; font-weight: 800; margin-bottom: 10px; color: var(--text-mute); }
+        .t-dot { 
+            width: 16px; height: 16px; border-radius: 50%; background: #0f1218; 
+            border: 3px solid var(--text-mute); margin-bottom: 15px; box-shadow: 0 0 0 5px #0f1218;
         }
+        .t-title { font-size: 0.95rem; font-weight: 700; color: white; margin-bottom: 5px; }
+        .t-desc { font-size: 0.8rem; color: var(--text-mute); }
+
+        /* Roadmap States */
+        .t-item.done .t-dot { border-color: var(--gemini-green); background: var(--gemini-green); box-shadow: 0 0 15px var(--gemini-green); }
+        .t-item.done .t-date { color: var(--gemini-green); }
         
-        /* STATUS: RELEASED (Green) */
-        .t-item.done .t-dot { background: var(--st-valid); border-color: var(--st-valid); box-shadow: 0 0 15px var(--st-valid); }
-        .t-item.done .t-date { color: var(--st-valid); }
+        .t-item.test .t-dot { border-color: var(--gemini-orange); background: var(--gemini-orange); }
+        .t-item.test .t-date { color: var(--gemini-orange); }
+        
+        .t-item.dev .t-dot { border-color: var(--gemini-gold); background: var(--gemini-gold); animation: breathe 2s infinite; }
+        .t-item.dev .t-date { color: var(--gemini-gold); }
+        @keyframes breathe { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
 
-        /* STATUS: BREATHING YELLOW (Active) */
-        .t-item.breathing { opacity: 1; }
-        .t-item.breathing .t-dot {
-            background: var(--neon-yellow); border-color: var(--neon-yellow);
-            animation: breathe-yellow 2s infinite;
-        }
-        .t-item.breathing .t-date { color: var(--neon-yellow); }
-
-        @keyframes breathe-yellow {
-            0% { box-shadow: 0 0 0 0 rgba(255, 234, 0, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 234, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 234, 0, 0); }
-        }
-
-        /* FUTURE ITEMS (Neon Blue) */
-        .t-date { font-size: 0.75rem; color: var(--neon-blue); font-weight: 700; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .t-title { font-size: 0.9rem; font-weight: 600; color: white; line-height: 1.3; }
-        .t-desc { font-size: 0.75rem; color: #888; margin-top: 5px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
 
         @media (max-width: 768px) {
-            .selection-grid { grid-template-columns: 1fr; }
-            .corner-logo { height: 35px; top: 15px; }
-            .logo-left { left: 15px; } .logo-right { right: 15px; }
-            .footer-nav { flex-direction: column; bottom: 15px; gap: 10px; }
+            #main-menu { flex-direction: column; }
+            .portal-card { min-height: 200px; padding: 30px; }
+            .brand-title { font-size: 3rem; }
+            .corner-logo { height: 50px; top: 20px; padding: 8px 15px; } /* Mobile adjust */
+            .logo-left { left: 20px; } .logo-right { right: 20px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="loader" class="loader-overlay">
+    <div id="loader">
         <div class="gemini-spinner"></div>
-        <div class="loader-text">Initialisation MCalC+ ...</div>
+        <div class="loader-text">CHARGEMENT DU PORTAIL...</div>
     </div>
 
     <img src="https://www.univ-tlse3.fr/medias/photo/logo-ut-site_1747041194008-png" class="corner-logo logo-left" alt="UT3">
     <img src="https://iut.univ-tlse3.fr/uas/iut/LOGO/Logo_IUT_ACT_couleurs.png" class="corner-logo logo-right" alt="IUT">
 
-    <div class="brand-glow">MCalC+</div>
-    <div class="landing-subtitle">SÉLECTIONNEZ VOTRE ANNÉE</div>
-    
-    <div class="selection-grid">
-        <div class="year-card" id="card-but1">
-            <div class="year-title">BUT 1</div>
-            <div class="year-desc">Première Année</div>
+    <div class="brand-container">
+        <div class="brand-title">MCalC+</div>
+        <div class="brand-sub">PORTAIL ÉTUDIANT UNIFIÉ</div>
+    </div>
+
+    <div id="main-menu">
+        <div class="portal-card" onclick="openAlphaModal()">
+            <div class="badge-alpha">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                ALPHA FERMÉE
+            </div>
+            <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <div class="p-title" style="color:var(--gemini-cyan)">SmartST</div>
+            <div class="p-desc">
+                Votre Système d'Exploitation Étudiant.<br>
+                Dashboard, Notes & Assiduité.
+            </div>
+        </div>
+
+        <div class="portal-card" onclick="showCalculator()">
+            <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+                <line x1="8" y1="6" x2="16" y2="6"></line>
+                <line x1="16" y1="14" x2="16" y2="14"></line><line x1="8" y1="14" x2="8" y2="14"></line>
+                <line x1="12" y1="14" x2="12" y2="14"></line><line x1="16" y1="18" x2="16" y2="18"></line>
+                <line x1="8" y1="18" x2="8" y2="18"></line><line x1="12" y1="18" x2="12" y2="18"></line>
+            </svg>
+            <div class="p-title" style="color:var(--gemini-purple)">Calculateur</div>
+            <div class="p-desc">
+                Simulateur de moyenne classique.<br>
+                Gestion des coefficients et semestres.
+            </div>
+        </div>
+    </div>
+
+    <div id="calc-view">
+        <h2 style="font-size:2rem; font-weight:700;">Sélectionnez votre Année</h2>
+        <div class="selection-grid">
             
-            <div class="semester-overlay">
-                <div class="sem-btn-wrapper">
-                    <a href="#" onclick="navigateWithLoader(event, 'but1-s1.html')" class="sem-btn">
+            <div class="year-card">
+                <div class="year-head">BUT 1</div>
+                <div class="year-sub">Première Année</div>
+                <div class="btn-wrapper">
+                    <a href="#" onclick="navTo('but1-s1.html')" class="sem-btn">
                         Semestre 1 
-                        <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-valid)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <svg class="status-icon icon-valid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </a>
-                    <div class="tooltip">Statut : <span class="t-valid">Validé</span><br>Coefficients à jour</div>
-                </div>
-
-                <div class="sem-btn-wrapper">
-                    <a href="#" onclick="navigateWithLoader(event, 'but1-s2.html')" class="sem-btn">
+                    <a href="#" onclick="navTo('but1-s2.html')" class="sem-btn">
                         Semestre 2
-                        <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-valid)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <svg class="status-icon icon-valid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </a>
-                    <div class="tooltip">Statut : <span class="t-valid">Validé</span><br>Coefficients à jour</div>
                 </div>
-
-                <button class="back-btn" onclick="resetSelection(event)">Retour</button>
             </div>
-        </div>
 
-        <div class="year-card" id="card-but2">
-            <div class="year-title">BUT 2</div>
-            <div class="year-desc">Deuxième Année</div>
-
-            <div class="semester-overlay">
-                <div class="sem-btn-wrapper">
-                    <a href="soon.html" class="sem-btn btn-inactive">
+            <div class="year-card">
+                <div class="year-head">BUT 2</div>
+                <div class="year-sub">Deuxième Année</div>
+                <div class="btn-wrapper">
+                    <div class="sem-btn inactive">
                         Semestre 3
-                        <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-inactive)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </a>
-                    <div class="tooltip">Statut : <span class="t-inactive">En Développement</span><br>Non disponible</div>
-                </div>
-
-                <div class="sem-btn-wrapper">
-                    <a href="soon.html" class="sem-btn btn-inactive">
+                        <svg class="status-icon icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <div class="sem-btn inactive">
                         Semestre 4
-                        <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-inactive)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </a>
-                    <div class="tooltip">Statut : <span class="t-inactive">En Développement</span><br>Non disponible</div>
+                        <svg class="status-icon icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
                 </div>
-
-                <button class="back-btn" onclick="resetSelection(event)">Retour</button>
             </div>
-        </div>
 
-        <div class="year-card" id="card-but3">
-            <div class="year-title">BUT 3</div>
-            <div class="year-desc">Troisième Année</div>
-
-            <div class="semester-overlay">
-                <div class="sem-btn-wrapper">
-                    <a href="soon.html" class="sem-btn btn-inactive">
+            <div class="year-card">
+                <div class="year-head">BUT 3</div>
+                <div class="year-sub">Troisième Année</div>
+                <div class="btn-wrapper">
+                    <div class="sem-btn inactive">
                         Semestre 5
-                        <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-inactive)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </a>
-                    <div class="tooltip">Statut : <span class="t-inactive">En Développement</span><br>Non disponible</div>
-                </div>
-
-                <div class="sem-btn-wrapper">
-                    <a href="soon.html" class="sem-btn btn-inactive">
+                        <svg class="status-icon icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <div class="sem-btn inactive">
                         Semestre 6
-                        <svg class="status-svg" viewBox="0 0 24 24" fill="none" stroke="var(--st-inactive)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </a>
-                    <div class="tooltip">Statut : <span class="t-inactive">En Développement</span><br>Non disponible</div>
+                        <svg class="status-icon icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
                 </div>
-
-                <button class="back-btn" onclick="resetSelection(event)">Retour</button>
             </div>
+
         </div>
+        <button class="back-link" onclick="hideCalculator()">← Retour au menu principal</button>
     </div>
 
     <div class="footer-nav">
-        <button class="footer-link" onclick="openModal('roadmapModal')">
-            <svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            Roadmap & Changelog
+        <button class="f-link" onclick="document.getElementById('roadmapModal').style.display='flex'">
+            <svg class="icon" style="width:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            Roadmap
         </button>
-        <a href="mailto:alexios.elizalde-xirokosta@etu.iut-tlse3.fr" class="footer-link">
-            <svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-            Signaler un bug / Aide
+        <a href="mailto:alexios.elizalde-xirokosta@etu.iut-tlse3.fr" class="f-link">
+            <svg class="icon" style="width:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+            Signaler un bug
         </a>
     </div>
 
-    <div class="modal-overlay" id="roadmapModal">
-        <div class="modal-card">
-            <span onclick="closeModal('roadmapModal')" style="position:absolute; top:20px; right:20px; cursor:pointer; font-size:1.5rem;">&times;</span>
-            <div class="modal-title">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gemini-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                Roadmap 2026
+    <div class="modal-overlay" id="alphaModal" onclick="closeAlpha()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <h2 class="alpha-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                ACCÈS RESTREINT
+            </h2>
+            <p class="alpha-desc">
+                SmartST est actuellement en phase de <b>test Alpha</b>.<br>
+                Veuillez saisir votre code d'accès unique.
+            </p>
+            <input type="text" id="alphaCode" class="alpha-input" placeholder="CODE">
+            <button class="alpha-btn" onclick="checkAlpha()">VALIDER</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="roadmapModal" onclick="closeModal('roadmapModal')">
+        <div class="modal-box modal-roadmap" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:10px;">
+                <h2 style="margin:0; font-size:1.5rem; color:white;">Roadmap 2026 (v. 2.4.1)</h2>
+                <span onclick="closeModal('roadmapModal')" style="cursor:pointer; font-size:1.5rem; color:#666;">&times;</span>
             </div>
             
-            <div class="timeline-wrapper">
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
                 
                 <div class="t-item done">
-                    <div class="t-date">29 JAN</div>
+                    <div class="t-date">JANVIER 2026</div>
                     <div class="t-dot"></div>
-                    <div class="t-title">Sortie BUT 1 S2</div>
-                    <div class="t-desc">Released (Beta)</div>
+                    <div class="t-title">Lancement</div>
+                    <div class="t-desc">MCalC+ BUT1</div>
                 </div>
 
-                <div class="t-item breathing">
-                    <div class="t-date">DÉBUT FÉV</div>
+                <div class="t-item test">
+                    <div class="t-date">FÉVRIER 2026</div>
                     <div class="t-dot"></div>
-                    <div class="t-title">Design UI/UX</div>
-                    <div class="t-desc" style="color:var(--neon-yellow);">Actuellement en développement</div>
+                    <div class="t-title">SmartST</div>
+                    <div class="t-desc">Alpha Test (C1/C2)</div>
                 </div>
 
-                <div class="t-item">
-                    <div class="t-date">FIN FÉV</div>
+                <div class="t-item dev">
+                    <div class="t-date">MARS 2026</div>
                     <div class="t-dot"></div>
-                    <div class="t-title">MCalC+ 360</div>
-                    <div class="t-desc">Data Browser Module</div>
-                </div>
-
-                <div class="t-item">
-                    <div class="t-date">DÉBUT MARS</div>
-                    <div class="t-dot"></div>
-                    <div class="t-title">Sortie BUT 2</div>
-                    <div class="t-desc">Semestres S3-S4</div>
+                    <div class="t-title">Modules</div>
+                    <div class="t-desc">Assiduité Avancée</div>
                 </div>
 
                 <div class="t-item">
-                    <div class="t-date">FIN MARS</div>
+                    <div class="t-date">AVRIL 2026</div>
                     <div class="t-dot"></div>
-                    <div class="t-title">Sortie BUT 3</div>
-                    <div class="t-desc">Semestres S5-S6</div>
+                    <div class="t-title">Expansion</div>
+                    <div class="t-desc">BUT 2 & 3</div>
                 </div>
 
                 <div class="t-item">
-                    <div class="t-date">DÉBUT AVRIL</div>
+                    <div class="t-date">MAI 2026</div>
                     <div class="t-dot"></div>
-                    <div class="t-title">Système Profil</div>
-                    <div class="t-desc">Save & Load Grade</div>
+                    <div class="t-title">Mobile App</div>
+                    <div class="t-desc">PWA Native</div>
                 </div>
-
-                <div class="t-item">
-                    <div class="t-date">FIN AVRIL</div>
-                    <div class="t-dot"></div>
-                    <div class="t-title">Import Notes</div>
-                    <div class="t-desc">Consolidation Fichiers</div>
-                </div>
-
-                <div class="t-item">
-                    <div class="t-date">DÉBUT MAI</div>
-                    <div class="t-dot"></div>
-                    <div class="t-title">Calendrier IUT</div>
-                    <div class="t-desc">Expérimental (BUT 1)</div>
-                </div>
-
-                <div class="t-item">
-                    <div class="t-date">MI-MAI</div>
-                    <div class="t-dot"></div>
-                    <div class="t-title">Dashboard Global</div>
-                    <div class="t-desc">Vue d'ensemble</div>
-                </div>
-
             </div>
         </div>
     </div>
 
     <script>
-        // Modal Logic
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 800);
+        }
+
+        // --- NAVIGATION ---
+        function openAlphaModal() {
+            openModal('alphaModal');
+            document.getElementById('alphaCode').focus();
+        }
+
+        function closeAlpha() {
+            closeModal('alphaModal');
+            const inp = document.getElementById('alphaCode');
+            inp.value = ''; inp.classList.remove('alpha-error', 'alpha-success');
+        }
+
+        function checkAlpha() {
+            const input = document.getElementById('alphaCode');
+            const code = input.value.trim().toUpperCase();
+            
+            if(code === 'AEX516') {
+                input.classList.remove('alpha-error');
+                input.classList.add('alpha-success');
+                setTimeout(() => {
+                    navTo('smartst-cloud-access.html');
+                }, 800);
+            } else {
+                input.classList.add('alpha-error');
+                setTimeout(() => input.classList.remove('alpha-error'), 300);
+            }
+        }
+
+        document.getElementById('alphaCode').addEventListener('keydown', function(e) {
+            if(e.key === 'Enter') checkAlpha();
+        });
+
+        function showCalculator() {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('calc-view').style.display = 'block';
+        }
+
+        function hideCalculator() {
+            document.getElementById('calc-view').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+        }
+
+        function navTo(url) {
+            const l = document.getElementById('loader');
+            l.classList.remove('hidden');
+            setTimeout(() => window.location.href = url, 800);
+        }
+
+        // --- MODAL UTILS ---
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        
-        window.onclick = function(event) {
-            const modal = document.getElementById('roadmapModal');
-            if (event.target == modal) { modal.style.display = "none"; }
-        }
 
-        // Card Selection Logic
-        const cards = ['card-but1', 'card-but2', 'card-but3'];
-        cards.forEach(id => {
-            const card = document.getElementById(id);
-            card.addEventListener('click', function(e) {
-                // Open overlay only if not clicking button/link
-                if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A' && !e.target.closest('.sem-btn')) {
-                    cards.forEach(c => document.getElementById(c).classList.remove('active'));
-                    this.classList.add('active');
-                }
-            });
-        });
-        function resetSelection(e) {
-            e.stopPropagation();
-            cards.forEach(c => document.getElementById(c).classList.remove('active'));
-        }
-
-        // LOADER TRANSITION WITH BACK BUTTON FIX
-        function navigateWithLoader(event, url) {
-            event.preventDefault(); 
-            const loader = document.getElementById('loader');
-            loader.classList.add('loader-active'); 
-            
-            setTimeout(() => {
-                window.location.href = url;
-            }, 1500);
-        }
-
-        // FIX FOR BACK BUTTON (BFCACHE)
-        // This removes the loader if the user clicks "Back" in the browser
-        window.addEventListener('pageshow', function(event) {
-            const loader = document.getElementById('loader');
-            if (loader.classList.contains('loader-active')) {
-                loader.classList.remove('loader-active');
+        window.onclick = function(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.style.display = 'none';
+                if(e.target.id === 'alphaModal') closeAlpha();
             }
-        });
+        }
     </script>
 </body>
 </html>
