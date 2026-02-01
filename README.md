@@ -60,6 +60,30 @@ The project has shifted to a **Serverless JAMstack** architecture.
 ## Quick Preview
 https://github.com/user-attachments/assets/8b20eb6f-cf21-4703-9275-07213d6f4498
 
+## Screenshots
+
+### Main Menu
+<img width="1919" height="968" alt="image" src="https://github.com/user-attachments/assets/bdb15f2a-3f7d-4435-ab44-dada99c90f0c" />
+
+### Year Selection Screen (for grade calculation)
+<img width="1919" height="969" alt="image" src="https://github.com/user-attachments/assets/d1a94090-38ac-4d57-a6fe-e8e05f89eba0" />
+
+### Grade Input Screen
+<img width="1919" height="965" alt="image" src="https://github.com/user-attachments/assets/0a85e66b-ad7f-41d5-845a-46682a1fbef0" />
+
+### Grade Results Screen
+<img width="1904" height="968" alt="image" src="https://github.com/user-attachments/assets/83779779-62c3-43e7-beb4-c67d4e761eee" />
+
+### SmartST Login Screen
+<img width="1919" height="965" alt="image" src="https://github.com/user-attachments/assets/bcdb7948-78a9-4781-b905-4acaa3b953df" />
+
+### SmartST Student View
+<img width="1919" height="969" alt="image" src="https://github.com/user-attachments/assets/25b72e93-eaa5-4616-9f79-b7de0b4dabab" />
+
+### Student Calendar View
+<img width="1919" height="970" alt="image" src="https://github.com/user-attachments/assets/de8f7570-68f8-4192-822f-dca947d6b98d" />
+
+
 ## ⚖️ Disclaimer
 **Unofficial Tool.** This project is not affiliated with IUT Paul Sabatier or Université Toulouse III. It is a student-led initiative for simulation and organization purposes. Official grades and schedules are provided exclusively by the IUT administration.
 
