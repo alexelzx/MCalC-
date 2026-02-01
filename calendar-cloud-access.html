@@ -334,9 +334,9 @@
     </div>
 
     <script type="module">
-        // 1. FIREBASE CONFIGURATION (YOUR KEYS)
+        // 1. FIREBASE CONFIGURATION
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, query, onSnapshot, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -365,26 +365,36 @@
             { start: 16.25, duration: 1.75 }
         ];
 
-        window.onload = async function() {
-            await refreshData();
-            document.getElementById('loader').style.opacity = '0';
-            setTimeout(()=>document.getElementById('loader').style.display='none', 400);
+        // INIT WITH REAL-TIME LISTENERS
+        window.onload = function() {
+            initRealTimeSync();
+            // Hide loader after a slight buffer to ensure data is visible
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(()=>document.getElementById('loader').style.display='none', 400);
+            }, 1000);
             renderSlots();
         };
 
-        async function refreshData() {
-            scheduleData = [];
-            dateData = {};
-            try {
-                const q = query(collection(db, "schedule"));
-                const snapshot = await getDocs(q);
-                snapshot.forEach(doc => scheduleData.push({ ...doc.data(), id: doc.id }));
-                
-                const metaSnap = await getDoc(doc(db, "meta", "calendarDates"));
-                if(metaSnap.exists()) dateData = metaSnap.data();
-                
-                renderCalendar();
-            } catch(e) { console.log("Offline"); }
+        function initRealTimeSync() {
+            // 1. Listen for Schedule Changes (Classes)
+            const q = query(collection(db, "schedule"));
+            onSnapshot(q, (snapshot) => {
+                scheduleData = [];
+                snapshot.forEach(doc => {
+                    scheduleData.push({ ...doc.data(), id: doc.id });
+                });
+                console.log("Synced Schedule:", scheduleData.length, "events");
+                renderCalendar(); // Auto-refresh whenever DB changes
+            });
+
+            // 2. Listen for Date Changes (Week dates)
+            onSnapshot(doc(db, "meta", "calendarDates"), (doc) => {
+                if(doc.exists()) {
+                    dateData = doc.data();
+                    renderCalendar();
+                }
+            });
         }
 
         function renderSlots() {
@@ -400,11 +410,13 @@
         }
 
         window.renderCalendar = function() {
+            // Clear current view
             document.querySelectorAll('.slot').forEach(s => s.innerHTML = '');
+            
             const week = document.getElementById('weekSelect').value;
             const group = document.getElementById('groupSelect').value;
 
-            // Dates
+            // Render Dates
             const weekDates = dateData[week] || ["...", "...", "...", "...", "..."];
             for(let i=0; i<5; i++) {
                 const el = document.getElementById(`date-${i}`);
@@ -412,13 +424,16 @@
                 if(isAdmin) el.classList.add('editable'); else el.classList.remove('editable');
             }
 
-            // Events
+            // Filter Events
             const events = scheduleData.filter(e => 
-                e.weeks.includes(parseInt(week)) && (e.groups.includes(group) || e.groups.includes("ALL"))
+                e.weeks && e.weeks.includes(parseInt(week)) && 
+                (e.groups.includes(group) || e.groups.includes("ALL"))
             );
 
+            // Render Events
             events.forEach(evt => {
                 let slotIdx = -1;
+                // Simple logic to map time to slot index 0-3
                 if (Math.abs(evt.start - 9.00) < 0.5) slotIdx = 0;
                 else if (Math.abs(evt.start - 11.00) < 0.5) slotIdx = 1;
                 else if (Math.abs(evt.start - 14.25) < 0.5) slotIdx = 2;
@@ -426,38 +441,41 @@
 
                 if (slotIdx > -1) {
                     const col = document.getElementById(`day-${evt.day}`);
+                    // Adjust index for lunch break div (which is at index 2)
                     const targetChildIndex = slotIdx < 2 ? slotIdx : slotIdx + 1;
                     const slotDiv = col.children[targetChildIndex];
 
-                    const card = document.createElement('div');
-                    card.className = `event-card type-${evt.type}`;
-                    if(evt.status === 'cancelled') card.classList.add('status-cancelled');
-                    if(evt.status === 'postponed') card.classList.add('status-postponed');
+                    if(slotDiv) {
+                        const card = document.createElement('div');
+                        card.className = `event-card type-${evt.type}`;
+                        if(evt.status === 'cancelled') card.classList.add('status-cancelled');
+                        if(evt.status === 'postponed') card.classList.add('status-postponed');
 
-                    // GROUP BADGE LOGIC
-                    let badgeHtml = '';
-                    if(evt.groups.includes('ALL')) badgeHtml = '<span class="evt-group-badge badge-promo">PROMO</span>';
-                    else if(evt.groups.length > 1) badgeHtml = '<span class="evt-group-badge badge-grp">C1 + C2</span>';
-                    else if(evt.groups.includes('C1')) badgeHtml = '<span class="evt-group-badge badge-grp">C1</span>';
-                    else if(evt.groups.includes('C2')) badgeHtml = '<span class="evt-group-badge badge-grp">C2</span>';
+                        // Badge Logic
+                        let badgeHtml = '';
+                        if(evt.groups.includes('ALL')) badgeHtml = '<span class="evt-group-badge badge-promo">PROMO</span>';
+                        else if(evt.groups.length > 1) badgeHtml = '<span class="evt-group-badge badge-grp">C1 + C2</span>';
+                        else if(evt.groups.includes('C1')) badgeHtml = '<span class="evt-group-badge badge-grp">C1</span>';
+                        else if(evt.groups.includes('C2')) badgeHtml = '<span class="evt-group-badge badge-grp">C2</span>';
 
-                    card.innerHTML = `
-                        <div class="evt-top">
-                            <div style="display:flex; gap:5px; align-items:center;">
-                                <span class="evt-type">${evt.type}</span>
-                                ${badgeHtml}
+                        card.innerHTML = `
+                            <div class="evt-top">
+                                <div style="display:flex; gap:5px; align-items:center;">
+                                    <span class="evt-type">${evt.type}</span>
+                                    ${badgeHtml}
+                                </div>
+                                ${evt.examInfo ? '<div class="exam-dot"></div>' : ''}
                             </div>
-                            ${evt.examInfo ? '<div class="exam-dot"></div>' : ''}
-                        </div>
-                        <div class="evt-title">${evt.name}</div>
-                        <div class="evt-bot"><span class="evt-room">${evt.room}</span><span>${evt.prof}</span></div>
-                    `;
-                    card.onclick = (e) => { e.stopPropagation(); openDetails(evt); };
-                    slotDiv.appendChild(card);
+                            <div class="evt-title">${evt.name}</div>
+                            <div class="evt-bot"><span class="evt-room">${evt.room}</span><span>${evt.prof}</span></div>
+                        `;
+                        card.onclick = (e) => { e.stopPropagation(); openDetails(evt); };
+                        slotDiv.appendChild(card);
+                    }
                 }
             });
 
-            // Admin Visuals
+            // Admin styling update
             document.querySelectorAll('.slot').forEach(s => {
                 if(isAdmin) s.classList.add('admin-mode'); else s.classList.remove('admin-mode');
             });
@@ -492,6 +510,8 @@
             if(!isAdmin) return;
             currentEvent = null;
             const def = SLOTS[idx];
+            
+            // Clear Form
             document.getElementById('eName').value = "";
             document.getElementById('eType').value = "CM";
             document.getElementById('eStart').value = def.start;
@@ -502,9 +522,8 @@
             document.getElementById('eExam').value = "";
             document.getElementById('eStatus').value = "active";
             
-            // Default group based on current filter
             const cf = document.getElementById('groupSelect').value;
-            document.getElementById('eGroup').value = cf; // Default C1 or C2
+            document.getElementById('eGroup').value = cf; 
 
             currentSlot = { day: day, wk: parseInt(document.getElementById('weekSelect').value), grp: cf };
             openModal('classModal');
@@ -519,7 +538,6 @@
                 if(!dateData[week]) dateData[week] = ["...", "...", "...", "...", "..."];
                 dateData[week][dayIdx] = newDate;
                 await setDoc(doc(db, "meta", "calendarDates"), dateData);
-                renderCalendar();
             }
         }
 
@@ -559,7 +577,6 @@
                 document.getElementById('eExam').value = currentEvent.examInfo;
                 document.getElementById('eStatus').value = currentEvent.status;
                 
-                // Group Logic for Dropdown
                 let gVal = 'C1'; 
                 if(currentEvent.groups.includes('ALL')) gVal = 'ALL';
                 else if(currentEvent.groups.includes('C1') && currentEvent.groups.includes('C2')) gVal = 'C_FULL';
@@ -596,7 +613,6 @@
                 await addDoc(collection(db, "schedule"), data);
             }
             closeModal('classModal');
-            refreshData();
         }
 
         window.confirmDelete = function() { openModal('deleteModal'); }
@@ -605,7 +621,6 @@
                 await deleteDoc(doc(db, "schedule", currentEvent.id));
                 closeModal('deleteModal');
                 closeModal('classModal');
-                refreshData();
             }
         }
 
@@ -621,7 +636,6 @@
             const mail = document.getElementById('mEmail').innerText;
             if(mail && mail !== "Non renseigné") { navigator.clipboard.writeText(mail); alert("Adresse copiée !"); }
         }
-
     </script>
 </body>
 </html>
