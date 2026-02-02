@@ -14,8 +14,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* [STYLES UNCHANGED - KEPT FOR CONSISTENCY] */
         :root {
+            /* GEMINI LIQUID PALETTE */
             --bg-deep: #02040a;
             --surface-glass: rgba(15, 23, 42, 0.65);
             --border-glass: 1px solid rgba(56, 189, 248, 0.15);
@@ -40,6 +40,7 @@
             display: flex; flex-direction: column;
         }
 
+        /* UTILS */
         .hidden { display: none !important; }
         .icon { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
         .btn-reset { background: none; border: none; cursor: pointer; color: inherit; font: inherit; }
@@ -555,8 +556,13 @@
 
         window.onload = function() { 
             checkConsent(); 
-            document.getElementById('loader').style.display='none'; 
-            checkSession();
+            // Important: Do not hide loader yet. Check session first.
+            if (checkSession()) {
+                // Session valid - logic continues inside checkSession -> loadDashboard
+            } else {
+                // No session - hide loader, reveal Login
+                document.getElementById('loader').style.display='none'; 
+            }
         };
 
         function saveSession(user, adminStatus) {
@@ -570,7 +576,7 @@
 
         function checkSession() {
             const stored = localStorage.getItem(SESSION_KEY);
-            if (!stored) return;
+            if (!stored) return false;
 
             const session = JSON.parse(stored);
             const now = Date.now();
@@ -579,11 +585,13 @@
                 // Expired
                 localStorage.removeItem(SESSION_KEY);
                 alert("Session expirée. Veuillez vous reconnecter.");
+                return false;
             } else {
                 // Valid - Refresh timestamp and load
                 session.timestamp = now;
                 localStorage.setItem(SESSION_KEY, JSON.stringify(session));
                 loadDashboard(session.user, session.isAdmin);
+                return true;
             }
         }
 
