@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartST | Student OS</title>
+    <title>MCalC+ | Emploi du Temps</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
             /* GEMINI LIQUID PALETTE */
             --bg-deep: #02040a;
-            --surface-glass: rgba(15, 23, 42, 0.65);
+            --surface-glass: rgba(20, 24, 30, 0.75);
             --border-glass: 1px solid rgba(56, 189, 248, 0.15);
             
             --gemini-cyan: #22d3ee;
@@ -23,8 +23,6 @@
             
             --text-main: #f8fafc;
             --text-mute: #94a3b8;
-            
-            --glow-blue: 0 0 30px rgba(59, 130, 246, 0.2);
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -36,466 +34,309 @@
             display: flex; flex-direction: column;
         }
 
-        /* UTILS */
-        .hidden { display: none !important; }
-        .icon { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        /* --- UTILS --- */
+        .icon { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
         .btn-reset { background: none; border: none; cursor: pointer; color: inherit; font: inherit; }
+        .hidden { display: none !important; }
 
-        /* LOADER */
+        /* --- LOADER --- */
         #loader {
             position: fixed; inset: 0; background: #02040a; z-index: 10000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 0.4s ease;
         }
-        .loader-circle {
+        .gemini-spinner {
             width: 50px; height: 50px; border-radius: 50%;
             border: 3px solid rgba(34, 211, 238, 0.1); border-top-color: var(--gemini-cyan);
             animation: spin 0.8s linear infinite; margin-bottom: 20px;
             box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
         }
-        .loader-text { font-size: 0.8rem; letter-spacing: 4px; color: var(--gemini-blue); font-weight: 700; animation: pulse 1.5s infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        /* LOGIN SCREEN */
-        #login-screen {
-            position: fixed; inset: 0; background: #02040a; z-index: 9000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 20px;
-        }
-        .login-card { width: 100%; max-width: 320px; text-align: center; }
-        
-        .brand-title {
-            font-size: 4rem; font-weight: 800; letter-spacing: -2px; margin: 0;
-            background: linear-gradient(135deg, #fff 0%, var(--gemini-cyan) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 40px rgba(34, 211, 238, 0.2);
-        }
-        .brand-sub { font-size: 0.8rem; color: var(--gemini-blue); letter-spacing: 4px; text-transform: uppercase; font-weight: 700; margin-top: 5px; }
-
-        .login-input {
-            background: rgba(255,255,255,0.03); border: var(--border-glass); color: white;
-            padding: 16px 25px; border-radius: 14px; font-size: 1.1rem; letter-spacing: 1px;
-            text-align: center; width: 100%; transition: 0.3s; margin-bottom: 15px; margin-top: 40px;
-        }
-        .login-input:focus { border-color: var(--gemini-cyan); box-shadow: var(--glow-blue); background: rgba(255,255,255,0.05); }
-        
-        .login-btn {
-            background: linear-gradient(135deg, var(--gemini-blue), var(--gemini-cyan));
-            color: #000; border: none; padding: 16px 50px; border-radius: 50px; width: 100%;
-            font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 10px;
-            transition: 0.3s; letter-spacing: 1px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
-        }
-        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(34, 211, 238, 0.5); }
-
-        .login-toggle { margin-top: 25px; font-size: 0.8rem; color: var(--text-mute); cursor: pointer; text-decoration: underline; transition: 0.2s; }
-        .login-toggle:hover { color: var(--gemini-cyan); }
-
-        /* --- DASHBOARD LAYOUT --- */
-        #dashboard { display: none; padding: 30px; max-width: 1400px; margin: 0 auto; width: 100%; }
-
-        /* HEADER */
-        .header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;
-            padding-bottom: 20px; border-bottom: var(--border-glass);
-        }
-        .profile { display: flex; align-items: center; gap: 20px; }
-        .avatar-lg {
-            width: 64px; height: 64px; border-radius: 18px; background: rgba(59, 130, 246, 0.15);
-            border: 1px solid var(--gemini-cyan); color: var(--gemini-cyan);
-            display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700;
-            box-shadow: var(--glow-blue);
-        }
-        .user-info h1 { margin: 0; font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
-        .group-tag { 
-            background: rgba(59, 130, 246, 0.2); padding: 4px 10px; border-radius: 6px; 
-            color: var(--gemini-cyan); font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-
-        /* NAVIGATION */
-        .nav-actions { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
-        .nav-btn {
-            background: rgba(255,255,255,0.03); border: var(--border-glass); color: var(--text-mute);
-            padding: 12px 24px; border-radius: 12px; font-size: 0.9rem; font-weight: 600; text-decoration: none;
-            display: flex; align-items: center; gap: 10px; transition: 0.2s;
-        }
-        .nav-btn:hover { background: rgba(59, 130, 246, 0.1); color: white; border-color: var(--gemini-blue); }
-
-        .btn-logout {
-            padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 700;
-            background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--gemini-cyan);
-            display: flex; align-items: center; gap: 8px; transition: 0.3s;
-        }
-        .btn-logout:hover { background: rgba(59, 130, 246, 0.15); color: white; border-color: var(--gemini-cyan); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
-        .btn-logout.admin-back { border-color: var(--gemini-purple); color: var(--gemini-purple); background: rgba(168, 85, 247, 0.1); }
-
-        /* GRID SYSTEM */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
-
-        /* CARD */
-        .card {
-            background: var(--surface-glass); border: var(--border-glass); border-radius: 24px;
-            padding: 25px; position: relative; overflow: hidden; backdrop-filter: blur(20px);
-            display: flex; flex-direction: column; min-height: 300px; transition: 0.3s;
-        }
-        .card:hover { border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-
-        .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card-title { font-size: 1rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .icon-box { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--text-mute); }
-
-        /* WIDGETS */
-        .gpa-display { font-size: 3.5rem; font-weight: 800; color: white; letter-spacing: -2px; }
-        .gpa-sub { font-size: 0.8rem; color: var(--text-mute); margin-bottom: 15px; }
-        .grade-list, .hw-list, .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; max-height: 180px; }
-        
-        .item-row {
+        /* --- TOP BAR --- */
+        .top-bar {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 14px; background: rgba(255,255,255,0.03); border-radius: 10px;
-            font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.02); transition: 0.2s;
-        }
-        .item-row:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
-        .val-hl { font-weight: 700; color: var(--gemini-purple); }
-        .del-btn { color: var(--gemini-red); opacity: 0; cursor: pointer; transition: 0.2s; margin-left: 10px; font-weight: 800; font-size: 1.2rem; }
-        .item-row:hover .del-btn, .hw-item:hover .del-btn { opacity: 1; }
-
-        /* ATTENDANCE WIDGETS */
-        .att-alert {
-            background: rgba(244, 63, 94, 0.1); border: 1px solid var(--gemini-red); color: var(--gemini-red);
-            padding: 10px; border-radius: 8px; font-weight: 700; text-align: center; margin-bottom: 15px;
-            font-size: 0.9rem; display: none; animation: pulse 2s infinite;
+            padding: 15px 30px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px);
+            border-bottom: var(--border-glass); position: sticky; top: 0; z-index: 100;
         }
         
-        .att-stats { display: flex; justify-content: space-between; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; }
-        .stat-item { text-align: center; flex: 1; }
-        .stat-val { font-size: 1.2rem; font-weight: 800; display: block; }
-        .stat-lbl { font-size: 0.65rem; color: var(--text-mute); text-transform: uppercase; letter-spacing: 1px; }
-        .c-red { color: var(--gemini-red); }
-        .c-gold { color: var(--gemini-gold); }
-        .c-blue { color: var(--gemini-blue); }
+        .logo-text { font-size: 1.2rem; font-weight: 800; color: white; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+        .logo-text span { color: var(--gemini-cyan); }
 
-        .warn-info { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-mute); margin-bottom: 5px; }
-        .abs-detail { font-size: 0.75rem; color: var(--text-mute); margin-top: 2px; }
-
-        /* HOMEWORK */
-        .hw-item { 
-            background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; display: flex; align-items: flex-start; gap: 10px; 
-            border: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
-        }
-        .hw-check {
-            min-width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--text-mute);
-            display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 2px;
-        }
-        .hw-check.done { background: var(--gemini-cyan); border-color: var(--gemini-cyan); }
-        .hw-check svg { width: 12px; color: black; display: none; }
-        .hw-check.done svg { display: block; }
-        .hw-text { font-size: 0.9rem; color: #e2e8f0; flex: 1; line-height: 1.4; }
-        .hw-item.done .hw-text { text-decoration: line-through; color: var(--text-mute); }
-
-        /* INPUTS */
-        .add-row, .admin-controls { display: none; gap: 10px; margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
-        .admin-controls { flex-direction: column; }
+        .controls { display: flex; gap: 15px; align-items: center; }
         
-        /* Force Display for Admin Mode via Class */
-        .admin-visible { display: flex !important; }
+        .st-select {
+            background: rgba(255,255,255,0.05); border: var(--border-glass); color: white;
+            padding: 8px 15px; border-radius: 8px; font-family: inherit; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s;
+        }
+        .st-select:hover { border-color: var(--gemini-cyan); background: rgba(34, 211, 238, 0.05); }
+        .st-select option { background-color: #0f172a; color: white; }
+
+        /* Admin Button */
+        .btn-admin {
+            background: rgba(251, 191, 36, 0.05); border: 1px solid rgba(251, 191, 36, 0.3); 
+            color: var(--gemini-gold); font-weight: 700; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-admin:hover { background: rgba(251, 191, 36, 0.15); border-color: var(--gemini-gold); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+        .btn-admin.logged-in { background: rgba(239, 68, 68, 0.1); border-color: var(--gemini-red); color: var(--gemini-red); }
+        .btn-admin.logged-in:hover { background: var(--gemini-red); color: white; }
+
+        .btn-back {
+            background: transparent; border: 1px solid var(--gemini-red); color: var(--gemini-red);
+            padding: 8px 20px; border-radius: 20px; font-weight: 600; cursor: pointer; text-decoration: none;
+            font-size: 0.8rem; transition: 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-back:hover { background: var(--gemini-red); color: white; }
+
+        /* --- CALENDAR --- */
+        .calendar-container { padding: 20px; flex: 1; overflow-y: auto; display: flex; justify-content: center; }
         
-        .st-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 8px; width: 100%; }
-        .st-btn { background: var(--gemini-blue); color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: 700; cursor: pointer; }
-        .admin-tag { font-size: 0.7rem; color: var(--gemini-gold); font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
-
-        /* ADMIN BAR */
-        .admin-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(251, 191, 36, 0.9);
-            color: black; text-align: center; padding: 8px; font-weight: 800; z-index: 2000;
-            display: none; justify-content: center; align-items: center; gap: 15px; letter-spacing: 1px;
-            backdrop-filter: blur(10px);
+        .cal-wrapper {
+            display: grid; grid-template-columns: 80px repeat(5, 1fr); gap: 10px;
+            max-width: 1400px; width: 100%; min-width: 900px;
         }
 
-        /* ADMIN REGISTRY (HOLOGRAPHIC CARDS) */
-        #admin-registry { display: none; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .cal-header {
+            text-align: center; color: var(--text-mute); padding-bottom: 10px;
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .day-name { font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        .day-date { 
+            font-size: 0.75rem; color: white; font-weight: 600; background: rgba(255,255,255,0.05); 
+            padding: 2px 8px; border-radius: 12px; align-self: center; cursor: default; transition: 0.2s;
+        }
+        .day-date.editable:hover { background: var(--gemini-cyan); color: black; cursor: pointer; }
+
+        .time-labels { display: grid; grid-template-rows: 1fr 1fr 20px 1fr 1fr; gap: 15px; text-align: right; padding-right: 15px; }
+        .time-label { 
+            display: flex; flex-direction: column; justify-content: center; 
+            font-size: 0.75rem; color: var(--text-mute); font-weight: 600;
+        }
+        .time-label span { display: block; font-size: 0.65rem; opacity: 0.7; }
+        .lunch-break-label { font-size: 0.7rem; color: var(--gemini-purple); display: flex; align-items: center; justify-content: flex-end; opacity: 0.8; }
+
+        .day-col { display: grid; grid-template-rows: 1fr 1fr 20px 1fr 1fr; gap: 15px; }
         
-        .registry-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;
-            padding-bottom: 20px; border-bottom: var(--border-glass);
+        .slot {
+            background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1);
+            border-radius: 12px; position: relative; transition: 0.2s; min-height: 120px;
         }
-        .reg-title h1 { margin: 0; font-size: 2rem; font-weight: 700; color: white; }
-        .reg-title p { color: var(--text-mute); margin-top: 5px; }
+        .slot.admin-mode:hover { background: rgba(34, 211, 238, 0.05); border-color: var(--gemini-cyan); cursor: pointer; }
+        .slot.admin-mode:hover::after {
+            content: '+'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: var(--gemini-cyan); opacity: 0.5;
+        }
 
-        .registry-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; 
+        .lunch-break { height: 20px; display: flex; align-items: center; justify-content: center; }
+        .lunch-line { width: 100%; height: 1px; background: rgba(255,255,255,0.05); }
+
+        /* --- EVENTS --- */
+        .event-card {
+            position: absolute; inset: 0; border-radius: 12px; padding: 12px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            border-left: 4px solid; backdrop-filter: blur(10px); z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.2s; cursor: pointer;
+        }
+        .event-card:hover { transform: scale(1.02); z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
+        .type-CM { background: rgba(59, 130, 246, 0.15); border-color: var(--gemini-blue); }
+        .type-TD { background: rgba(16, 185, 129, 0.15); border-color: var(--gemini-green); }
+        .type-TP { background: rgba(249, 115, 22, 0.15); border-color: var(--gemini-orange); }
+        .type-SAE { background: rgba(168, 85, 247, 0.15); border-color: var(--gemini-purple); }
+
+        .status-cancelled { 
+            background: rgba(239, 68, 68, 0.15) !important; border-color: var(--gemini-red) !important; 
+            opacity: 0.8; 
+        }
+        .status-cancelled .evt-title { text-decoration: line-through; opacity: 0.6; }
+        
+        .status-postponed { 
+            background: repeating-linear-gradient(45deg, rgba(255,255,255,0.03), rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.01) 10px, rgba(255,255,255,0.01) 20px) !important;
+            border-color: #64748b !important; opacity: 0.6; filter: grayscale(0.5);
+        }
+
+        .evt-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        
+        /* Group Badge */
+        .evt-group-badge { 
+            font-size: 0.6rem; font-weight: 800; letter-spacing: 0.5px; 
+            padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.3);
+        }
+        .badge-promo { color: var(--gemini-gold); border: 1px solid rgba(251, 191, 36, 0.3); }
+        .badge-grp { color: var(--gemini-cyan); border: 1px solid rgba(34, 211, 238, 0.2); }
+
+        .evt-type { font-size: 0.65rem; font-weight: 800; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; }
+        .evt-title { font-weight: 700; font-size: 0.95rem; color: white; line-height: 1.2; margin-top: 5px; }
+        .evt-bot { display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.75rem; color: var(--text-mute); }
+        .evt-room { font-weight: 600; color: var(--gemini-cyan); display: flex; align-items: center; gap: 4px; }
+        .exam-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gemini-red); box-shadow: 0 0 10px var(--gemini-red); margin-left: 5px; }
+
+        /* --- MODALS --- */
+        .modal-overlay { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000;
+            justify-content: center; align-items: center; backdrop-filter: blur(8px);
+        }
+        .modal-box { 
+            background: #0f1218; border: var(--border-glass); padding: 30px; border-radius: 20px; 
+            width: 95%; max-width: 450px; box-shadow: 0 0 60px rgba(0,0,0,0.8);
         }
         
-        #adminSearch {
-            width: 100%; max-width: 300px; padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.3); color: white; margin-bottom: 30px; font-size: 1rem;
-        }
-
-        /* NEW CARD DESIGN */
-        .student-card {
-            background: rgba(15, 23, 42, 0.4); border: var(--border-glass); border-radius: 20px;
-            padding: 25px; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative; overflow: hidden; backdrop-filter: blur(10px);
-            display: flex; flex-direction: column; justify-content: space-between; height: 180px;
-        }
-        .student-card:hover { 
-            border-color: var(--gemini-cyan); transform: translateY(-5px); 
-            box-shadow: 0 10px 30px rgba(0, 240, 255, 0.1); background: rgba(15, 23, 42, 0.7);
-        }
+        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .m-title { font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 5px; }
+        .m-sub { color: var(--gemini-cyan); font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
         
-        /* Card Internals */
-        .st-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .st-avatar {
-            width: 55px; height: 55px; border-radius: 16px; 
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(34, 211, 238, 0.2));
-            border: 1px solid rgba(59, 130, 246, 0.3); color: var(--gemini-cyan);
-            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
-        }
-        .st-grp-badge {
-            background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 8px;
-            font-size: 0.75rem; font-weight: 700; color: var(--text-mute); border: 1px solid rgba(255,255,255,0.05);
-        }
+        .m-row { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .m-val { font-size: 1rem; color: white; font-weight: 500; }
+        .m-val.email { color: var(--gemini-blue); text-decoration: underline; cursor: pointer; transition:0.2s; }
+        .m-val.email:hover { color: white; }
+
+        /* Forms */
+        .st-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-family: inherit; }
+        .st-input:focus { border-color: var(--gemini-cyan); outline: none; }
+        .st-input option { background-color: #0f172a; color: white; }
         
-        .st-name { font-size: 1.2rem; font-weight: 700; color: white; margin: 15px 0 5px 0; }
-        .st-id { font-size: 0.85rem; color: var(--text-mute); font-family: monospace; letter-spacing: 1px; }
-        
-        .st-action {
-            margin-top: auto; display: flex; align-items: center; gap: 8px; font-size: 0.8rem;
-            color: var(--gemini-cyan); font-weight: 600; opacity: 0.7; transition: 0.2s;
-        }
-        .student-card:hover .st-action { opacity: 1; transform: translateX(5px); }
+        .btn-action { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition:0.2s; margin-top: 10px; }
+        .btn-primary { background: var(--gemini-cyan); color: black; }
+        .btn-primary:hover { box-shadow: 0 5px 20px rgba(34, 211, 238, 0.3); transform: translateY(-2px); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--gemini-red); border: 1px solid var(--gemini-red); }
+        .btn-danger:hover { background: var(--gemini-red); color: white; }
 
-        .footer { margin-top: 60px; text-align: center; font-size: 0.75rem; color: var(--text-mute); padding-bottom: 30px; }
-        .footer span { color: var(--gemini-cyan); font-weight: 700; text-shadow: 0 0 10px rgba(34, 211, 238, 0.4); }
-
-        /* MODAL */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-box { background: #0f1218; border: var(--border-glass); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 0 60px rgba(0,0,0,0.8); }
-        .modal-xl { max-width: 700px; }
-
-        /* Modal Detail Styles */
-        .det-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
-        .det-lbl { color: var(--text-mute); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
-        .det-val { color: white; font-weight: 600; font-size: 0.95rem; text-align: right; }
-        .det-hl { color: var(--gemini-cyan); }
-
-        /* ANALYTICS TABLE */
-        .ana-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .ana-table th { text-align: left; color: var(--text-mute); font-size: 0.75rem; text-transform: uppercase; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .ana-table td { padding: 12px 0; color: white; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .ana-month { font-weight: 700; color: var(--gemini-blue); }
+        .login-title { text-align: center; font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; }
 
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div class="loader-circle"></div>
-        <div class="loader-text">CONNEXION...</div>
+        <div class="gemini-spinner"></div>
     </div>
 
-    <div id="login-screen">
-        <div class="login-card">
-            <h1 class="brand-title">SmartST</h1>
-            <div class="brand-sub">Student Operating System</div>
+    <div class="top-bar">
+        <div class="logo-area">
+            <div class="logo-text">
+                <svg class="icon" viewBox="0 0 24 24" style="color:var(--gemini-cyan); width:24px; height:24px; margin-right:10px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                MCalC+ <span>Calendar</span>
+            </div>
+        </div>
+        <div class="controls">
+            <select id="weekSelect" class="st-select" onchange="renderCalendar()">
+                <option value="6">Sem A</option>
+                <option value="7">Sem B</option>
+            </select>
+            <select id="groupSelect" class="st-select" onchange="renderCalendar()">
+                <option value="C1">Groupe C1</option>
+                <option value="C2">Groupe C2</option>
+            </select>
             
-            <div id="studentLogin">
-                <input type="text" id="userCode" class="login-input" placeholder="IDENTIFIANT">
-            </div>
-            <div id="adminLogin" class="hidden">
-                <input type="text" id="adminUser" class="login-input" placeholder="ID" style="margin-bottom:10px;">
-                <input type="password" id="adminPwd" class="login-input" style="margin-top:0;" placeholder="PASS">
-            </div>
+            <button id="adminBtn" class="st-select btn-admin" onclick="handleAdminClick()">
+                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span id="adminBtnText">Admin</span>
+            </button>
 
-            <button class="login-btn" onclick="attemptLogin()">ENTRER</button>
-            
-            <div class="login-toggle" onclick="toggleMode()">
-                <span id="toggleTxt">Accès Administrateur</span>
-            </div>
-            <div id="errorMsg" style="color:var(--gemini-red); margin-top:20px; font-size:0.85rem; opacity:0; transition:0.3s; text-align:center;">Identifiant Inconnu</div>
+            <a href="smartst-cloud-access.html" class="btn-back">
+                <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Retour OS
+            </a>
         </div>
     </div>
 
-    <div id="admin-registry">
-        <div class="registry-header">
-            <div class="reg-title">
-                <h1>Registre Admin</h1>
-                <p>Gestion Centralisée des Étudiants</p>
+    <div class="calendar-container">
+        <div class="cal-wrapper">
+            <div class="cal-header"></div>
+            <div class="cal-header"><span class="day-name">Lundi</span><span class="day-date" id="date-0" onclick="editDate(0)">...</span></div>
+            <div class="cal-header"><span class="day-name">Mardi</span><span class="day-date" id="date-1" onclick="editDate(1)">...</span></div>
+            <div class="cal-header"><span class="day-name">Mercredi</span><span class="day-date" id="date-2" onclick="editDate(2)">...</span></div>
+            <div class="cal-header"><span class="day-name">Jeudi</span><span class="day-date" id="date-3" onclick="editDate(3)">...</span></div>
+            <div class="cal-header"><span class="day-name">Vendredi</span><span class="day-date" id="date-4" onclick="editDate(4)">...</span></div>
+
+            <div class="time-labels">
+                <div class="time-label"><span>09h00</span>10h45</div>
+                <div class="time-label"><span>11h00</span>12h45</div>
+                <div class="lunch-break-label">PAUSE</div>
+                <div class="time-label"><span>14h15</span>16h00</div>
+                <div class="time-label"><span>16h15</span>18h00</div>
             </div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn-logout" onclick="window.location.href='attendance.html'" style="color:var(--gemini-gold); border-color:var(--gemini-gold);">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-                    Passer l'Appel
-                </button>
-                <button class="btn-logout" onclick="logout()" style="border-color:var(--gemini-red); color:var(--gemini-red);">Déconnexion</button>
-            </div>
+
+            <div class="day-col" id="day-0"></div>
+            <div class="day-col" id="day-1"></div>
+            <div class="day-col" id="day-2"></div>
+            <div class="day-col" id="day-3"></div>
+            <div class="day-col" id="day-4"></div>
         </div>
-        <input type="text" id="adminSearch" placeholder="Rechercher (Nom, Prénom, ID)..." onkeyup="filterStudents()">
-        <div class="registry-grid" id="studentGrid"></div>
     </div>
 
-    <div id="dashboard">
-        <div id="adminBar" class="admin-bar">
-            <span>ÉDITION : <span id="adminTargetName">...</span></span>
-            <button onclick="exitAdmin()" style="background:black; color:white; border:none; padding:4px 12px; border-radius:20px; font-weight:700; cursor:pointer;">QUITTER</button>
+    <div class="modal-overlay" id="adminLoginModal">
+        <div class="modal-box">
+            <div class="login-title">Accès Administrateur</div>
+            <input type="text" id="loginUser" class="st-input" placeholder="Identifiant">
+            <input type="password" id="loginPass" class="st-input" placeholder="Mot de passe">
+            <button class="btn-action btn-primary" onclick="verifyAdmin()">Connexion</button>
+            <button class="btn-action btn-danger" style="background:transparent; border:none; color:#666;" onclick="closeModal('adminLoginModal')">Annuler</button>
         </div>
-
-        <div class="header">
-            <div class="profile">
-                <div class="avatar-lg" id="dashAvatar">--</div>
-                <div class="user-info">
-                    <h1 id="greeting">Bienvenue</h1>
-                    <p><span class="group-tag" id="dashGroup">--</span> BUT InfoCom</p>
-                </div>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn-logout admin-back" id="adminBackBtn" style="display:none;" onclick="exitAdmin()">Retour Admin</button>
-                <button class="btn-logout" onclick="logout()">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                    Déconnexion
-                </button>
-            </div>
-        </div>
-
-        <div class="nav-actions">
-            <a href="index.html" class="nav-btn">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                Accueil
-            </a>
-            <a href="calendar-cloud-access.html" class="nav-btn">
-                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                Emploi du temps
-            </a>
-            <a href="but1-s1.html" class="nav-btn">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-                Calculateur
-            </a>
-            <a href="attendance.html" id="navAppel" class="nav-btn" style="display:none; color:var(--gemini-gold); border-color:var(--gemini-gold);">
-                <svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-                Appel (Admin)
-            </a>
-        </div>
-
-        <div class="grid">
-            
-            <div class="card">
-                <div class="card-head">
-                    <div class="card-title"><div class="icon-box" style="color:var(--gemini-red)"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>Assiduité</div>
-                    <button class="btn-reset" onclick="openAnalytics()" style="color:var(--gemini-blue); font-size:0.8rem; font-weight:700;">📊 Analytics</button>
-                </div>
-                
-                <div id="warnLevel1" class="att-alert">⚠️ 1er AVERTISSEMENT (5+ Points)</div>
-                <div id="warnLevel2" class="att-alert" style="border-color:var(--gemini-red); background:rgba(244,63,94,0.2);">🚨 2ème AVERTISSEMENT (9+ Points)</div>
-
-                <div class="warn-info"><span>Progression Avertissement</span><span id="warnPts">0 pts</span></div>
-                <div class="att-stats">
-                    <div class="stat-item">
-                        <span class="stat-val c-red" id="countAbs">0</span>
-                        <span class="stat-lbl">Classes Manquées</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-val c-gold" id="countLate">0</span>
-                        <span class="stat-lbl">Retards</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-val c-blue" id="countExc">0</span>
-                        <span class="stat-lbl">Justifiées</span>
-                    </div>
-                </div>
-                <div class="history-list" id="absList"></div>
-                
-                <div class="admin-controls" id="adminAbsBox">
-                    <span class="admin-tag">Admin: Ajouter Absence Manuelle</span>
-                    <div style="display:flex; gap:5px;">
-                        <select id="adAbsType" class="st-input" style="flex:1"><option value="absent">Absence</option><option value="late">Retard</option><option value="excused">Excusée</option></select>
-                        <input type="text" id="adAbsReason" class="st-input" placeholder="Motif" style="flex:2">
-                        <button class="st-btn" style="background:var(--gemini-red)" onclick="addAbsence()">OK</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-head">
-                    <div class="card-title"><div class="icon-box" style="color:var(--gemini-purple)"><svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>Notes</div>
-                </div>
-                <div style="text-align:center; margin-bottom:20px;">
-                    <div class="gpa-display" id="gpaVal">--</div>
-                    <span style="color:var(--text-mute); font-size:0.8rem;">Moyenne Générale</span>
-                </div>
-                <div class="grade-list" id="gradeList"></div>
-                <div class="add-row">
-                    <input type="text" id="grName" class="st-input" placeholder="Matière" style="flex:2">
-                    <input type="number" id="grVal" class="st-input" placeholder="/20" style="flex:1">
-                    <button class="st-btn" onclick="addGrade()">+</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-head">
-                    <div class="card-title"><div class="icon-box" style="color:var(--gemini-cyan)"><svg class="icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>Devoirs</div>
-                </div>
-                <div class="hw-list" id="hwList"></div>
-                
-                <div class="admin-controls" id="adminHwBox">
-                    <span class="admin-tag">Admin: Assigner Devoir</span>
-                    <div style="display:flex; gap:5px;">
-                        <input type="text" id="adHwTxt" class="st-input" placeholder="Titre..." style="flex:2">
-                        <select id="adHwTgt" class="st-input" style="flex:1"><option value="USER">Étudiant</option><option value="GROUP">Groupe</option><option value="ALL">Tous</option></select>
-                        <button class="st-btn" style="background:var(--gemini-gold); color:black;" onclick="addHomework()">+</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <div class="footer">Powered by <span>MCalC+</span></div>
     </div>
 
-    <div class="modal-overlay" id="detailModal" onclick="closeModal()">
+    <div class="modal-overlay" id="classModal" onclick="closeModal('classModal')">
         <div class="modal-box" onclick="event.stopPropagation()">
-            <h3 style="color:white; margin-top:0; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px; margin-bottom:20px;">Détails Absence</h3>
-            <div class="det-row"><span class="det-lbl">Cours</span><span class="det-val det-hl" id="detClass">...</span></div>
-            <div class="det-row"><span class="det-lbl">Enseignant</span><span class="det-val" id="detProf">...</span></div>
-            <div class="det-row"><span class="det-lbl">Date</span><span class="det-val" id="detDate">...</span></div>
-            <div class="det-row"><span class="det-lbl">Heure</span><span class="det-val" id="detTime">...</span></div>
             
-            <div id="viewStatus" class="det-row"><span class="det-lbl">Statut</span><span class="det-val" id="detStatus">...</span></div>
-            <div id="editStatus" style="display:none; margin-bottom:15px;">
-                <label class="det-lbl">Modifier Statut</label>
-                <select id="editStatusInput" class="st-input" style="margin-top:5px;">
-                    <option value="absent">Absence Injustifiée</option>
-                    <option value="late">Retard</option>
-                    <option value="excused">Absence Justifiée</option>
+            <div id="viewMode">
+                <div class="m-header">
+                    <div><div class="m-title" id="mName">...</div><div class="m-sub" id="mType">...</div></div>
+                    <button class="btn-reset" onclick="closeModal('classModal')" style="font-size:1.5rem; color:#666;">&times;</button>
+                </div>
+                <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><div class="m-val" id="mTimeLoc">...</div></div>
+                <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><div class="m-val" id="mProf">...</div></div>
+                <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg><div class="m-val email" id="mEmail" onclick="copyEmail()">...</div></div>
+                <div id="mExamBox" style="display:none; margin-top:20px; padding:15px; background:rgba(244, 63, 94, 0.1); border:1px solid var(--gemini-red); border-radius:10px;"><div style="color:var(--gemini-red); font-weight:800; font-size:0.8rem; margin-bottom:5px;">⚠️ EXAMEN PRÉVU</div><div class="m-val" id="mExamText" style="font-size:0.9rem;"></div></div>
+                <button id="btnEdit" class="btn-action btn-primary" style="margin-top:25px; background:var(--gemini-gold); color:black; display:none;" onclick="toEditMode()">MODIFIER (ADMIN)</button>
+            </div>
+
+            <div id="editMode" class="hidden">
+                <h3 style="color:white; margin-top:0;">Éditer le Cours</h3>
+                
+                <select id="eGroup" class="st-input" style="border:1px solid var(--gemini-gold);">
+                    <option value="C1">C1 Uniquement</option>
+                    <option value="C2">C2 Uniquement</option>
+                    <option value="C_FULL">Groupe C Complet (C1 + C2)</option>
+                    <option value="ALL">PROMO (Toute la promo)</option>
                 </select>
-            </div>
 
-            <div style="margin-top:20px;">
-                <span class="det-lbl">Motif / Commentaire</span>
-                <p id="detReason" style="color:#aaa; font-size:0.9rem; background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; margin-top:5px;">...</p>
-                <textarea id="editReasonInput" class="st-input" style="display:none; height:80px;"></textarea>
-            </div>
+                <input type="text" id="eName" class="st-input" placeholder="Matière">
+                <select id="eType" class="st-input">
+                    <option value="CM">CM</option><option value="TD">TD</option><option value="TP">TP</option><option value="SAE">SAE</option>
+                </select>
+                <div style="display:flex; gap:10px;">
+                    <input type="number" id="eStart" class="st-input" placeholder="Début">
+                    <input type="number" id="eDur" class="st-input" placeholder="Durée">
+                </div>
+                <input type="text" id="eRoom" class="st-input" placeholder="Salle">
+                <input type="text" id="eProf" class="st-input" placeholder="Professeur">
+                <input type="text" id="eEmail" class="st-input" placeholder="Email">
+                <input type="text" id="eExam" class="st-input" placeholder="Info Examen">
+                <select id="eStatus" class="st-input">
+                    <option value="active">Actif</option>
+                    <option value="cancelled">Annulé</option>
+                    <option value="postponed">Reporté</option>
+                </select>
 
-            <div id="editActions" style="display:none; gap:10px; margin-top:20px;">
-                <button class="st-btn" onclick="saveAbsenceEdit()" style="background:var(--gemini-green); color:black; flex:1;">Enregistrer</button>
-                <button class="st-btn" onclick="deleteAbs(currentAbsenceId, true)" style="background:var(--gemini-red); flex:1;">Supprimer</button>
+                <button class="btn-action btn-primary" onclick="saveClass()">ENREGISTRER</button>
+                <button class="btn-action btn-danger" onclick="confirmDelete()">SUPPRIMER</button>
             </div>
-            <button id="btnClose" class="st-btn" style="width:100%; background:rgba(255,255,255,0.1); margin-top:20px;" onclick="closeModal()">Fermer</button>
         </div>
     </div>
 
-    <div class="modal-overlay" id="analyticsModal" onclick="closeModal()">
-        <div class="modal-box modal-xl" onclick="event.stopPropagation()">
-            <h3 style="color:white; margin-top:0; margin-bottom:20px;">Analytics Mensuels</h3>
-            <table class="ana-table">
-                <thead><tr><th>Mois</th><th>Présences</th><th>Absences</th><th>Retards</th><th>Justifiées</th></tr></thead>
-                <tbody id="anaBody"></tbody>
-            </table>
-            <button class="st-btn" style="width:100%; background:rgba(255,255,255,0.1); margin-top:20px;" onclick="closeModal()">Fermer</button>
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box" style="text-align:center;">
+            <h3 style="color:white;">Confirmer la suppression ?</h3>
+            <button class="btn-action btn-danger" onclick="executeDelete()">OUI, SUPPRIMER</button>
+            <button class="btn-action" style="background:transparent; border:1px solid #666; color:#aaa; margin-top:10px;" onclick="closeModal('deleteModal')">ANNULER</button>
         </div>
     </div>
 
     <script type="module">
+        // 1. FIREBASE CONFIGURATION
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, updateDoc, orderBy, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, query, onSnapshot, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -503,346 +344,298 @@
             projectId: "smartst-os",
             storageBucket: "smartst-os.firebasestorage.app",
             messagingSenderId: "866980185011",
-            appId: "1:866980185011:web:03006fe6a81634d5dec1c6"
+            appId: "1:866980185011:web:03006fe6a81634d5dec1c6",
+            measurementId: "G-556P9P719R"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let currentUser = null;
-        let isAdmin = false; 
-        let isLoginAdmin = false; 
-        let localData = { grades: [], attendance: [], homework: [], scheduleMap: {} };
-        let allStudents = []; 
-        window.currentAbsenceId = null;
+        // STATE
+        let scheduleData = [];
+        let dateData = {}; 
+        let isAdmin = false;
+        let currentEvent = null;
+        let currentSlot = null;
 
-        window.onload = function() { 
-            document.getElementById('loader').style.display='none'; 
-            ensureUserExists(); 
+        const SLOTS = [
+            { start: 9.00, duration: 1.75 }, 
+            { start: 11.00, duration: 1.75 }, 
+            { start: 14.25, duration: 1.75 }, 
+            { start: 16.25, duration: 1.75 }
+        ];
+
+        // INIT WITH REAL-TIME LISTENERS
+        window.onload = function() {
+            initRealTimeSync();
+            // Hide loader after a slight buffer to ensure data is visible
+            setTimeout(() => {
+                document.getElementById('loader').style.opacity = '0';
+                setTimeout(()=>document.getElementById('loader').style.display='none', 400);
+            }, 1000);
+            renderSlots();
         };
 
-        window.showLoader = function(cb) {
-            const l = document.getElementById('loader'); l.style.display='flex'; l.style.opacity='1';
-            setTimeout(() => { cb(); setTimeout(() => { l.style.opacity='0'; setTimeout(()=>l.style.display='none',200); }, 500); }, 500);
-        }
-
-        async function ensureUserExists() {
-            const ref = doc(db, "students", "U881");
-            const snap = await getDoc(ref);
-            if(!snap.exists()) {
-                await setDoc(ref, { nom: "ELIZALDE", prenom: "Alexios", grp: "C2" });
-            }
-        }
-
-        window.toggleMode = function() {
-            isLoginAdmin = !isLoginAdmin;
-            document.getElementById('studentLogin').classList.toggle('hidden');
-            document.getElementById('adminLogin').classList.toggle('hidden');
-            document.getElementById('toggleTxt').innerText = isLoginAdmin ? "Accès Étudiant" : "Accès Administrateur";
-        }
-
-        window.attemptLogin = async function() {
-            const err = document.getElementById('errorMsg');
-            if(isLoginAdmin) {
-                const u = document.getElementById('adminUser').value;
-                const p = document.getElementById('adminPwd').value;
-                if(u === 'nodata' && p === 'nodata') showLoader(loadAdminRegistry);
-                else { err.innerText = "Identifiants Admin Incorrects"; err.style.opacity = '1'; setTimeout(() => err.style.opacity = '0', 2000); }
-                return;
-            }
-            const c = document.getElementById('userCode').value.trim().toUpperCase();
-            if(!c) return;
-            showLoader(async () => {
-                try {
-                    const docRef = doc(db, "students", c);
-                    const docSnap = await getDoc(docRef);
-                    if (docSnap.exists()) loadDashboard({ id: docSnap.id, ...docSnap.data() }, false);
-                    else { err.innerText = "Identifiant introuvable"; err.style.opacity = '1'; setTimeout(()=>err.style.opacity='0',2000); }
-                } catch(e) { console.error(e); err.innerText = "Erreur de connexion"; err.style.opacity='1'; }
-            });
-        }
-
-        window.logout = function() { location.reload(); }
-
-        window.loadAdminRegistry = async function() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('admin-registry').style.display = 'block';
-            
-            const q = query(collection(db, "students"), orderBy("nom"));
-            const snapshot = await getDocs(q);
-            allStudents = [];
-            snapshot.forEach(doc => allStudents.push({ id: doc.id, ...doc.data() }));
-            renderStudentGrid(allStudents);
-        }
-
-        window.renderStudentGrid = function(list) {
-            const grid = document.getElementById('studentGrid');
-            grid.innerHTML = '';
-            list.forEach(s => {
-                const div = document.createElement('div');
-                div.className = 'student-card';
-                div.innerHTML = `
-                    <div class="st-card-top"><div class="st-avatar">${s.prenom.charAt(0)}${s.nom.charAt(0)}</div><div class="st-grp-badge">${s.grp}</div></div>
-                    <div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${s.id}</div><div class="st-action">Accéder au profil <svg class="icon" style="width:16px;" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></div></div>
-                `;
-                div.onclick = () => showLoader(() => loadDashboard(s, true));
-                grid.appendChild(div);
-            });
-        }
-
-        window.filterStudents = function() {
-            const term = document.getElementById('adminSearch').value.toLowerCase();
-            const filtered = allStudents.filter(s => s.nom.toLowerCase().includes(term) || s.prenom.toLowerCase().includes(term) || s.id.toLowerCase().includes(term));
-            renderStudentGrid(filtered);
-        }
-
-        window.exitAdmin = function() { showLoader(loadAdminRegistry); }
-
-        window.loadDashboard = async function(userObj, adminMode) {
-            currentUser = userObj;
-            isAdmin = adminMode; 
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('admin-registry').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-            document.getElementById('greeting').innerText = `Hello, ${currentUser.prenom}`;
-            document.getElementById('dashGroup').innerText = currentUser.grp;
-            document.getElementById('dashAvatar').innerText = currentUser.prenom.charAt(0) + currentUser.nom.charAt(0);
-            
-            // Only admin sees "Appel"
-            document.getElementById('navAppel').style.display = isAdmin ? 'flex' : 'none';
-            
-            const adminBar = document.getElementById('adminBar');
-            adminBar.style.display = isAdmin ? 'flex' : 'none';
-            if(isAdmin) document.getElementById('adminTargetName').innerText = `${currentUser.nom} ${currentUser.prenom}`;
-            document.getElementById('adminBackBtn').style.display = isAdmin ? 'flex' : 'none';
-            
-            // Toggle Admin Controls Visibility via Class
-            if(isAdmin) {
-                document.getElementById('adminAbsBox').classList.add('admin-visible');
-                document.getElementById('adminHwBox').classList.add('admin-visible');
-                document.querySelectorAll('.add-row').forEach(e => e.classList.add('admin-visible'));
-            } else {
-                document.getElementById('adminAbsBox').classList.remove('admin-visible');
-                document.getElementById('adminHwBox').classList.remove('admin-visible');
-                document.querySelectorAll('.add-row').forEach(e => e.classList.remove('admin-visible'));
-            }
-
-            await syncData();
-        }
-
-        async function syncData() {
-            localData = { grades: [], attendance: [], homework: [], scheduleMap: {} };
-            try {
-                const schSnap = await getDocs(collection(db, "schedule"));
-                schSnap.forEach(d => {
-                    const s = d.data();
-                    localData.scheduleMap[d.id] = { name: s.name, start: s.start, prof: s.prof || "N/A" };
+        function initRealTimeSync() {
+            // 1. Listen for Schedule Changes (Classes)
+            const q = query(collection(db, "schedule"));
+            onSnapshot(q, (snapshot) => {
+                scheduleData = [];
+                snapshot.forEach(doc => {
+                    scheduleData.push({ ...doc.data(), id: doc.id });
                 });
-                const hwSnap = await getDocs(collection(db, "homework"));
-                hwSnap.forEach(d => localData.homework.push({ ...d.data(), id: d.id }));
-                const grQ = query(collection(db, "grades"), where("userId", "==", currentUser.id));
-                const grS = await getDocs(grQ);
-                grS.forEach(d => localData.grades.push({ ...d.data(), id: d.id }));
-                const atQ = query(collection(db, "attendance"), where("studentId", "==", currentUser.id));
-                const atS = await getDocs(atQ);
-                atS.forEach(d => localData.attendance.push({ ...d.data(), id: d.id }));
-            } catch(e) { console.log("Offline/Error", e); }
-            renderAll();
-        }
-
-        function renderAll() { renderGrades(); renderAttendance(); renderHomework(); }
-
-        function renderGrades() {
-            const list = document.getElementById('gradeList');
-            list.innerHTML = '';
-            const grades = localData.grades;
-            if(grades.length > 0) {
-                const sum = grades.reduce((a,b)=>a+parseFloat(b.val),0);
-                document.getElementById('gpaVal').innerText = (sum/grades.length).toFixed(2);
-            } else document.getElementById('gpaVal').innerText = "--";
-            grades.forEach(g => {
-                const d = document.createElement('div');
-                d.className = 'item-row';
-                d.innerHTML = `<span>${g.name}</span><div style="display:flex;align-items:center;"><span class="val-hl">${g.val}</span>${isAdmin ? `<div class="del-btn" onclick="window.deleteGrade('${g.id}')">&times;</div>` : ''}</div>`;
-                list.appendChild(d);
+                console.log("Synced Schedule:", scheduleData.length, "events");
+                renderCalendar(); // Auto-refresh whenever DB changes
             });
-        }
 
-        function renderAttendance() {
-            const list = document.getElementById('absList');
-            list.innerHTML = '';
-            const recs = localData.attendance;
-            let absCount = 0; let lateCount = 0; let excCount = 0; let warningPoints = 0;
-            let daysMap = {};
-
-            recs.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-            recs.forEach(r => {
-                if(r.status === 'present') return; 
-
-                const classInfo = localData.scheduleMap[r.classId] || { name: "Non Spécifié", start: 9, prof: "N/A" };
-                const timeStr = formatTime(classInfo.start);
-                let label = "Absence"; let styleClass = "c-red"; let statusText = "Non Justifiée";
-                
-                if(r.status === 'excused') { label = "Justifiée"; styleClass = "c-blue"; statusText = "Justifiée"; excCount++; }
-                else if (r.status === 'late') { label = "Retard"; styleClass = "c-gold"; statusText = "Retard"; lateCount++; }
-                else { 
-                    label = "Absence"; styleClass = "c-red"; statusText = "Absence Injustifiée"; absCount++; 
-                    if(!daysMap[r.date]) daysMap[r.date] = { am: false, pm: false };
-                    if(classInfo.start < 12.75) daysMap[r.date].am = true; else daysMap[r.date].pm = true;
+            // 2. Listen for Date Changes (Week dates)
+            onSnapshot(doc(db, "meta", "calendarDates"), (doc) => {
+                if(doc.exists()) {
+                    dateData = doc.data();
+                    renderCalendar();
                 }
-
-                const d = document.createElement('div');
-                d.className = 'item-row';
-                d.onclick = () => window.openAbsenceModal(r, classInfo, statusText);
-                d.style.cursor = 'pointer';
-                d.innerHTML = `<div style="flex:1"><div style="font-weight:600; color:white;">${r.date} • ${timeStr}</div><div class="abs-detail">${classInfo.name}</div></div><span style="font-weight:700;" class="${styleClass}">${label}</span>`;
-                list.appendChild(d);
             });
-
-            Object.values(daysMap).forEach(day => { if(day.am) warningPoints++; if(day.pm) warningPoints++; });
-
-            document.getElementById('countAbs').innerText = absCount;
-            document.getElementById('countLate').innerText = lateCount;
-            document.getElementById('countExc').innerText = excCount;
-            document.getElementById('warnPts').innerText = `${warningPoints} pts`;
-            
-            // WARNING LEVEL LOGIC
-            document.getElementById('warnLevel1').style.display = warningPoints >= 5 ? 'block' : 'none';
-            document.getElementById('warnLevel2').style.display = warningPoints >= 9 ? 'block' : 'none';
         }
 
-        window.openAnalytics = function() {
-            const months = {};
-            localData.attendance.forEach(r => {
-                const m = r.date.substring(0, 7); 
-                if(!months[m]) months[m] = { present:0, absent:0, late:0, excused:0 };
-                if(r.status === 'present') months[m].present++;
-                else if(r.status === 'absent') months[m].absent++;
-                else if(r.status === 'late') months[m].late++;
-                else if(r.status === 'excused') months[m].excused++;
-            });
-            const tbody = document.getElementById('anaBody');
-            tbody.innerHTML = '';
-            Object.keys(months).sort().reverse().forEach(m => {
-                const d = months[m];
-                tbody.innerHTML += `<tr><td class="ana-month">${m}</td><td>${d.present}</td><td class="c-red">${d.absent}</td><td class="c-gold">${d.late}</td><td class="c-blue">${d.excused}</td></tr>`;
-            });
-            document.getElementById('analyticsModal').style.display = 'flex';
+        function renderSlots() {
+            for(let d=0; d<5; d++) {
+                const col = document.getElementById(`day-${d}`);
+                col.innerHTML = '';
+                col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 0)"></div>`;
+                col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 1)"></div>`;
+                col.innerHTML += `<div class="lunch-break"><div class="lunch-line"></div></div>`;
+                col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 2)"></div>`;
+                col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 3)"></div>`;
+            }
         }
 
-        window.openAbsenceModal = function(r, c, statusText) {
-            window.currentAbsenceId = r.id;
-            document.getElementById('detClass').innerText = c.name;
-            document.getElementById('detProf').innerText = c.prof;
-            document.getElementById('detDate').innerText = r.date;
-            document.getElementById('detTime').innerText = formatTime(c.start);
+        window.renderCalendar = function() {
+            // Clear current view
+            document.querySelectorAll('.slot').forEach(s => s.innerHTML = '');
             
-            // View Mode
-            document.getElementById('detStatus').innerText = statusText;
-            document.getElementById('detReason').innerText = r.reason || "Aucun commentaire.";
-            
-            // Edit Mode (Admin Only)
-            const isEdit = isAdmin;
-            document.getElementById('viewStatus').style.display = isEdit ? 'none' : 'flex';
-            document.getElementById('detReason').style.display = isEdit ? 'none' : 'block';
-            document.getElementById('btnClose').style.display = isEdit ? 'none' : 'block';
-            
-            document.getElementById('editStatus').style.display = isEdit ? 'block' : 'none';
-            document.getElementById('editReasonInput').style.display = isEdit ? 'block' : 'none';
-            document.getElementById('editActions').style.display = isEdit ? 'flex' : 'none';
+            const week = document.getElementById('weekSelect').value;
+            const group = document.getElementById('groupSelect').value;
 
-            if(isEdit) {
-                document.getElementById('editStatusInput').value = r.status;
-                document.getElementById('editReasonInput').value = r.reason || "";
+            // Render Dates
+            const weekDates = dateData[week] || ["...", "...", "...", "...", "..."];
+            for(let i=0; i<5; i++) {
+                const el = document.getElementById(`date-${i}`);
+                el.innerText = weekDates[i];
+                if(isAdmin) el.classList.add('editable'); else el.classList.remove('editable');
             }
 
-            document.getElementById('detailModal').style.display = 'flex';
-        }
+            // Filter Events
+            const events = scheduleData.filter(e => 
+                e.weeks && e.weeks.includes(parseInt(week)) && 
+                (e.groups.includes(group) || e.groups.includes("ALL"))
+            );
 
-        window.saveAbsenceEdit = async function() {
-            const newStatus = document.getElementById('editStatusInput').value;
-            const newReason = document.getElementById('editReasonInput').value;
-            await updateDoc(doc(db, "attendance", window.currentAbsenceId), { status: newStatus, reason: newReason });
-            closeModal();
-            await syncData();
-        }
+            // Render Events
+            events.forEach(evt => {
+                let slotIdx = -1;
+                // Simple logic to map time to slot index 0-3
+                if (Math.abs(evt.start - 9.00) < 0.5) slotIdx = 0;
+                else if (Math.abs(evt.start - 11.00) < 0.5) slotIdx = 1;
+                else if (Math.abs(evt.start - 14.25) < 0.5) slotIdx = 2;
+                else if (Math.abs(evt.start - 16.25) < 0.5) slotIdx = 3;
 
-        window.closeModal = function() { document.querySelectorAll('.modal-overlay').forEach(e => e.style.display = 'none'); }
+                if (slotIdx > -1) {
+                    const col = document.getElementById(`day-${evt.day}`);
+                    // Adjust index for lunch break div (which is at index 2)
+                    const targetChildIndex = slotIdx < 2 ? slotIdx : slotIdx + 1;
+                    const slotDiv = col.children[targetChildIndex];
 
-        function renderHomework() {
-            const list = document.getElementById('hwList');
-            list.innerHTML = '';
-            const tasks = localData.homework.filter(h => {
-                if(h.targetType==='ALL') return true;
-                if(h.targetType==='GROUP' && h.targetVal===currentUser.grp) return true;
-                if(h.targetType==='USER' && h.targetVal===currentUser.id) return true;
-                return false;
+                    if(slotDiv) {
+                        const card = document.createElement('div');
+                        card.className = `event-card type-${evt.type}`;
+                        if(evt.status === 'cancelled') card.classList.add('status-cancelled');
+                        if(evt.status === 'postponed') card.classList.add('status-postponed');
+
+                        // Badge Logic
+                        let badgeHtml = '';
+                        if(evt.groups.includes('ALL')) badgeHtml = '<span class="evt-group-badge badge-promo">PROMO</span>';
+                        else if(evt.groups.length > 1) badgeHtml = '<span class="evt-group-badge badge-grp">C1 + C2</span>';
+                        else if(evt.groups.includes('C1')) badgeHtml = '<span class="evt-group-badge badge-grp">C1</span>';
+                        else if(evt.groups.includes('C2')) badgeHtml = '<span class="evt-group-badge badge-grp">C2</span>';
+
+                        card.innerHTML = `
+                            <div class="evt-top">
+                                <div style="display:flex; gap:5px; align-items:center;">
+                                    <span class="evt-type">${evt.type}</span>
+                                    ${badgeHtml}
+                                </div>
+                                ${evt.examInfo ? '<div class="exam-dot"></div>' : ''}
+                            </div>
+                            <div class="evt-title">${evt.name}</div>
+                            <div class="evt-bot"><span class="evt-room">${evt.room}</span><span>${evt.prof}</span></div>
+                        `;
+                        card.onclick = (e) => { e.stopPropagation(); openDetails(evt); };
+                        slotDiv.appendChild(card);
+                    }
+                }
             });
-            if(tasks.length===0) list.innerHTML = '<div style="color:#666;text-align:center;">Rien à faire.</div>';
-            tasks.forEach(t => {
-                const isDone = t.doneBy && t.doneBy.includes(currentUser.id);
-                list.innerHTML += `<div class="hw-item ${isDone?'done':''}"><div class="hw-check ${isDone?'done':''}" onclick="window.toggleTask('${t.id}', ${isDone})"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="hw-text">${t.text}</div>${isAdmin ? `<div class="del-btn" onclick="window.deleteTask('${t.id}')">&times;</div>` : ''}</div>`;
+
+            // Admin styling update
+            document.querySelectorAll('.slot').forEach(s => {
+                if(isAdmin) s.classList.add('admin-mode'); else s.classList.remove('admin-mode');
             });
         }
 
-        window.toggleTask = async function(id, isDone) {
-            const task = localData.homework.find(h=>h.id===id);
-            if(!task.doneBy) task.doneBy=[];
-            let newDone = [...task.doneBy];
-            if(isDone) newDone = newDone.filter(u=>u!==currentUser.id); else newDone.push(currentUser.id);
-            await updateDoc(doc(db, "homework", id), { doneBy: newDone });
-            await syncData();
+        window.handleAdminClick = function() {
+            if(isAdmin) {
+                isAdmin = false;
+                const btn = document.getElementById('adminBtn');
+                btn.classList.remove('logged-in');
+                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Admin`;
+                renderCalendar();
+            } else {
+                openModal('adminLoginModal');
+            }
         }
 
-        window.addHomework = async function() {
-            const txt = document.getElementById('adHwTxt').value;
-            const tgt = document.getElementById('adHwTgt').value;
-            let val = 'ALL';
-            if(tgt==='GROUP') val = currentUser.grp;
-            if(tgt==='USER') val = currentUser.id;
-            if(txt) { await addDoc(collection(db, "homework"), { text: txt, targetType: tgt, targetVal: val, doneBy: [] }); document.getElementById('adHwTxt').value=''; await syncData(); }
+        window.verifyAdmin = function() {
+            const u = document.getElementById('loginUser').value;
+            const p = document.getElementById('loginPass').value;
+            if(u === 'nodata' && p === 'nodata') {
+                isAdmin = true;
+                closeModal('adminLoginModal');
+                const btn = document.getElementById('adminBtn');
+                btn.classList.add('logged-in');
+                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg> Quit Admin`;
+                renderCalendar();
+            } else { alert("Erreur"); }
         }
 
-        window.addAbsence = async function() {
-            const t = document.getElementById('adAbsType').value;
-            const r = document.getElementById('adAbsReason').value;
-            const now = new Date();
-            const dateStr = now.toISOString().split('T')[0];
-            await addDoc(collection(db, "attendance"), { studentId: currentUser.id, date: dateStr, status: t, reason: r, timestamp: now, classId: 'MANUAL' });
-            document.getElementById('adAbsReason').value=''; await syncData();
+        window.clickSlot = function(day, idx) {
+            if(!isAdmin) return;
+            currentEvent = null;
+            const def = SLOTS[idx];
+            
+            // Clear Form
+            document.getElementById('eName').value = "";
+            document.getElementById('eType').value = "CM";
+            document.getElementById('eStart').value = def.start;
+            document.getElementById('eDur').value = def.duration;
+            document.getElementById('eRoom').value = "";
+            document.getElementById('eProf').value = "";
+            document.getElementById('eEmail').value = "";
+            document.getElementById('eExam').value = "";
+            document.getElementById('eStatus').value = "active";
+            
+            const cf = document.getElementById('groupSelect').value;
+            document.getElementById('eGroup').value = cf; 
+
+            currentSlot = { day: day, wk: parseInt(document.getElementById('weekSelect').value), grp: cf };
+            openModal('classModal');
+            window.toEditMode();
         }
 
-        window.addGrade = async function() {
-            const n = document.getElementById('grName').value;
-            const v = document.getElementById('grVal').value;
-            if(n && v) { await addDoc(collection(db, "grades"), { userId: currentUser.id, name: n, val: v }); document.getElementById('grName').value=''; document.getElementById('grVal').value=''; await syncData(); }
+        window.editDate = async function(dayIdx) {
+            if(!isAdmin) return;
+            const week = document.getElementById('weekSelect').value;
+            const newDate = prompt("Modifier la date (ex: 02/02) :", dateData[week]?.[dayIdx] || "");
+            if(newDate) {
+                if(!dateData[week]) dateData[week] = ["...", "...", "...", "...", "..."];
+                dateData[week][dayIdx] = newDate;
+                await setDoc(doc(db, "meta", "calendarDates"), dateData);
+            }
         }
 
-        window.deleteGrade = async function(id) { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "grades", id)); await syncData(); } }
-        window.deleteAbs = async function(id, fromModal) { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "attendance", id)); if(fromModal) closeModal(); await syncData(); } }
-        window.deleteTask = async function(id) { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "homework", id)); await syncData(); } }
+        window.openDetails = function(evt) {
+            currentEvent = evt;
+            document.getElementById('mName').innerText = evt.name;
+            document.getElementById('mType').innerText = evt.type;
+            document.getElementById('mTimeLoc').innerText = `${formatTime(evt.start)} - ${formatTime(evt.start+evt.duration)} • ${evt.room}`;
+            document.getElementById('mProf').innerText = evt.prof;
+            document.getElementById('mEmail').innerText = evt.profEmail || "Non renseigné";
+            
+            if(evt.examInfo) {
+                document.getElementById('mExamBox').style.display = 'block';
+                document.getElementById('mExamText').innerText = evt.examInfo;
+            } else document.getElementById('mExamBox').style.display = 'none';
 
+            document.getElementById('viewMode').style.display = 'block';
+            document.getElementById('editMode').style.display = 'none';
+            document.getElementById('btnEdit').style.display = isAdmin ? 'block' : 'none';
+            
+            openModal('classModal');
+        }
+
+        window.toEditMode = function() {
+            document.getElementById('viewMode').style.display = 'none';
+            document.getElementById('editMode').classList.remove('hidden');
+            document.getElementById('editMode').style.display = 'block';
+            
+            if(currentEvent) {
+                document.getElementById('eName').value = currentEvent.name;
+                document.getElementById('eType').value = currentEvent.type;
+                document.getElementById('eStart').value = currentEvent.start;
+                document.getElementById('eDur').value = currentEvent.duration;
+                document.getElementById('eRoom').value = currentEvent.room;
+                document.getElementById('eProf').value = currentEvent.prof;
+                document.getElementById('eEmail').value = currentEvent.profEmail;
+                document.getElementById('eExam').value = currentEvent.examInfo;
+                document.getElementById('eStatus').value = currentEvent.status;
+                
+                let gVal = 'C1'; 
+                if(currentEvent.groups.includes('ALL')) gVal = 'ALL';
+                else if(currentEvent.groups.includes('C1') && currentEvent.groups.includes('C2')) gVal = 'C_FULL';
+                else if(currentEvent.groups.includes('C1')) gVal = 'C1';
+                else if(currentEvent.groups.includes('C2')) gVal = 'C2';
+                document.getElementById('eGroup').value = gVal;
+            }
+        }
+
+        window.saveClass = async function() {
+            const tGroup = document.getElementById('eGroup').value;
+            let groupsArr = [tGroup];
+            if(tGroup === 'ALL') groupsArr = ['ALL'];
+            if(tGroup === 'C_FULL') groupsArr = ['C1', 'C2'];
+
+            const data = {
+                name: document.getElementById('eName').value,
+                type: document.getElementById('eType').value,
+                start: parseFloat(document.getElementById('eStart').value),
+                duration: parseFloat(document.getElementById('eDur').value),
+                room: document.getElementById('eRoom').value,
+                prof: document.getElementById('eProf').value,
+                profEmail: document.getElementById('eEmail').value,
+                examInfo: document.getElementById('eExam').value,
+                status: document.getElementById('eStatus').value,
+                groups: groupsArr
+            };
+
+            if(currentEvent) {
+                await updateDoc(doc(db, "schedule", currentEvent.id), data);
+            } else {
+                data.day = currentSlot.day;
+                data.weeks = [currentSlot.wk];
+                await addDoc(collection(db, "schedule"), data);
+            }
+            closeModal('classModal');
+        }
+
+        window.confirmDelete = function() { openModal('deleteModal'); }
+        window.executeDelete = async function() {
+            if(currentEvent) {
+                await deleteDoc(doc(db, "schedule", currentEvent.id));
+                closeModal('deleteModal');
+                closeModal('classModal');
+            }
+        }
+
+        window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; }
+        window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
+        
         window.formatTime = function(dec) {
-            if(!dec && dec !== 0) return "--:--";
             const h = Math.floor(dec);
             const m = Math.round((dec - h) * 60);
             return `${h}h${m<10?'0'+m:m}`;
         }
-
-        // Expose functions globally
-        window.showAbsenceDetail = window.showAbsenceDetail;
-        window.toggleTask = window.toggleTask;
-        window.deleteGrade = window.deleteGrade;
-        window.deleteAbs = window.deleteAbs;
-        window.deleteTask = window.deleteTask;
-        window.openAnalytics = window.openAnalytics;
-        window.closeModal = window.closeModal;
-        window.saveAbsenceEdit = window.saveAbsenceEdit;
-        window.filterStudents = window.filterStudents;
-        window.openAbsenceModal = window.openAbsenceModal;
-
+        window.copyEmail = function() {
+            const mail = document.getElementById('mEmail').innerText;
+            if(mail && mail !== "Non renseigné") { navigator.clipboard.writeText(mail); alert("Adresse copiée !"); }
+        }
     </script>
 </body>
-</html> 
+</html>
