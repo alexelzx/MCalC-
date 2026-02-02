@@ -323,6 +323,10 @@
                 <p>Gestion Centralisée des Étudiants</p>
             </div>
             <div style="display:flex; gap:10px;">
+                <button class="btn-logout" onclick="window.location.href='setup_students.html'" style="color:var(--gemini-cyan); border-color:var(--gemini-cyan);">
+                    <svg class="icon" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                    Database
+                </button>
                 <button class="btn-logout" onclick="window.location.href='attendance.html'" style="color:var(--gemini-gold); border-color:var(--gemini-gold);">
                     <svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
                     Passer l'Appel
@@ -388,6 +392,7 @@
                 <div id="warnLevel2" class="att-alert" style="border-color:var(--gemini-red); background:rgba(244,63,94,0.2);">🚨 2ème AVERTISSEMENT (9+ Points)</div>
 
                 <div class="warn-info"><span>Progression Avertissement</span><span id="warnPts">0 pts</span></div>
+
                 <div class="att-stats">
                     <div class="stat-item">
                         <span class="stat-val c-red" id="countAbs">0</span>
@@ -845,4 +850,4 @@
 
     </script>
 </body>
-</html> 
+</html>
