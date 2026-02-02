@@ -2,11 +2,15 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>MCalC+ | Portail Étudiant</title>
+    
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://icons.veryicon.com/png/o/miscellaneous/street-network-app/student-13.png">
+    <meta name="theme-color" content="#0f172a">
+
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -205,39 +209,32 @@
         .t-title { font-size: 1rem; font-weight: 700; color: white; margin-bottom: 5px; }
         .t-desc { font-size: 0.8rem; color: var(--text-mute); max-width: 180px; line-height: 1.4; }
 
-        /* --- ROADMAP STATES (ALWAYS ON GLOW) --- */
-        
-        /* DONE: Strong Neon Green */
+        /* --- ROADMAP STATES --- */
         .t-item.done { opacity: 1 !important; }
         .t-item.done .t-dot-outer { border-color: #00ff88; box-shadow: 0 0 25px rgba(0, 255, 136, 0.6); }
         .t-item.done .t-dot-inner { background: #00ff88; box-shadow: 0 0 10px #00ff88; }
         .t-item.done .t-date { color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
 
-        /* DEV: Breathing Yellow (En Cours) */
         .t-item.dev { opacity: 1 !important; }
         .t-item.dev .t-dot-outer { border-color: var(--gemini-yellow); animation: pulse-yellow 2s infinite; }
         .t-item.dev .t-dot-inner { background: var(--gemini-yellow); box-shadow: 0 0 15px var(--gemini-yellow); }
         .t-item.dev .t-date { color: var(--gemini-yellow); text-shadow: 0 0 10px rgba(255, 230, 0, 0.3); }
 
-        /* TEST R: Neon Orange */
         .t-item.test-r { opacity: 1 !important; }
         .t-item.test-r .t-dot-outer { border-color: var(--gemini-orange); box-shadow: 0 0 25px rgba(249, 115, 22, 0.6); }
         .t-item.test-r .t-dot-inner { background: var(--gemini-orange); box-shadow: 0 0 10px var(--gemini-orange); }
         .t-item.test-r .t-date { color: var(--gemini-orange); text-shadow: 0 0 10px rgba(249, 115, 22, 0.3); }
 
-        /* TEST P: Neon Pink */
         .t-item.test-p { opacity: 1 !important; }
         .t-item.test-p .t-dot-outer { border-color: var(--gemini-pink); box-shadow: 0 0 25px rgba(217, 70, 239, 0.6); }
         .t-item.test-p .t-dot-inner { background: var(--gemini-pink); box-shadow: 0 0 10px var(--gemini-pink); }
         .t-item.test-p .t-date { color: var(--gemini-pink); text-shadow: 0 0 10px rgba(217, 70, 239, 0.3); }
 
-        /* PLAN: Grey/Ghost (Planned) */
-        .t-item.plan { opacity: 0.5; } /* Keeps it dim */
+        .t-item.plan { opacity: 0.5; }
         .t-item.plan .t-dot-outer { border-color: #64748b; }
         .t-item.plan .t-dot-inner { background: #64748b; }
         .t-item.plan .t-date { color: #94a3b8; }
 
-        /* ANNULEE: Red Strikethrough */
         .t-item.annulee { opacity: 0.6 !important; }
         .t-item.annulee .t-dot-outer { border-color: var(--gemini-red); }
         .t-item.annulee .t-dot-inner { background: var(--gemini-red); }
@@ -265,12 +262,38 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-10px);} 75% {transform: translateX(10px);} }
 
-        @media (max-width: 768px) {
-            #main-menu { flex-direction: column; }
-            .portal-card { min-height: 200px; padding: 30px; }
-            .brand-title { font-size: 3rem; }
-            .corner-logo { height: 50px; top: 20px; padding: 8px 15px; } 
-            .logo-left { left: 20px; } .logo-right { right: 20px; }
+        /* --- MOBILE APP MODE (RESPONSIVE FIXES) --- */
+        @media screen and (max-width: 768px) {
+            /* General Layout */
+            body { justify-content: flex-start; padding-top: 80px; }
+            
+            /* Logo Fix */
+            .corner-logo { height: 40px; padding: 5px 15px; top: 15px; }
+            .logo-left { left: 10px; }
+            .logo-right { right: 10px; }
+            
+            /* Brand Title */
+            .brand-container { margin-bottom: 30px; margin-top: 20px; }
+            .brand-title { font-size: 2.8rem; }
+            .brand-sub { font-size: 0.8rem; letter-spacing: 2px; }
+
+            /* Stack Menu Cards */
+            #main-menu { flex-direction: column; width: 90%; gap: 20px; padding-bottom: 80px; }
+            .portal-card { min-height: auto; padding: 30px 20px; }
+            
+            /* Calculator Grid */
+            .selection-grid { grid-template-columns: 1fr; }
+            .year-card { padding: 20px; }
+            
+            /* Footer */
+            .footer-nav { bottom: 20px; width: 90%; justify-content: center; }
+            .f-link { font-size: 0.75rem; padding: 10px 15px; }
+            
+            /* Modals */
+            .modal-box { width: 95%; max-height: 85vh; overflow-y: auto; padding: 30px 20px; }
+            
+            /* Roadmap Scroll */
+            .timeline-container { padding-left: 20px; padding-right: 20px; }
         }
     </style>
 </head>
@@ -624,5 +647,3 @@
     </script>
 </body>
 </html>
-
-
