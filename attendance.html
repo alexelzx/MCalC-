@@ -214,9 +214,9 @@
     </div>
 
     <script type="module">
-        // 1. FIREBASE
+        // 1. FIREBASE (Added setDoc for ID injection)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, doc, query, where, writeBatch, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, setDoc, doc, query, where, writeBatch, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -442,36 +442,45 @@
         window.openAdmin = () => document.getElementById('adminModal').style.display = 'flex';
         window.closeModal = () => document.getElementById('adminModal').style.display = 'none';
         
+        // --- ADD STUDENT FUNCTION (UPDATED) ---
         window.addStudent = async function() {
-            const nom = document.getElementById('newNom').value.toUpperCase();
-            const prenom = document.getElementById('newPrenom').value;
+            const nom = document.getElementById('newNom').value.trim().toUpperCase();
+            const prenom = document.getElementById('newPrenom').value.trim();
             const grp = document.getElementById('newGroup').value;
 
-            if(nom && prenom) {
-                // Generate a pseudo-ID (e.g. U + Random)
-                const newId = "U" + Math.floor(1000 + Math.random() * 9000);
-                
-                await showLoaderSync(async () => {
-                    await apiAddStudent(newId, nom, prenom, grp);
-                });
+            if (!nom || !prenom) {
+                alert("Veuillez remplir le nom et le prénom.");
+                return;
             }
-        }
 
-        async function apiAddStudent(id, nom, prenom, grp) {
-            await createDoc(collection(db, "students"), { nom, prenom, grp }, id); // Use ID if possible or auto
-            // Re-fetch
-            await loadStudents();
-            closeModal();
-            // If current view matches new student's group, refresh
-            const curGrp = document.getElementById('attGroup').value;
-            if(curGrp === 'ALL' || curGrp === grp) renderStudents();
-            alert(`Étudiant ${nom} ajouté (ID: ${id})`);
-        }
-        
-        // Helper to add doc with specific ID
-        async function createDoc(col, data, id) {
-            await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js")
-                .then(mod => mod.setDoc(mod.doc(col, id), data));
+            // 1. GENERATE RANDOM ID (U + 3 Digits)
+            const randomNum = Math.floor(Math.random() * 900) + 100;
+            const newID = "U" + randomNum;
+
+            // 2. UPLOAD WITH SPECIFIC ID (Using setDoc)
+            try {
+                await setDoc(doc(db, "students", newID), {
+                    nom: nom,
+                    prenom: prenom,
+                    grp: grp
+                });
+
+                alert(`Succès ! Étudiant créé : ${prenom} ${nom} (ID: ${newID})`);
+                closeModal();
+                
+                // Clear inputs
+                document.getElementById('newNom').value = "";
+                document.getElementById('newPrenom').value = "";
+                
+                // Refresh list
+                await loadStudents();
+                const curGrp = document.getElementById('attGroup').value;
+                if(curGrp === 'ALL' || curGrp === grp) renderStudents();
+
+            } catch (e) {
+                console.error("Error adding student: ", e);
+                alert("Erreur lors de l'inscription.");
+            }
         }
 
         // --- UTILS ---
@@ -490,14 +499,6 @@
             return `${h}h${m<10?'0'+m:m}`;
         }
         
-        async function showLoaderSync(fn) {
-            document.getElementById('loader').style.display='flex';
-            document.getElementById('loader').style.opacity='1';
-            await fn();
-            document.getElementById('loader').style.opacity='0';
-            setTimeout(()=>document.getElementById('loader').style.display='none', 400);
-        }
-
     </script>
 </body>
 </html>
