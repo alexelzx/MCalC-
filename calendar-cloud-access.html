@@ -2,17 +2,23 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>MCalC+ | Emploi du Temps</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://icons.veryicon.com/png/o/miscellaneous/street-network-app/student-13.png">
+    <meta name="theme-color" content="#0f172a">
+
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
+        /* [STYLES UNCHANGED FROM YOUR CODE] */
         :root {
-            /* GEMINI LIQUID PALETTE */
             --bg-deep: #02040a;
             --surface-glass: rgba(20, 24, 30, 0.75);
             --border-glass: 1px solid rgba(56, 189, 248, 0.15);
-            
             --gemini-cyan: #22d3ee;
             --gemini-blue: #3b82f6;
             --gemini-purple: #a855f7;
@@ -20,7 +26,6 @@
             --gemini-green: #10b981;
             --gemini-gold: #fbbf24;
             --gemini-orange: #f97316;
-            
             --text-main: #f8fafc;
             --text-mute: #94a3b8;
         }
@@ -34,12 +39,10 @@
             display: flex; flex-direction: column;
         }
 
-        /* --- UTILS --- */
         .icon { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
         .btn-reset { background: none; border: none; cursor: pointer; color: inherit; font: inherit; }
         .hidden { display: none !important; }
 
-        /* --- LOADER --- */
         #loader {
             position: fixed; inset: 0; background: #02040a; z-index: 10000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -53,16 +56,14 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* --- TOP BAR --- */
+        /* HEADER */
         .top-bar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 15px 30px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px);
             border-bottom: var(--border-glass); position: sticky; top: 0; z-index: 100;
         }
-        
         .logo-text { font-size: 1.2rem; font-weight: 800; color: white; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
         .logo-text span { color: var(--gemini-cyan); }
-
         .controls { display: flex; gap: 15px; align-items: center; }
         
         .st-select {
@@ -73,7 +74,6 @@
         .st-select:hover { border-color: var(--gemini-cyan); background: rgba(34, 211, 238, 0.05); }
         .st-select option { background-color: #0f172a; color: white; }
 
-        /* Admin Button */
         .btn-admin {
             background: rgba(251, 191, 36, 0.05); border: 1px solid rgba(251, 191, 36, 0.3); 
             color: var(--gemini-gold); font-weight: 700; display: flex; align-items: center; gap: 8px;
@@ -89,14 +89,12 @@
         }
         .btn-back:hover { background: var(--gemini-red); color: white; }
 
-        /* --- CALENDAR --- */
+        /* CALENDAR */
         .calendar-container { padding: 20px; flex: 1; overflow-y: auto; display: flex; justify-content: center; }
-        
         .cal-wrapper {
             display: grid; grid-template-columns: 80px repeat(5, 1fr); gap: 10px;
             max-width: 1400px; width: 100%; min-width: 900px;
         }
-
         .cal-header {
             text-align: center; color: var(--text-mute); padding-bottom: 10px;
             display: flex; flex-direction: column; gap: 4px;
@@ -109,15 +107,11 @@
         .day-date.editable:hover { background: var(--gemini-cyan); color: black; cursor: pointer; }
 
         .time-labels { display: grid; grid-template-rows: 1fr 1fr 20px 1fr 1fr; gap: 15px; text-align: right; padding-right: 15px; }
-        .time-label { 
-            display: flex; flex-direction: column; justify-content: center; 
-            font-size: 0.75rem; color: var(--text-mute); font-weight: 600;
-        }
+        .time-label { display: flex; flex-direction: column; justify-content: center; font-size: 0.75rem; color: var(--text-mute); font-weight: 600; }
         .time-label span { display: block; font-size: 0.65rem; opacity: 0.7; }
         .lunch-break-label { font-size: 0.7rem; color: var(--gemini-purple); display: flex; align-items: center; justify-content: flex-end; opacity: 0.8; }
 
         .day-col { display: grid; grid-template-rows: 1fr 1fr 20px 1fr 1fr; gap: 15px; }
-        
         .slot {
             background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1);
             border-radius: 12px; position: relative; transition: 0.2s; min-height: 120px;
@@ -127,11 +121,9 @@
             content: '+'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
             font-size: 2rem; color: var(--gemini-cyan); opacity: 0.5;
         }
-
         .lunch-break { height: 20px; display: flex; align-items: center; justify-content: center; }
         .lunch-line { width: 100%; height: 1px; background: rgba(255,255,255,0.05); }
 
-        /* --- EVENTS --- */
         .event-card {
             position: absolute; inset: 0; border-radius: 12px; padding: 12px;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -145,24 +137,12 @@
         .type-TP { background: rgba(249, 115, 22, 0.15); border-color: var(--gemini-orange); }
         .type-SAE { background: rgba(168, 85, 247, 0.15); border-color: var(--gemini-purple); }
 
-        .status-cancelled { 
-            background: rgba(239, 68, 68, 0.15) !important; border-color: var(--gemini-red) !important; 
-            opacity: 0.8; 
-        }
+        .status-cancelled { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--gemini-red) !important; opacity: 0.8; }
         .status-cancelled .evt-title { text-decoration: line-through; opacity: 0.6; }
-        
-        .status-postponed { 
-            background: repeating-linear-gradient(45deg, rgba(255,255,255,0.03), rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.01) 10px, rgba(255,255,255,0.01) 20px) !important;
-            border-color: #64748b !important; opacity: 0.6; filter: grayscale(0.5);
-        }
+        .status-postponed { background: repeating-linear-gradient(45deg, rgba(255,255,255,0.03), rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.01) 10px, rgba(255,255,255,0.01) 20px) !important; border-color: #64748b !important; opacity: 0.6; filter: grayscale(0.5); }
 
         .evt-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        
-        /* Group Badge */
-        .evt-group-badge { 
-            font-size: 0.6rem; font-weight: 800; letter-spacing: 0.5px; 
-            padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.3);
-        }
+        .evt-group-badge { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.3); }
         .badge-promo { color: var(--gemini-gold); border: 1px solid rgba(251, 191, 36, 0.3); }
         .badge-grp { color: var(--gemini-cyan); border: 1px solid rgba(34, 211, 238, 0.2); }
 
@@ -172,38 +152,37 @@
         .evt-room { font-weight: 600; color: var(--gemini-cyan); display: flex; align-items: center; gap: 4px; }
         .exam-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gemini-red); box-shadow: 0 0 10px var(--gemini-red); margin-left: 5px; }
 
-        /* --- MODALS --- */
-        .modal-overlay { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000;
-            justify-content: center; align-items: center; backdrop-filter: blur(8px);
-        }
-        .modal-box { 
-            background: #0f1218; border: var(--border-glass); padding: 30px; border-radius: 20px; 
-            width: 95%; max-width: 450px; box-shadow: 0 0 60px rgba(0,0,0,0.8);
-        }
-        
+        /* MODALS */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
+        .modal-box { background: #0f1218; border: var(--border-glass); padding: 30px; border-radius: 20px; width: 95%; max-width: 450px; box-shadow: 0 0 60px rgba(0,0,0,0.8); }
         .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
         .m-title { font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 5px; }
         .m-sub { color: var(--gemini-cyan); font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
-        
         .m-row { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .m-val { font-size: 1rem; color: white; font-weight: 500; }
         .m-val.email { color: var(--gemini-blue); text-decoration: underline; cursor: pointer; transition:0.2s; }
         .m-val.email:hover { color: white; }
 
-        /* Forms */
         .st-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-family: inherit; }
         .st-input:focus { border-color: var(--gemini-cyan); outline: none; }
         .st-input option { background-color: #0f172a; color: white; }
-        
         .btn-action { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition:0.2s; margin-top: 10px; }
         .btn-primary { background: var(--gemini-cyan); color: black; }
         .btn-primary:hover { box-shadow: 0 5px 20px rgba(34, 211, 238, 0.3); transform: translateY(-2px); }
         .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--gemini-red); border: 1px solid var(--gemini-red); }
         .btn-danger:hover { background: var(--gemini-red); color: white; }
-
         .login-title { text-align: center; font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; }
 
+        /* --- MOBILE APP MODE --- */
+        @media screen and (max-width: 768px) {
+            body { font-size: 14px; }
+            .calendar-container { justify-content: flex-start; -webkit-overflow-scrolling: touch; }
+            .cal-wrapper { min-width: 800px; margin-bottom: 20px; }
+            .top-bar { flex-direction: column; gap: 15px; align-items: flex-start; }
+            .controls { flex-wrap: wrap; width: 100%; justify-content: space-between; }
+            .st-select { flex: 1; text-align: center; }
+            .modal-box { width: 95%; max-height: 85vh; overflow-y: auto; }
+        }
     </style>
 </head>
 <body>
@@ -293,14 +272,12 @@
 
             <div id="editMode" class="hidden">
                 <h3 style="color:white; margin-top:0;">Éditer le Cours</h3>
-                
                 <select id="eGroup" class="st-input" style="border:1px solid var(--gemini-gold);">
                     <option value="C1">C1 Uniquement</option>
                     <option value="C2">C2 Uniquement</option>
                     <option value="C_FULL">Groupe C Complet (C1 + C2)</option>
                     <option value="ALL">PROMO (Toute la promo)</option>
                 </select>
-
                 <input type="text" id="eName" class="st-input" placeholder="Matière">
                 <select id="eType" class="st-input">
                     <option value="CM">CM</option><option value="TD">TD</option><option value="TP">TP</option><option value="SAE">SAE</option>
@@ -318,7 +295,6 @@
                     <option value="cancelled">Annulé</option>
                     <option value="postponed">Reporté</option>
                 </select>
-
                 <button class="btn-action btn-primary" onclick="saveClass()">ENREGISTRER</button>
                 <button class="btn-action btn-danger" onclick="confirmDelete()">SUPPRIMER</button>
             </div>
@@ -334,7 +310,6 @@
     </div>
 
     <script type="module">
-        // 1. FIREBASE CONFIGURATION
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, query, onSnapshot, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -344,14 +319,12 @@
             projectId: "smartst-os",
             storageBucket: "smartst-os.firebasestorage.app",
             messagingSenderId: "866980185011",
-            appId: "1:866980185011:web:03006fe6a81634d5dec1c6",
-            measurementId: "G-556P9P719R"
+            appId: "1:866980185011:web:03006fe6a81634d5dec1c6"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // STATE
         let scheduleData = [];
         let dateData = {}; 
         let isAdmin = false;
@@ -365,10 +338,13 @@
             { start: 16.25, duration: 1.75 }
         ];
 
-        // INIT WITH REAL-TIME LISTENERS
         window.onload = function() {
+            // SESSION CHECK
+            if(!localStorage.getItem('smartst_session')) {
+                window.location.href = 'smartst-cloud-access.html'; // Force Login
+            }
+
             initRealTimeSync();
-            // Hide loader after a slight buffer to ensure data is visible
             setTimeout(() => {
                 document.getElementById('loader').style.opacity = '0';
                 setTimeout(()=>document.getElementById('loader').style.display='none', 400);
@@ -377,18 +353,15 @@
         };
 
         function initRealTimeSync() {
-            // 1. Listen for Schedule Changes (Classes)
             const q = query(collection(db, "schedule"));
             onSnapshot(q, (snapshot) => {
                 scheduleData = [];
                 snapshot.forEach(doc => {
                     scheduleData.push({ ...doc.data(), id: doc.id });
                 });
-                console.log("Synced Schedule:", scheduleData.length, "events");
-                renderCalendar(); // Auto-refresh whenever DB changes
+                renderCalendar();
             });
 
-            // 2. Listen for Date Changes (Week dates)
             onSnapshot(doc(db, "meta", "calendarDates"), (doc) => {
                 if(doc.exists()) {
                     dateData = doc.data();
@@ -410,13 +383,11 @@
         }
 
         window.renderCalendar = function() {
-            // Clear current view
             document.querySelectorAll('.slot').forEach(s => s.innerHTML = '');
             
             const week = document.getElementById('weekSelect').value;
             const group = document.getElementById('groupSelect').value;
 
-            // Render Dates
             const weekDates = dateData[week] || ["...", "...", "...", "...", "..."];
             for(let i=0; i<5; i++) {
                 const el = document.getElementById(`date-${i}`);
@@ -424,16 +395,13 @@
                 if(isAdmin) el.classList.add('editable'); else el.classList.remove('editable');
             }
 
-            // Filter Events
             const events = scheduleData.filter(e => 
                 e.weeks && e.weeks.includes(parseInt(week)) && 
                 (e.groups.includes(group) || e.groups.includes("ALL"))
             );
 
-            // Render Events
             events.forEach(evt => {
                 let slotIdx = -1;
-                // Simple logic to map time to slot index 0-3
                 if (Math.abs(evt.start - 9.00) < 0.5) slotIdx = 0;
                 else if (Math.abs(evt.start - 11.00) < 0.5) slotIdx = 1;
                 else if (Math.abs(evt.start - 14.25) < 0.5) slotIdx = 2;
@@ -441,7 +409,6 @@
 
                 if (slotIdx > -1) {
                     const col = document.getElementById(`day-${evt.day}`);
-                    // Adjust index for lunch break div (which is at index 2)
                     const targetChildIndex = slotIdx < 2 ? slotIdx : slotIdx + 1;
                     const slotDiv = col.children[targetChildIndex];
 
@@ -451,7 +418,6 @@
                         if(evt.status === 'cancelled') card.classList.add('status-cancelled');
                         if(evt.status === 'postponed') card.classList.add('status-postponed');
 
-                        // Badge Logic
                         let badgeHtml = '';
                         if(evt.groups.includes('ALL')) badgeHtml = '<span class="evt-group-badge badge-promo">PROMO</span>';
                         else if(evt.groups.length > 1) badgeHtml = '<span class="evt-group-badge badge-grp">C1 + C2</span>';
@@ -475,7 +441,6 @@
                 }
             });
 
-            // Admin styling update
             document.querySelectorAll('.slot').forEach(s => {
                 if(isAdmin) s.classList.add('admin-mode'); else s.classList.remove('admin-mode');
             });
@@ -511,7 +476,6 @@
             currentEvent = null;
             const def = SLOTS[idx];
             
-            // Clear Form
             document.getElementById('eName').value = "";
             document.getElementById('eType').value = "CM";
             document.getElementById('eStart').value = def.start;
