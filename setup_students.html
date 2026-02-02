@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>MCalC+ | KERNEL ACCESS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* COLORS */
+            --term-green: #0f0;
+            --term-red: #ff003c;
+            --term-blue: #00ccff;
+            --bg: #000000;
+            --gui-glass: rgba(20, 25, 30, 0.95);
+            --gui-border: 1px solid rgba(255,255,255,0.1);
+            --gemini-cyan: #22d3ee;
+        }
+
+        body {
+            background-color: var(--bg);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        /* --- 1. BIOS SCREEN --- */
+        #bios-screen {
+            position: fixed; inset: 0; background: black; z-index: 2000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: #444; font-family: 'Fira Code', monospace; font-size: 1.2rem;
+        }
+        .bios-blink { animation: blink 1s infinite; color: white; margin-top: 20px; cursor: pointer; }
+
+        /* --- 2. GREEN TERMINAL (LOGIN) --- */
+        #terminal-view {
+            display: none;
+            font-family: 'Fira Code', monospace;
+            color: var(--term-green);
+            font-size: 14px;
+            padding: 20px;
+            height: 100%;
+            flex-direction: column;
+            text-shadow: 0 0 2px var(--term-green);
+            z-index: 10;
+        }
+
+        #term-output { flex: 1; overflow-y: auto; white-space: pre-wrap; margin-bottom: 10px; }
+        .t-line { display: block; margin-bottom: 2px; }
+        .sys { color: #666; }
+        .info { color: var(--term-blue); }
+        .err { color: var(--term-red); }
+        
+        #input-line { display: none; align-items: center; border-top: 1px solid #333; padding-top: 10px; }
+        #cmd-input {
+            background: transparent; border: none; color: white;
+            font-family: inherit; font-size: 1.1rem; flex: 1; outline: none;
+            caret-color: transparent;
+        }
+        .cursor-block {
+            display: inline-block; width: 10px; height: 1.2em;
+            background-color: var(--term-green); animation: blink 1s step-end infinite;
+            vertical-align: middle; margin-left: -10px; pointer-events: none;
+        }
+
+        /* --- 3. RED TERMINAL (LOCKDOWN BG) --- */
+        #lockdown-view {
+            display: none;
+            position: fixed; inset: 0; background: black; z-index: 3000;
+            padding: 40px; font-family: 'Fira Code', monospace; color: var(--term-red);
+            text-shadow: 0 0 5px var(--term-red);
+            flex-direction: column;
+        }
+        #lock-output { flex: 1; overflow-y: auto; opacity: 0.5; /* Dimmed behind popup */ }
+
+        /* --- 3b. SECURITY OVERLAY (PROFESSIONAL POPUP) --- */
+        #security-overlay {
+            display: none; position: fixed; inset: 0; z-index: 4000;
+            background: rgba(0, 0, 0, 0.7); /* Standard dim */
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(8px);
+        }
+        
+        .sec-box {
+            background: #0f172a; /* Modern Slate Color */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 50px;
+            text-align: center;
+            font-family: 'Outfit', sans-serif; /* Clean Font */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            width: 90%;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .sec-brand {
+            font-size: 3rem; font-weight: 800; letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, var(--gemini-cyan) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .sec-title { 
+            font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 10px; 
+        }
+        
+        .sec-desc {
+            color: #94a3b8; font-size: 1rem; line-height: 1.5; margin-bottom: 30px;
+        }
+
+        .sec-code {
+            font-family: 'Fira Code', monospace; color: #64748b; font-size: 0.75rem; 
+            background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 6px; display: inline-block;
+        }
+
+        /* --- 4. GUI ADMIN PANEL --- */
+        #gui-view {
+            display: none; height: 100%; font-family: 'Outfit', sans-serif;
+            color: white; padding: 40px; box-sizing: border-box;
+            background: radial-gradient(circle at 50% -20%, #1a202c 0%, #000 80%);
+            animation: fadeIn 1s ease-in; z-index: 50;
+        }
+
+        .gui-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid #333; padding-bottom: 20px; }
+        .gui-brand { font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #fff, var(--gemini-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .gui-sub { color: #666; font-family: 'Fira Code', monospace; }
+
+        .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        
+        .panel {
+            background: var(--gui-glass); border: var(--gui-border); border-radius: 16px;
+            padding: 30px; backdrop-filter: blur(10px);
+        }
+        .panel h3 { margin-top: 0; color: var(--gemini-cyan); font-weight: 700; }
+        .panel p { color: #888; font-size: 0.9rem; margin-bottom: 20px; }
+
+        .gui-btn {
+            width: 100%; padding: 15px; border-radius: 8px; border: none;
+            background: linear-gradient(90deg, #0ea5e9, #2563eb);
+            color: white; font-weight: 800; cursor: pointer; transition: 0.2s;
+            text-transform: uppercase; letter-spacing: 1px; font-family: 'Outfit', sans-serif;
+        }
+        .gui-btn:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(14, 165, 233, 0.4); }
+        .gui-btn.danger { background: linear-gradient(90deg, #ef4444, #b91c1c); }
+
+        .input-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .gui-input {
+            background: rgba(0,0,0,0.5); border: 1px solid #444; color: white;
+            padding: 10px; border-radius: 6px; width: 100%; font-family: inherit;
+        }
+        .gui-input:focus { border-color: var(--gemini-cyan); outline: none; }
+
+        #gui-log {
+            grid-column: 1 / -1; background: black; border: 1px solid #333;
+            height: 200px; overflow-y: auto; padding: 15px; font-family: 'Fira Code', monospace;
+            font-size: 0.9rem; color: #888; border-radius: 8px;
+        }
+
+        /* CUSTOM GUI MODAL */
+        #gui-modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+            z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .modal-box {
+            background: #111; border: 1px solid var(--gemini-cyan); padding: 30px; border-radius: 16px;
+            max-width: 400px; text-align: center; box-shadow: 0 0 40px rgba(34, 211, 238, 0.2);
+            font-family: 'Outfit', sans-serif; color: white;
+        }
+        .modal-btns { display: flex; gap: 10px; margin-top: 20px; }
+
+        /* CRT SCANLINES */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 2px, 3px 100%; pointer-events: none; z-index: 9999;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="scanlines"></div>
+
+    <div id="bios-screen" onclick="startSystem()">
+        <div>MCalC+ BIOS v4.5.0</div>
+        <div style="font-size:0.8rem; margin-top:5px; color:#666;">ACPI Compliant System</div>
+        <div class="bios-blink">_ CLICK TO INITIALIZE KERNEL</div>
+    </div>
+
+    <div id="terminal-view">
+        <div id="term-output"></div>
+        <div id="input-line">
+            <span style="color:#0f0; margin-right:10px; font-weight:bold;">root@mcalc-db:~$</span>
+            <input type="text" id="cmd-input" autocomplete="off" spellcheck="false">
+            <span class="cursor-block"></span>
+        </div>
+    </div>
+
+    <div id="lockdown-view">
+        <div id="lock-output"></div>
+    </div>
+
+    <div id="security-overlay">
+        <div class="sec-box">
+            <div class="sec-brand">MCalC+</div>
+            <div class="sec-title">Security Lockout</div>
+            <div class="sec-desc">
+                Access blocked.<br>
+                Too many failed attempts.
+            </div>
+            <div class="sec-code">ERR_ID: AUTH_MAX_RETRY_EXCEEDED</div>
+        </div>
+    </div>
+
+    <div id="gui-view">
+        <div class="gui-header">
+            <div class="gui-brand">MCalC+</div>
+            <div class="gui-sub">ADMINISTRATIVE DATABASE ACCESS<br>SESSION ID: <span style="color:var(--gemini-cyan)">#A99-X</span></div>
+        </div>
+
+        <div class="control-grid">
+            <div class="panel">
+                <h3>BATCH PROCESSING</h3>
+                <p>Initialize student database using hardcoded roster. Overwrites existing IDs.</p>
+                <button class="gui-btn" onclick="window.requestBulk()">EXECUTE BATCH UPLOAD</button>
+            </div>
+
+            <div class="panel">
+                <h3>SURGICAL INJECTION</h3>
+                <p>Add a single student record manually.</p>
+                <div class="input-row">
+                    <input type="text" id="mID" class="gui-input" placeholder="ID (ex: U900)">
+                    <input type="text" id="mGrp" class="gui-input" placeholder="Groupe (C1/C2)" style="width:100px;">
+                </div>
+                <div class="input-row">
+                    <input type="text" id="mNom" class="gui-input" placeholder="NOM">
+                    <input type="text" id="mPre" class="gui-input" placeholder="PRÉNOM">
+                </div>
+                <button class="gui-btn" onclick="window.addManual()">INJECT RECORD</button>
+            </div>
+
+            <div id="gui-log">
+                <div>> GUI SYSTEM INITIALIZED...</div>
+                <div>> WAITING FOR ADMIN INPUT...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="gui-modal">
+        <div class="modal-box">
+            <h3 style="color:var(--gemini-cyan); margin-top:0;">CONFIRM DATABASE OVERWRITE</h3>
+            <p style="color:#ccc; font-size:0.9rem;">This action will reset specific student records to their default state. Are you sure you want to proceed?</p>
+            <div class="modal-btns">
+                <button class="gui-btn danger" onclick="window.closeGuiModal()">CANCEL</button>
+                <button class="gui-btn" onclick="window.confirmBulk()">PROCEED</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
+            authDomain: "smartst-os.firebaseapp.com",
+            projectId: "smartst-os",
+            storageBucket: "smartst-os.firebasestorage.app",
+            messagingSenderId: "866980185011",
+            appId: "1:866980185011:web:03006fe6a81634d5dec1c6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // DATA
+        const STUDENTS = [
+            { id: "U558", nom: "RUMIEL", prenom: "Fabio", grp: "C1" },
+            { id: "U103", nom: "BENKADDAR", prenom: "Lorry", grp: "C1" },
+            { id: "U104", nom: "CARALP", prenom: "Leo", grp: "C1" },
+            { id: "U105", nom: "THOMASSON", prenom: "Emilien", grp: "C1" },
+            { id: "U102", nom: "MENDES", prenom: "Lola", grp: "C1" },
+            { id: "U881", nom: "ELIZALDE", prenom: "Alexios", grp: "C2" },
+            { id: "U809", nom: "LAROCHETTE", prenom: "Nina", grp: "C2" },
+            { id: "U810", nom: "MATTHIEU", prenom: "Charlotte", grp: "C2" },
+            { id: "U811", nom: "DUBOIS", prenom: "Mykalis", grp: "C2" }
+        ];
+
+        // TERMINAL LOGIC
+        const termOutput = document.getElementById('term-output');
+        const lockOutput = document.getElementById('lock-output');
+        const inputDiv = document.getElementById('input-line');
+        const inputField = document.getElementById('cmd-input');
+        const promptSpan = document.querySelector('#input-line span');
+        let state = 'BOOT';
+        let attempts = 0;
+        let tempUser = "";
+
+        // --- UTILS ---
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        async function tPrint(text, style='', target=termOutput) {
+            const d = document.createElement('div');
+            d.className = 't-line ' + style;
+            d.textContent = text;
+            target.appendChild(d);
+            target.scrollTop = target.scrollHeight;
+            await sleep(20); 
+        }
+
+        async function tType(text, style='', speed=30, target=termOutput) {
+            const d = document.createElement('div');
+            d.className = 't-line ' + style;
+            target.appendChild(d);
+            for(let i=0; i<text.length; i++){
+                d.textContent += text[i];
+                target.scrollTop = target.scrollHeight;
+                await sleep(speed);
+            }
+        }
+
+        async function tLoading(text) {
+            const d = document.createElement('div');
+            d.className = 't-line sys';
+            d.textContent = text;
+            termOutput.appendChild(d);
+            for(let i=0; i<3; i++){
+                await sleep(400);
+                d.textContent += ".";
+            }
+            d.innerHTML += ' <span style="color:#0f0">[OK]</span>';
+            termOutput.scrollTop = termOutput.scrollHeight;
+        }
+
+        // --- BIOS & BOOT ---
+        window.startSystem = async function() {
+            try { if(document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen(); } catch(e){}
+            document.getElementById('bios-screen').style.display = 'none';
+            document.getElementById('terminal-view').style.display = 'flex';
+            
+            await sleep(500);
+            await tType("MCalC+ SECURE BOOTLOADER v2.1", 'info', 10);
+            await sleep(200);
+            await tPrint("Checking peripherals...", 'sys');
+            await tPrint("Loading kernel...", 'sys');
+            await tLoading("Mounting volumes");
+            await tLoading("Establishing Firebase Uplink");
+            await sleep(300);
+            await tPrint("---------------------------------------");
+            await tPrint(" SYSTEM READY. AUTHENTICATION REQUIRED.");
+            await tPrint("---------------------------------------");
+            askUser();
+        }
+
+        // --- LOGIN FLOW ---
+        function askUser() {
+            state = 'USER';
+            promptSpan.textContent = "login:";
+            inputField.value = "";
+            inputField.type = "text";
+            inputDiv.style.display = 'flex';
+            inputField.focus();
+        }
+
+        function askPass() {
+            state = 'PASS';
+            promptSpan.textContent = "password:";
+            inputField.value = "";
+            inputField.type = "password";
+            inputDiv.style.display = 'flex';
+            inputField.focus();
+        }
+
+        inputField.addEventListener('keydown', async (e) => {
+            if(e.key === 'Enter') {
+                const val = inputField.value;
+                inputDiv.style.display = 'none';
+                
+                if(state !== 'PASS') await tPrint(`${promptSpan.textContent} ${val}`);
+                else await tPrint(`${promptSpan.textContent}`);
+
+                if(state === 'USER') {
+                    tempUser = val;
+                    askPass();
+                } 
+                else if(state === 'PASS') {
+                    await tLoading("Verifying Hash");
+                    if(tempUser === 'nodata' && val === 'nodata') {
+                        // SUCCESS
+                        await tPrint("ACCESS GRANTED.", 'info');
+                        await sleep(500);
+                        await tType("Initializing Graphical User Interface...", 'info');
+                        await sleep(1000);
+                        document.getElementById('terminal-view').style.display = 'none';
+                        document.getElementById('gui-view').style.display = 'block';
+                    } else {
+                        // FAIL
+                        attempts++;
+                        await tPrint("ACCESS DENIED.", 'err');
+                        if(attempts >= 3) {
+                            initiateLockdown();
+                        } else {
+                            askUser();
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- LOCKDOWN SEQUENCE ---
+        async function initiateLockdown() {
+            document.getElementById('terminal-view').style.display = 'none';
+            document.getElementById('lockdown-view').style.display = 'flex';
+            
+            const msgs = [
+                "SECURITY ALERT: UNAUTHORIZED ADMIN ACCESS DETECTED.",
+                "INITIATING LOCKDOWN PROTOCOL...",
+                "TERMINATING SESSION...",
+                " ",
+                "> TRACING ROUTE TO SOURCE IP...",
+                "> HOP 1: 192.168.0.1 [LOCAL] ... OK",
+                "> HOP 2: 10.54.22.11 [GATEWAY] ... OK",
+                "> HOP 3: 84.12.33.XX [ISP] ... CAPTURED",
+                " ",
+                "GENERATING FORENSIC DIGITAL PRINT...",
+                "UPLOADING TO MCalC+ SECURITY REGISTRY...",
+                "UPLOAD COMPLETE.",
+                " ",
+                "ACCESS PERMANENTLY BLOCKED.",
+                "CONNECTION CLOSED."
+            ];
+
+            for (let msg of msgs) {
+                await tPrint(msg, '', lockOutput);
+                await sleep(msg.length * 10 + 200);
+            }
+
+            // AUTO SHOW OVERLAY AFTER TERMINAL SEQUENCE FINISHES
+            showSecurityOverlay();
+        }
+
+        function showSecurityOverlay() {
+            const ol = document.getElementById('security-overlay');
+            ol.style.display = 'flex';
+        }
+
+        // --- GUI OPERATIONS ---
+        const guiLog = document.getElementById('gui-log');
+        function gLog(msg, type='normal') {
+            const color = type==='err'?'#ff4444':(type==='suc'?'#00ff00':'#888');
+            guiLog.innerHTML += `<div style="color:${color}">> ${msg}</div>`;
+            guiLog.scrollTop = guiLog.scrollHeight;
+        }
+
+        // Modal Handling
+        window.requestBulk = function() {
+            document.getElementById('gui-modal').style.display = 'flex';
+        }
+        window.closeGuiModal = function() {
+            document.getElementById('gui-modal').style.display = 'none';
+        }
+        window.confirmBulk = async function() {
+            window.closeGuiModal();
+            gLog("Starting batch upload...", 'normal');
+            for(const s of STUDENTS) {
+                try {
+                    await setDoc(doc(db, "students", s.id), { nom:s.nom, prenom:s.prenom, grp:s.grp }, { merge: true });
+                    gLog(`Uploaded: ${s.id}`, 'suc');
+                } catch(e) { gLog(`Error: ${e.message}`, 'err'); }
+            }
+            gLog("Batch complete.", 'suc');
+        }
+
+        window.addManual = async function() {
+            const id = document.getElementById('mID').value.trim().toUpperCase();
+            const nom = document.getElementById('mNom').value.trim().toUpperCase();
+            const pre = document.getElementById('mPre').value.trim();
+            const grp = document.getElementById('mGrp').value;
+
+            if(!id || !nom || !pre) return gLog("Missing fields.", 'err');
+
+            gLog(`Injecting ${id}...`);
+            try {
+                await setDoc(doc(db, "students", id), { nom, prenom:pre, grp }, { merge: true });
+                gLog("Injection successful.", 'suc');
+                document.getElementById('mID').value='';
+                document.getElementById('mNom').value='';
+                document.getElementById('mPre').value='';
+            } catch(e) { gLog("Injection failed.", 'err'); }
+        }
+
+        // Focus Keeper
+        document.addEventListener('click', () => {
+            if(document.getElementById('terminal-view').style.display === 'flex' && inputDiv.style.display !== 'none') {
+                inputField.focus();
+            }
+        });
+
+    </script>
+</body>
+</html>
