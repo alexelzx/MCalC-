@@ -14,7 +14,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* [STYLES UNCHANGED FROM YOUR CODE] */
         :root {
             --bg-deep: #02040a;
             --surface-glass: rgba(20, 24, 30, 0.75);
@@ -312,6 +311,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, doc, query, onSnapshot, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -324,6 +324,10 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // YOUR ADMIN UID (Must match Firestore Rule)
+        const ADMIN_UID = "WA5k4NI4mWWsmzdLgRS9tGRRfVz2"; 
 
         let scheduleData = [];
         let dateData = {}; 
@@ -339,18 +343,34 @@
         ];
 
         window.onload = function() {
-            // SESSION CHECK
+            // Basic UI session check (to prevent random access without main login)
             if(!localStorage.getItem('smartst_session')) {
-                window.location.href = 'smartst-cloud-access.html'; // Force Login
+                window.location.href = 'smartst-cloud-access.html'; 
+            }
+        };
+
+        // --- REAL AUTH LISTENER ---
+        // This detects if you are signed in as the Admin or just a Student
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.uid === ADMIN_UID) {
+                console.log("Admin privileges active.");
+                isAdmin = true;
+                updateAdminBtnUI(true);
+            } else {
+                console.log("Standard user access.");
+                isAdmin = false;
+                updateAdminBtnUI(false);
             }
 
+            // Start Data Sync
             initRealTimeSync();
+            
+            // Remove Loader
             setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(()=>document.getElementById('loader').style.display='none', 400);
-            }, 1000);
-            renderSlots();
-        };
+                const l = document.getElementById('loader');
+                if(l) { l.style.opacity = '0'; setTimeout(()=>l.style.display='none', 400); }
+            }, 500);
+        });
 
         function initRealTimeSync() {
             const q = query(collection(db, "schedule"));
@@ -360,6 +380,8 @@
                     scheduleData.push({ ...doc.data(), id: doc.id });
                 });
                 renderCalendar();
+            }, (error) => {
+                console.error("Sync Error:", error);
             });
 
             onSnapshot(doc(db, "meta", "calendarDates"), (doc) => {
@@ -380,10 +402,12 @@
                 col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 2)"></div>`;
                 col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 3)"></div>`;
             }
+            updateAdminStyles();
         }
 
         window.renderCalendar = function() {
-            document.querySelectorAll('.slot').forEach(s => s.innerHTML = '');
+            // Re-render empty slots first
+            renderSlots();
             
             const week = document.getElementById('weekSelect').value;
             const group = document.getElementById('groupSelect').value;
@@ -440,7 +464,10 @@
                     }
                 }
             });
+            updateAdminStyles();
+        }
 
+        function updateAdminStyles() {
             document.querySelectorAll('.slot').forEach(s => {
                 if(isAdmin) s.classList.add('admin-mode'); else s.classList.remove('admin-mode');
             });
@@ -448,29 +475,43 @@
 
         window.handleAdminClick = function() {
             if(isAdmin) {
-                isAdmin = false;
-                const btn = document.getElementById('adminBtn');
-                btn.classList.remove('logged-in');
-                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Admin`;
-                renderCalendar();
+                if(confirm("Se déconnecter du mode Admin ?")) {
+                    signOut(auth).then(() => {
+                        window.location.reload(); 
+                    });
+                }
             } else {
                 openModal('adminLoginModal');
             }
         }
 
-        window.verifyAdmin = function() {
+        // --- AUTHENTICATION ---
+        window.verifyAdmin = async function() {
             const u = document.getElementById('loginUser').value;
             const p = document.getElementById('loginPass').value;
-            if(u === 'nodata' && p === 'nodata') {
-                isAdmin = true;
+            
+            try {
+                // This swaps the current Auth user to the Admin user.
+                await signInWithEmailAndPassword(auth, u, p);
                 closeModal('adminLoginModal');
-                const btn = document.getElementById('adminBtn');
-                btn.classList.add('logged-in');
-                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg> Quit Admin`;
-                renderCalendar();
-            } else { alert("Erreur"); }
+            } catch (error) {
+                console.error(error);
+                alert("Erreur de connexion : " + error.message);
+            }
         }
 
+        function updateAdminBtnUI(active) {
+            const btn = document.getElementById('adminBtn');
+            if(active) {
+                btn.classList.add('logged-in');
+                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg> Quit Admin`;
+            } else {
+                btn.classList.remove('logged-in');
+                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Admin`;
+            }
+        }
+
+        // --- EDITOR LOGIC ---
         window.clickSlot = function(day, idx) {
             if(!isAdmin) return;
             currentEvent = null;
@@ -501,7 +542,11 @@
             if(newDate) {
                 if(!dateData[week]) dateData[week] = ["...", "...", "...", "...", "..."];
                 dateData[week][dayIdx] = newDate;
-                await setDoc(doc(db, "meta", "calendarDates"), dateData);
+                try {
+                    await setDoc(doc(db, "meta", "calendarDates"), dateData);
+                } catch(e) {
+                    alert("Erreur: Impossible de modifier (Droits insuffisants)");
+                }
             }
         }
 
@@ -569,22 +614,31 @@
                 groups: groupsArr
             };
 
-            if(currentEvent) {
-                await updateDoc(doc(db, "schedule", currentEvent.id), data);
-            } else {
-                data.day = currentSlot.day;
-                data.weeks = [currentSlot.wk];
-                await addDoc(collection(db, "schedule"), data);
+            try {
+                if(currentEvent) {
+                    await updateDoc(doc(db, "schedule", currentEvent.id), data);
+                } else {
+                    data.day = currentSlot.day;
+                    data.weeks = [currentSlot.wk];
+                    await addDoc(collection(db, "schedule"), data);
+                }
+                closeModal('classModal');
+            } catch(e) {
+                console.error(e);
+                alert("Erreur de sauvegarde: Permissions refusées. Vérifiez que vous êtes connecté avec le compte Admin.");
             }
-            closeModal('classModal');
         }
 
         window.confirmDelete = function() { openModal('deleteModal'); }
         window.executeDelete = async function() {
             if(currentEvent) {
-                await deleteDoc(doc(db, "schedule", currentEvent.id));
-                closeModal('deleteModal');
-                closeModal('classModal');
+                try {
+                    await deleteDoc(doc(db, "schedule", currentEvent.id));
+                    closeModal('deleteModal');
+                    closeModal('classModal');
+                } catch(e) {
+                    alert("Erreur: Impossible de supprimer (Permissions refusées).");
+                }
             }
         }
 
