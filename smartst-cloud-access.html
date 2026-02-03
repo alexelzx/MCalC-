@@ -63,7 +63,7 @@
             box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.02), 0 5px 15px rgba(0,0,0,0.5);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px 24px; border-radius: 50px; /* Fully Rounded */
+            padding: 12px 24px; border-radius: 50px;
             font-size: 0.8rem;
         }
         .liquid-btn:hover {
@@ -71,6 +71,7 @@
             border-color: var(--gemini-cyan); color: var(--gemini-cyan);
             box-shadow: 0 0 20px rgba(34, 211, 238, 0.15); transform: translateY(-2px);
         }
+        .liquid-btn.danger { border-color: rgba(239, 68, 68, 0.5); color: var(--gemini-red); }
         .liquid-btn.danger:hover {
             border-color: var(--gemini-red); color: var(--gemini-red);
             box-shadow: 0 0 20px rgba(244, 63, 94, 0.2);
@@ -136,6 +137,14 @@
             text-decoration: underline; transition: 0.2s; display: block;
         }
         .switch-link:hover { color: white; text-shadow: 0 0 10px white; }
+
+        .top-back-btn {
+            position: absolute; top: 30px; left: 30px; 
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-mute); text-decoration: none; font-weight: 700; font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .top-back-btn:hover { color: white; transform: translateX(-5px); }
 
         /* DASHBOARD */
         #dashboard { display: none; padding: 30px; padding-top: calc(20px + var(--safe-top)); padding-bottom: calc(100px + var(--safe-bottom)); max-width: 1400px; margin: 0 auto; width: 100%; }
@@ -340,15 +349,20 @@
                     Contacter le Responsable
                 </button>
             </div>
-            <button class="liquid-btn danger" style="width:100%; margin-top:15px;" onclick="eraseData()">
+            <button class="liquid-btn danger" style="width:100%; margin-top:15px;" onclick="deleteAccount()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                Effacement des données
+                Supprimer mon compte (Définitif)
             </button>
             <button class="liquid-btn" onclick="closeModal()" style="width:100%; margin-top:15px;">Fermer</button>
         </div>
     </div>
 
     <div id="login-screen">
+        <a href="index.html" class="top-back-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Retour au Menu
+        </a>
+
         <div class="login-card">
             <h1 class="brand-title">SmartST</h1>
             <div class="brand-sub">Student Operating System</div>
@@ -478,8 +492,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, orderBy, deleteDoc, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, orderBy, deleteDoc, addDoc, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -532,7 +546,6 @@
         };
 
         window.onload = function() { 
-            // GDPR removed from auto-check since it's in footer now
             if (!checkSession()) {
                 document.getElementById('loader').style.display='none'; 
             }
@@ -822,10 +835,72 @@
         window.logout = () => { signOut(auth).then(() => { localStorage.removeItem(SESSION_KEY); location.reload(); }).catch((e) => { localStorage.removeItem(SESSION_KEY); location.reload(); }); }
         window.openModal = (id) => document.getElementById(id).style.display='flex';
         window.closeModal = () => document.querySelectorAll('.modal-overlay').forEach(e=>e.style.display='none');
-        window.downloadData = () => alert("Téléchargement des données JSON..."); // Placeholder
+        
+        window.downloadData = () => {
+            if(!currentUser) return alert("Veuillez vous connecter pour télécharger vos données.");
+            const exportData = {
+                userProfile: currentUser,
+                academicData: localData,
+                exportDate: new Date().toISOString(),
+                platform: "SmartST Student OS"
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "smartst_data_export.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        window.deleteAccount = async () => {
+            if(!confirm("ATTENTION: Cette action est irréversible. Toutes vos données sur le serveur (Notes, Présence, Tickets) seront effacées.")) return;
+            
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+            
+            try {
+                const uid = currentUser.id;
+                const batch = writeBatch(db);
+
+                // 1. Delete Grades
+                const gradesQ = query(collection(db, "grades"), where("userId", "==", uid));
+                const gradesSnap = await getDocs(gradesQ);
+                gradesSnap.forEach(doc => batch.delete(doc.ref));
+
+                // 2. Delete Attendance
+                const attQ = query(collection(db, "attendance"), where("studentId", "==", uid));
+                const attSnap = await getDocs(attQ);
+                attSnap.forEach(doc => batch.delete(doc.ref));
+
+                // 3. Delete Tickets
+                const tickQ = query(collection(db, "support_tickets"), where("userId", "==", uid));
+                const tickSnap = await getDocs(tickQ);
+                tickSnap.forEach(doc => batch.delete(doc.ref));
+
+                // 4. Delete Student Profile
+                const studentRef = doc(db, "students", uid);
+                batch.delete(studentRef);
+
+                await batch.commit();
+
+                // 5. Delete Auth User
+                const user = auth.currentUser;
+                if(user) await deleteUser(user);
+
+                localStorage.clear();
+                alert("Compte supprimé avec succès.");
+                location.reload();
+
+            } catch (error) {
+                console.error(error);
+                loader.style.display = 'none';
+                alert("Erreur: Une reconnexion récente est nécessaire pour supprimer le compte. Veuillez vous déconnecter et vous reconnecter.");
+            }
+        }
+        
         window.eraseData = () => { if(confirm("Reset Local?")) { localStorage.clear(); location.reload(); } }
 
     </script>
 </body>
 </html>
-
