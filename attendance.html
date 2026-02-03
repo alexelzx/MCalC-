@@ -4,37 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartST | Attendance Manager</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-deep: #02040a;
-            --surface-glass: rgba(20, 24, 30, 0.7);
-            --border-glass: 1px solid rgba(56, 189, 248, 0.15);
-            
-            --gemini-cyan: #22d3ee;
-            --gemini-blue: #3b82f6;
-            --gemini-purple: #a855f7;
-            --gemini-green: #10b981;
-            --gemini-red: #f43f5e;
-            --gemini-gold: #fbbf24;
-            
-            --text-main: #f8fafc;
-            --text-mute: #94a3b8;
+            --bg-deep: #000000;
+            --surface-glass: rgba(255, 255, 255, 0.03);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.1);
+            --gemini-cyan: #22d3ee; --gemini-blue: #3b82f6; --gemini-purple: #a855f7;
+            --gemini-green: #10b981; --gemini-red: #f43f5e; --gemini-gold: #fbbf24;
+            --text-main: #ffffff; --text-mute: #a3a3a3;
+            --safe-top: env(safe-area-inset-top);
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body {
             margin: 0; font-family: 'Outfit', sans-serif;
-            background: radial-gradient(circle at 50% -20%, #0f172a 0%, #02040a 80%);
+            background: #000000;
             color: var(--text-main); min-height: 100vh; overflow-x: hidden;
-            display: flex; flex-direction: column;
+            display: flex; flex-direction: column; padding-top: var(--safe-top);
         }
 
         /* --- LOADER --- */
         #loader {
-            position: fixed; inset: 0; background: #02040a; z-index: 10000;
+            position: fixed; inset: 0; background: #000000; z-index: 10000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 0.4s ease;
         }
@@ -68,7 +65,7 @@
         .btn-primary:hover { background: #67e8f9; box-shadow: 0 0 15px rgba(34, 211, 238, 0.3); }
 
         /* --- MAIN LAYOUT --- */
-        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; width: 100%; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; width: 100%; flex: 1; }
 
         /* --- CONTROLS CARD --- */
         .controls-card {
@@ -214,9 +211,9 @@
     </div>
 
     <script type="module">
-        // 1. FIREBASE (Added setDoc for ID injection)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, addDoc, setDoc, doc, query, where, writeBatch, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -224,62 +221,44 @@
             projectId: "smartst-os",
             storageBucket: "smartst-os.firebasestorage.app",
             messagingSenderId: "866980185011",
-            appId: "1:866980185011:web:03006fe6a81634d5dec1c6",
-            measurementId: "G-556P9P719R"
+            appId: "1:866980185011:web:03006fe6a81634d5dec1c6"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
-        // INITIAL SEED DATA (If DB is empty)
-        const SEED_STUDENTS = [
-            { id: "U558", nom: "RUMIEL", prenom: "Fabio", grp: "C1" },
-            { id: "U103", nom: "BENKADDAR", prenom: "Lorry", grp: "C1" },
-            { id: "U104", nom: "CARALP", prenom: "Leo", grp: "C1" },
-            { id: "U105", nom: "THOMASSON", prenom: "Emilien", grp: "C1" },
-            { id: "U102", nom: "MENDES", prenom: "Lola", grp: "C1" },
-            { id: "U881", nom: "ELIZALDE", prenom: "Alexios", grp: "C2" },
-            { id: "U809", nom: "LAROCHETTE", prenom: "Nina", grp: "C2" },
-            { id: "U810", nom: "MATTHIEU", prenom: "Charlotte", grp: "C2" },
-            { id: "U811", nom: "DUBOIS", prenom: "Mykalis", grp: "C2" }
-        ];
+        const auth = getAuth(app);
 
         let students = [];
         let dailySchedule = [];
 
-        window.onload = async function() {
-            // Default Date = Today
-            document.getElementById('attDate').valueAsDate = new Date();
-            
-            // 1. Fetch Students
-            await loadStudents();
-            
-            // 2. Load Schedule
-            await fetchScheduleForDay();
-
-            document.getElementById('loader').style.opacity = '0';
-            setTimeout(()=>document.getElementById('loader').style.display='none', 400);
-        };
+        // Check Auth First
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Initial Load
+                document.getElementById('attDate').valueAsDate = new Date();
+                try {
+                    await loadStudents();
+                    await fetchScheduleForDay();
+                } catch (e) {
+                    console.error("Load error:", e);
+                    alert("Erreur de chargement des données. Vérifiez vos droits d'accès.");
+                } finally {
+                    document.getElementById('loader').style.opacity = '0';
+                    setTimeout(()=>document.getElementById('loader').style.display='none', 400);
+                }
+            } else {
+                // Redirect if not logged in
+                window.location.href = 'smartst-cloud-access.html';
+            }
+        });
 
         // --- CORE FUNCTIONS ---
 
         async function loadStudents() {
             const q = query(collection(db, "students"), orderBy("nom"));
             const snapshot = await getDocs(q);
-            
-            if (snapshot.empty) {
-                console.log("Seeding Database...");
-                const batch = writeBatch(db);
-                SEED_STUDENTS.forEach(s => {
-                    const ref = doc(collection(db, "students"), s.id); // Use specific IDs
-                    batch.set(ref, { nom: s.nom, prenom: s.prenom, grp: s.grp });
-                });
-                await batch.commit();
-                students = SEED_STUDENTS;
-            } else {
-                students = [];
-                snapshot.forEach(doc => students.push({ id: doc.id, ...doc.data() }));
-            }
+            students = [];
+            snapshot.forEach(doc => students.push({ id: doc.id, ...doc.data() }));
         }
 
         window.fetchScheduleForDay = async function() {
@@ -307,22 +286,16 @@
             }
 
             // 2. Fetch Schedule from Cloud
+            // In a real app with many records, you'd filter by day server-side
             const q = query(collection(db, "schedule")); 
             const snapshot = await getDocs(q);
             
             dailySchedule = [];
             snapshot.forEach(doc => {
                 const s = doc.data();
-                // Logic: Class exists IF:
-                // 1. It is on this Day Index (0-4)
-                // 2. It is scheduled for this Week Number
-                // 3. It targets the Selected Group OR "ALL" OR (Selected Group is "ALL")
-                
-                // For simplicity in this tool, if user selects "C1", we show C1+ALL. 
-                // If user selects "ALL", we show everything.
                 
                 const groupMatch = (groupVal === 'ALL') 
-                    ? true // Show everything if user wants Promo view
+                    ? true 
                     : (s.groups.includes(groupVal) || s.groups.includes('ALL'));
 
                 if (s.day === dayIdx && s.weeks.includes(weekNum) && groupMatch) {
@@ -336,7 +309,6 @@
                 slotSelect.disabled = false;
                 indicator.style.display = 'none';
                 
-                // Sort by time
                 dailySchedule.sort((a,b) => a.start - b.start);
                 
                 dailySchedule.forEach(c => {
@@ -365,6 +337,11 @@
             if(groupVal === 'ALL') filtered = students; // Promo view
             else filtered = students.filter(s => s.grp === groupVal);
 
+            if(filtered.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:#666;">Aucun étudiant trouvé pour ce groupe.</div>';
+                return;
+            }
+
             // Render Cards
             filtered.forEach(s => {
                 const el = document.createElement('div');
@@ -380,7 +357,7 @@
                             <div class="s-id">ID: ${s.id}</div>
                         </div>
                     </div>
-                    <div class="s-actions" id="actions-${s.id}">
+                    <div class="s-actions" id="actions-${s.id}" data-status="present">
                         <button class="status-btn present active" onclick="setStatus(this, 'present')" title="Présent">P</button>
                         <button class="status-btn absent" onclick="setStatus(this, 'absent')" title="Absent">A</button>
                         <button class="status-btn late" onclick="setStatus(this, 'late')" title="Retard">R</button>
@@ -413,36 +390,44 @@
             if(cards.length === 0) return alert("Aucun étudiant à noter.");
 
             let count = 0;
+            let absCount = 0;
+
             cards.forEach(card => {
                 const actions = card.querySelector('.s-actions');
-                // Extract ID from the displayed text "ID: U558"
                 const idText = card.querySelector('.s-id').innerText; 
                 const studentId = idText.replace('ID: ', '').trim();
                 
                 const status = actions.dataset.status || 'present'; 
 
-                // Only save if NOT present (to save DB space), OR save everything.
-                // Professional systems usually save everything for history.
-                const ref = doc(collection(db, "attendance"));
-                batch.set(ref, {
-                    date: dateVal,
-                    classId: classId,
-                    studentId: studentId,
-                    status: status,
-                    timestamp: new Date()
-                });
+                // Only save if NOT present (Save DB space), OR save everything if needed.
+                // We'll save non-present to keep it efficient.
+                if(status !== 'present') {
+                    const ref = doc(collection(db, "attendance"));
+                    batch.set(ref, {
+                        date: dateVal,
+                        classId: classId,
+                        studentId: studentId,
+                        status: status,
+                        timestamp: new Date() // Server timestamp would be better but this is fine client side
+                    });
+                    absCount++;
+                }
                 count++;
             });
 
-            await batch.commit();
-            alert(`Appel enregistré pour ${count} étudiants.`);
+            if (absCount > 0) {
+                await batch.commit();
+                alert(`Appel enregistré ! ${absCount} absences/retards notés sur ${count} étudiants.`);
+            } else {
+                alert("Tout le monde est présent ! (Aucune donnée envoyée car 'Présent' est par défaut)");
+            }
         }
 
         // --- ADMIN ---
         window.openAdmin = () => document.getElementById('adminModal').style.display = 'flex';
         window.closeModal = () => document.getElementById('adminModal').style.display = 'none';
         
-        // --- ADD STUDENT FUNCTION (UPDATED) ---
+        // --- ADD STUDENT FUNCTION ---
         window.addStudent = async function() {
             const nom = document.getElementById('newNom').value.trim().toUpperCase();
             const prenom = document.getElementById('newPrenom').value.trim();
@@ -453,11 +438,9 @@
                 return;
             }
 
-            // 1. GENERATE RANDOM ID (U + 3 Digits)
             const randomNum = Math.floor(Math.random() * 900) + 100;
             const newID = "U" + randomNum;
 
-            // 2. UPLOAD WITH SPECIFIC ID (Using setDoc)
             try {
                 await setDoc(doc(db, "students", newID), {
                     nom: nom,
@@ -468,11 +451,9 @@
                 alert(`Succès ! Étudiant créé : ${prenom} ${nom} (ID: ${newID})`);
                 closeModal();
                 
-                // Clear inputs
                 document.getElementById('newNom').value = "";
                 document.getElementById('newPrenom').value = "";
                 
-                // Refresh list
                 await loadStudents();
                 const curGrp = document.getElementById('attGroup').value;
                 if(curGrp === 'ALL' || curGrp === grp) renderStudents();
@@ -484,7 +465,6 @@
         }
 
         // --- UTILS ---
-        // ISO Week Calculator
         function getISOWeek(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
             d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
