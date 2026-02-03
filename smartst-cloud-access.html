@@ -15,19 +15,17 @@
     
     <style>
         :root {
-            --bg-deep: #02040a;
-            --surface-glass: rgba(15, 23, 42, 0.65);
-            --border-glass: 1px solid rgba(56, 189, 248, 0.15);
+            --bg-deep: #000000;
+            --surface-glass: rgba(255, 255, 255, 0.03);
+            --border-glass: 1px solid rgba(255, 255, 255, 0.08);
             --gemini-cyan: #22d3ee;
             --gemini-blue: #3b82f6;
             --gemini-purple: #a855f7;
             --gemini-red: #f43f5e;
             --gemini-green: #10b981;
             --gemini-gold: #fbbf24;
-            --gemini-orange: #f97316;
-            --text-main: #f8fafc;
+            --text-main: #ffffff;
             --text-mute: #94a3b8;
-            --glow-blue: 0 0 30px rgba(59, 130, 246, 0.2);
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
@@ -36,7 +34,7 @@
         
         body {
             margin: 0; font-family: 'Outfit', sans-serif;
-            background: radial-gradient(circle at 50% -20%, #0f172a 0%, #02040a 80%);
+            background: radial-gradient(circle at 50% -20%, #1a1a1a 0%, #000000 80%);
             color: var(--text-main); min-height: 100dvh; overflow-x: hidden;
             display: flex; flex-direction: column;
             overscroll-behavior: none; user-select: none; -webkit-user-select: none;
@@ -47,9 +45,35 @@
         .icon { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
         .btn-reset { background: none; border: none; cursor: pointer; color: inherit; font: inherit; }
 
+        /* --- LIQUID GLASS UTILS --- */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .liquid-btn {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.02), 0 10px 20px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .liquid-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--gemini-cyan);
+            color: var(--gemini-cyan);
+            box-shadow: 0 0 30px rgba(34, 211, 238, 0.2), inset 0 0 20px rgba(34, 211, 238, 0.1);
+            transform: translateY(-2px);
+        }
+        .liquid-btn:active { transform: scale(0.98); }
+
         /* LOADER */
         #loader {
-            position: fixed; inset: 0; background: #02040a; z-index: 20000;
+            position: fixed; inset: 0; background: #000000; z-index: 20000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 0.4s ease;
         }
@@ -57,7 +81,7 @@
             width: 50px; height: 50px; border-radius: 50%;
             border: 3px solid rgba(34, 211, 238, 0.1); border-top-color: var(--gemini-cyan);
             animation: spin 0.8s linear infinite; margin-bottom: 20px;
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+            box-shadow: 0 0 30px rgba(34, 211, 238, 0.2);
         }
         .loader-text { font-size: 0.8rem; letter-spacing: 4px; color: var(--gemini-blue); font-weight: 700; animation: pulse 1.5s infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -65,126 +89,151 @@
 
         /* LOGIN SCREEN */
         #login-screen {
-            position: fixed; inset: 0; background: #02040a; z-index: 9000;
+            position: fixed; inset: 0; background: #000000; z-index: 9000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 20px; overflow-y: auto;
+            padding: 20px; overflow-y: auto; padding-bottom: 100px;
         }
-        .login-card { width: 100%; max-width: 340px; text-align: center; margin-top: auto; margin-bottom: auto;}
+        .login-card { width: 100%; max-width: 360px; text-align: center; margin: auto; }
         
         .brand-title {
             font-size: 4rem; font-weight: 800; letter-spacing: -2px; margin: 0;
             background: linear-gradient(135deg, #fff 0%, var(--gemini-cyan) 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 40px rgba(34, 211, 238, 0.2);
+            text-shadow: 0 0 50px rgba(34, 211, 238, 0.3);
         }
-        .brand-sub { font-size: 0.8rem; color: var(--gemini-blue); letter-spacing: 4px; text-transform: uppercase; font-weight: 700; margin-top: 5px; margin-bottom: 30px; }
+        .brand-sub { font-size: 0.8rem; color: var(--gemini-blue); letter-spacing: 4px; text-transform: uppercase; font-weight: 700; margin-top: 5px; margin-bottom: 40px; }
 
-        .login-tabs { display: flex; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 12px; margin-bottom: 20px; }
+        .login-tabs { display: flex; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 16px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); }
         .tab-btn {
-            flex: 1; padding: 10px; border-radius: 8px; border: none; background: transparent;
+            flex: 1; padding: 12px; border-radius: 12px; border: none; background: transparent;
             color: var(--text-mute); font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: 0.3s;
         }
-        .tab-btn.active { background: rgba(255,255,255,0.1); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .tab-btn.active { background: rgba(255,255,255,0.1); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
 
         .login-input {
-            background: rgba(255,255,255,0.03); border: var(--border-glass); color: white;
-            padding: 14px 20px; border-radius: 12px; font-size: 1rem; letter-spacing: 1px;
-            text-align: center; width: 100%; transition: 0.3s; margin-bottom: 10px;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); color: white;
+            padding: 16px 20px; border-radius: 16px; font-size: 1rem; letter-spacing: 1px;
+            text-align: center; width: 100%; transition: 0.3s; margin-bottom: 15px;
         }
-        .login-input:focus { border-color: var(--gemini-cyan); box-shadow: var(--glow-blue); background: rgba(255,255,255,0.05); outline: none; }
+        .login-input:focus { border-color: var(--gemini-cyan); box-shadow: 0 0 20px rgba(34, 211, 238, 0.1); background: rgba(255,255,255,0.05); outline: none; }
         select.login-input { appearance: none; cursor: pointer; }
-        select.login-input option { background: #0f172a; color: white; }
+        select.login-input option { background: #000; color: white; }
 
-        .login-btn {
-            background: linear-gradient(135deg, var(--gemini-blue), var(--gemini-cyan));
-            color: #000; border: none; padding: 14px 0; border-radius: 50px; width: 100%;
-            font-weight: 800; cursor: pointer; text-transform: uppercase; margin-top: 15px;
-            transition: 0.3s; letter-spacing: 1px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        .main-action-btn {
+            width: 100%; padding: 16px; border-radius: 50px; font-size: 1rem; margin-top: 20px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(34, 211, 238, 0.2));
+            border: 1px solid rgba(34, 211, 238, 0.3);
         }
-        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(34, 211, 238, 0.5); }
+        .main-action-btn:hover { background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(34, 211, 238, 0.4)); box-shadow: 0 0 40px rgba(34, 211, 238, 0.3); }
 
         .switch-link {
-            margin-top: 20px; font-size: 0.8rem; color: var(--text-mute); cursor: pointer; 
+            margin-top: 25px; font-size: 0.85rem; color: var(--text-mute); cursor: pointer; 
             text-decoration: underline; transition: 0.2s; display: block;
         }
-        .switch-link:hover { color: white; }
+        .switch-link:hover { color: white; text-shadow: 0 0 10px white; }
 
         /* DASHBOARD */
-        #dashboard { display: none; padding: 30px; padding-top: calc(20px + var(--safe-top)); padding-bottom: calc(40px + var(--safe-bottom)); max-width: 1400px; margin: 0 auto; width: 100%; }
+        #dashboard { display: none; padding: 30px; padding-top: calc(20px + var(--safe-top)); padding-bottom: calc(100px + var(--safe-bottom)); max-width: 1400px; margin: 0 auto; width: 100%; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: var(--border-glass); }
         .profile { display: flex; align-items: center; gap: 20px; }
-        .avatar-lg { width: 64px; height: 64px; border-radius: 18px; background: rgba(59, 130, 246, 0.15); border: 1px solid var(--gemini-cyan); color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; box-shadow: var(--glow-blue); }
-        .user-info h1 { margin: 0; font-size: 1.8rem; font-weight: 700; letter-spacing: -0.5px; }
-        .group-tag { background: rgba(59, 130, 246, 0.2); padding: 4px 10px; border-radius: 6px; color: var(--gemini-cyan); font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.3); }
-        .nav-actions { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
-        .nav-btn { background: rgba(255,255,255,0.03); border: var(--border-glass); color: var(--text-mute); padding: 12px 24px; border-radius: 12px; font-size: 0.9rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .nav-btn:hover { background: rgba(59, 130, 246, 0.1); color: white; border-color: var(--gemini-blue); }
-        .btn-logout { padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 700; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--gemini-cyan); display: flex; align-items: center; gap: 8px; transition: 0.3s; }
-        .btn-logout:hover { background: rgba(59, 130, 246, 0.15); color: white; border-color: var(--gemini-cyan); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
-        .btn-logout.admin-back { border-color: var(--gemini-purple); color: var(--gemini-purple); background: rgba(168, 85, 247, 0.1); }
-        .btn-privacy { padding: 10px; border-radius: 50%; font-size: 0.85rem; background: rgba(34, 211, 238, 0.05); border: 1px solid var(--gemini-cyan); color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; transition: 0.3s; cursor: pointer; }
-        .btn-privacy:hover { background: rgba(34, 211, 238, 0.2); box-shadow: 0 0 15px rgba(34, 211, 238, 0.2); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
-        .card { background: var(--surface-glass); border: var(--border-glass); border-radius: 24px; padding: 25px; position: relative; overflow: hidden; backdrop-filter: blur(20px); display: flex; flex-direction: column; min-height: 300px; transition: 0.3s; }
-        .card:hover { border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .card-title { font-size: 1rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .gpa-display { font-size: 3.5rem; font-weight: 800; color: white; letter-spacing: -2px; }
-        .grade-list, .hw-list, .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; max-height: 180px; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.02); transition: 0.2s; }
-        .item-row:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
-        .val-hl { font-weight: 700; color: var(--gemini-purple); }
-        .del-btn { color: var(--gemini-red); opacity: 0.7; cursor: pointer; transition: 0.2s; font-weight: 800; font-size: 1.2rem; padding: 0 5px; }
-        .ok-btn { color: var(--gemini-green); opacity: 0.7; cursor: pointer; transition: 0.2s; font-weight: 800; font-size: 1.2rem; padding: 0 5px; }
-        .del-btn:hover, .ok-btn:hover { opacity: 1; transform: scale(1.2); }
-
-        .att-alert { background: rgba(244, 63, 94, 0.1); border: 1px solid var(--gemini-red); color: var(--gemini-red); padding: 10px; border-radius: 8px; font-weight: 700; text-align: center; margin-bottom: 15px; font-size: 0.9rem; display: none; animation: pulse 2s infinite; }
-        .att-stats { display: flex; justify-content: space-between; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; }
-        .stat-item { text-align: center; flex: 1; }
-        .stat-val { font-size: 1.2rem; font-weight: 800; display: block; }
-        .stat-lbl { font-size: 0.65rem; color: var(--text-mute); text-transform: uppercase; letter-spacing: 1px; }
+        .avatar-lg { width: 64px; height: 64px; border-radius: 20px; background: rgba(34, 211, 238, 0.1); border: 1px solid var(--gemini-cyan); color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; box-shadow: 0 0 30px rgba(34, 211, 238, 0.15); }
+        .user-info h1 { margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .group-tag { background: rgba(59, 130, 246, 0.15); padding: 5px 12px; border-radius: 8px; color: var(--gemini-cyan); font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.3); }
         
-        .c-red { color: var(--gemini-red); } 
-        .c-gold { color: var(--gemini-gold); }
-        .c-green { color: var(--gemini-green); }
+        .nav-actions { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .nav-btn { flex: 1; padding: 14px; border-radius: 16px; font-size: 0.9rem; }
 
-        .hw-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 10px; display: flex; align-items: flex-start; gap: 10px; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
-        .hw-check { min-width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--text-mute); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 2px; }
-        .hw-check.done { background: var(--gemini-cyan); border-color: var(--gemini-cyan); }
-        .hw-check svg { width: 12px; color: black; display: none; }
+        /* GRID */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
+        .card { border-radius: 24px; padding: 30px; display: flex; flex-direction: column; min-height: 320px; }
+        
+        .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .card-title { font-size: 0.9rem; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
+        
+        .gpa-display { font-size: 4rem; font-weight: 800; color: white; letter-spacing: -3px; text-shadow: 0 0 40px rgba(255,255,255,0.1); }
+        
+        .grade-list, .hw-list, .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 200px; padding-right: 5px; }
+        
+        .item-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: 12px;
+            font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
+        }
+        .item-row:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); transform: translateX(3px); }
+        .val-hl { font-weight: 800; color: var(--gemini-purple); font-size: 1.1rem; }
+        
+        .del-btn { color: var(--gemini-red); cursor: pointer; opacity: 0.5; transition: 0.2s; padding: 5px; font-size: 1.2rem; }
+        .ok-btn { color: var(--gemini-green); cursor: pointer; opacity: 0.5; transition: 0.2s; padding: 5px; font-size: 1.2rem; }
+        .del-btn:hover, .ok-btn:hover { opacity: 1; transform: scale(1.2); text-shadow: 0 0 10px currentColor; }
+
+        .att-alert { background: rgba(244, 63, 94, 0.1); border: 1px solid var(--gemini-red); color: var(--gemini-red); padding: 12px; border-radius: 12px; font-weight: 800; text-align: center; margin-bottom: 20px; font-size: 0.8rem; display: none; box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); animation: pulse 2s infinite; }
+        .att-stats { display: flex; justify-content: space-between; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-item { text-align: center; flex: 1; position: relative; }
+        .stat-item:not(:last-child)::after { content:''; position: absolute; right: 0; top: 10%; height: 80%; width: 1px; background: rgba(255,255,255,0.1); }
+        .stat-val { font-size: 1.4rem; font-weight: 800; display: block; margin-bottom: 4px; }
+        .stat-lbl { font-size: 0.6rem; color: var(--text-mute); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .c-red { color: var(--gemini-red); } .c-gold { color: var(--gemini-gold); } .c-green { color: var(--gemini-green); }
+
+        .hw-item { background: rgba(255,255,255,0.02); padding: 14px; border-radius: 12px; display: flex; align-items: flex-start; gap: 12px; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
+        .hw-check { min-width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--text-mute); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 2px; transition: 0.2s; }
+        .hw-check:hover { border-color: white; }
+        .hw-check.done { background: var(--gemini-cyan); border-color: var(--gemini-cyan); box-shadow: 0 0 10px rgba(34, 211, 238, 0.3); }
+        .hw-check svg { width: 14px; color: black; display: none; }
         .hw-check.done svg { display: block; }
-        .hw-text { font-size: 0.9rem; color: #e2e8f0; flex: 1; line-height: 1.4; }
-        .hw-item.done .hw-text { text-decoration: line-through; color: var(--text-mute); }
-        .add-row, .admin-controls { display: none; gap: 10px; margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .hw-text { font-size: 0.95rem; color: #e2e8f0; flex: 1; line-height: 1.5; }
+        .hw-item.done .hw-text { text-decoration: line-through; color: rgba(255,255,255,0.3); }
+
+        .add-row, .admin-controls { display: none; gap: 10px; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
         .admin-controls { flex-direction: column; }
         .admin-visible { display: flex !important; }
-        .st-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px; border-radius: 8px; width: 100%; }
-        .st-btn { background: var(--gemini-blue); color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: 700; cursor: pointer; }
-        .admin-tag { font-size: 0.7rem; color: var(--gemini-gold); font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
+        .st-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 12px; width: 100%; transition: 0.2s; }
+        .st-input:focus { background: rgba(255,255,255,0.1); border-color: var(--gemini-cyan); outline: none; }
+        .admin-tag { font-size: 0.65rem; color: var(--gemini-gold); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
         
+        /* ADMIN REGISTRY */
         #admin-registry { display: none; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
         .registry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: var(--border-glass); }
         .reg-title h1 { margin: 0; font-size: 2rem; font-weight: 700; color: white; }
         .registry-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
-        #adminSearch { width: 100%; max-width: 300px; padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; margin-bottom: 30px; font-size: 1rem; }
-        .student-card { background: rgba(15, 23, 42, 0.4); border: var(--border-glass); border-radius: 20px; padding: 25px; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; overflow: hidden; backdrop-filter: blur(10px); display: flex; flex-direction: column; justify-content: space-between; height: 180px; }
-        .student-card:hover { border-color: var(--gemini-cyan); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0, 240, 255, 0.1); background: rgba(15, 23, 42, 0.7); }
+        #adminSearch { width: 100%; max-width: 300px; padding: 14px 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; margin-bottom: 30px; font-size: 1rem; backdrop-filter: blur(10px); }
+        .student-card { border-radius: 20px; padding: 25px; cursor: pointer; position: relative; overflow: hidden; height: 200px; display: flex; flex-direction: column; justify-content: space-between; }
+        .student-card:hover { border-color: var(--gemini-cyan); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(34, 211, 238, 0.05); transform: translateY(-5px); }
         .st-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .st-avatar { width: 55px; height: 55px; border-radius: 16px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(34, 211, 238, 0.2)); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; box-shadow: 0 0 15px rgba(59, 130, 246, 0.1); }
-        .st-grp-badge { background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; color: var(--text-mute); border: 1px solid rgba(255,255,255,0.05); }
-        .st-name { font-size: 1.2rem; font-weight: 700; color: white; margin: 15px 0 5px 0; }
-        .st-id { font-size: 0.85rem; color: var(--text-mute); font-family: monospace; letter-spacing: 1px; }
-        .footer { margin-top: 60px; text-align: center; font-size: 0.75rem; color: var(--text-mute); padding-bottom: 30px; }
-        .footer span { color: var(--gemini-cyan); font-weight: 700; text-shadow: 0 0 10px rgba(34, 211, 238, 0.4); }
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-box { background: #0f1218; border: var(--border-glass); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 0 60px rgba(0,0,0,0.8); }
-        .scroll-text { max-height: 250px; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; font-size: 0.8rem; color: #ccc; line-height: 1.5; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
-        .scroll-text h4 { color: var(--gemini-cyan); margin-top: 10px; margin-bottom: 5px; }
-        .privacy-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .st-avatar { width: 60px; height: 60px; border-radius: 18px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(34, 211, 238, 0.2)); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem; box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
+        .st-grp-badge { background: rgba(255,255,255,0.05); padding: 6px 14px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; color: var(--text-mute); border: 1px solid rgba(255,255,255,0.05); }
+        .st-name { font-size: 1.3rem; font-weight: 700; color: white; margin: 0; }
+        .st-id { font-size: 0.9rem; color: var(--text-mute); font-family: monospace; letter-spacing: 1px; margin-top: 5px; }
+
+        /* FOOTER LEGAL (Persistent) */
+        .footer-legal {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px);
+            border-top: var(--border-glass);
+            display: flex; justify-content: center; gap: 20px;
+            padding: 15px; 
+            z-index: 9500; /* Floating above login */
+            padding-bottom: calc(15px + var(--safe-bottom));
+        }
+        .foot-btn {
+            padding: 8px 16px; border-radius: 20px;
+            color: var(--text-mute); font-size: 0.75rem; font-weight: 700; 
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .foot-btn:hover { color: white; background: rgba(255,255,255,0.05); }
+        .foot-btn.support { color: var(--gemini-gold); border: 1px solid rgba(251, 191, 36, 0.2); background: rgba(251, 191, 36, 0.05); }
+        .foot-btn.support:hover { background: rgba(251, 191, 36, 0.15); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); color: white; }
+
+        /* MODALS */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 20000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
+        .modal-box { padding: 40px; border-radius: 24px; width: 90%; max-width: 600px; box-shadow: 0 0 100px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); }
+        .scroll-text { max-height: 50vh; overflow-y: auto; background: rgba(255,255,255,0.02); padding: 25px; border-radius: 16px; font-size: 0.95rem; color: #ccc; line-height: 1.7; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); text-align: left; }
+        .scroll-text h4 { color: var(--gemini-cyan); margin-top: 25px; margin-bottom: 10px; font-size: 1.1rem; }
+        .scroll-text h3 { color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; font-size: 1.5rem; }
+        .privacy-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
         @media screen and (max-width: 768px) {
             body { font-size: 14px; }
-            #dashboard, #admin-registry { padding: 15px; width: 100%; padding-top: var(--safe-top); }
+            #dashboard, #admin-registry { padding: 15px; width: 100%; padding-top: var(--safe-top); padding-bottom: 80px; }
             .header { flex-direction: column; align-items: flex-start; gap: 15px; }
             .profile { width: 100%; }
             .header > div:last-child { width: 100%; justify-content: flex-end; gap: 10px; }
@@ -193,11 +242,11 @@
             .grid { grid-template-columns: 1fr; }
             .login-card { width: 90%; max-width: none; }
             .brand-title { font-size: 3rem; }
-            .login-btn { padding: 15px; font-size: 1rem; }
             .registry-header { flex-direction: column; gap: 15px; align-items: flex-start; }
             .registry-header > div { width: 100%; flex-direction: column; gap: 10px; }
             .registry-grid { grid-template-columns: 1fr; }
-            .modal-box { width: 95%; max-height: 85vh; overflow-y: auto; padding: 25px 20px; margin-top: var(--safe-top); }
+            .modal-box { width: 95%; padding: 25px 20px; }
+            .footer-legal { flex-wrap: wrap; gap: 10px; }
         }
     </style>
 </head>
@@ -208,32 +257,80 @@
         <div class="loader-text">CONNEXION...</div>
     </div>
 
-    <div class="modal-overlay" id="consentModal" style="z-index: 10001; background: #02040a;">
-        <div class="modal-box">
-            <h3 style="color:white; margin-top:0;">Politique de Confidentialité</h3>
+    <div class="modal-overlay" id="gdprModal" onclick="closeModal()">
+        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <div class="scroll-text">
-                <p>Bienvenue sur <strong>MCalC+ / SmartST</strong>.</p>
-                <h4>1. Données Collectées</h4>
-                Nous traitons : Nom, Prénom, Groupe, Notes, Assiduité.
-                <h4>2. Stockage & Sécurité</h4>
-                Hébergement sécurisé sur Google Firebase (Europe). Chiffrement HTTPS.
-                <h4>3. Vos Droits</h4>
-                Conformément au RGPD, vous pouvez accéder, rectifier ou effacer vos données via le menu "Privacy".
+                <h3>Politique de Confidentialité (RGPD)</h3>
+                <p>Dernière mise à jour : 01 Février 2026</p>
+
+                <h4>1. Préambule</h4>
+                <p>SmartST (ci-après "la Plateforme") accorde une importance majeure à la confidentialité et à la sécurité des données de ses utilisateurs. Cette politique détaille comment nous collectons, utilisons et protégeons vos informations, conformément au Règlement Général sur la Protection des Données (RGPD).</p>
+
+                <h4>2. Responsable du Traitement</h4>
+                <p>Le traitement des données est opéré par SmartST, sous la supervision de M. Alexios Elizalde (IUT Paul Sabatier III, Toulouse / EFPRP).<br>Contact : alexios.elizalde-xirokosta@etu.iut-tlse3.fr</p>
+
+                <h4>3. Données Collectées</h4>
+                <p>Nous collectons uniquement les données strictement nécessaires au fonctionnement académique :</p>
+                <ul>
+                    <li>Identité : Nom, Prénom, Email universitaire.</li>
+                    <li>Scolarité : Groupe (TD/TP), Relevés de notes, Assiduité (Absences/Retards).</li>
+                    <li>Technique : Logs de connexion, adresse IP (sécurité uniquement).</li>
+                </ul>
+
+                <h4>4. Finalité et Base Légale</h4>
+                <p>Les données sont traitées sur la base de l'exécution du service (Gestion de scolarité et Suivi étudiant). Elles permettent :</p>
+                <ul>
+                    <li>L'accès sécurisé à votre espace personnel.</li>
+                    <li>Le calcul de vos moyennes et statistiques.</li>
+                    <li>La communication administrative.</li>
+                </ul>
+
+                <h4>5. Hébergement et Sécurité</h4>
+                <p>Toutes les données sont hébergées sur les serveurs sécurisés de Google Firebase (Google Cloud Platform) situés au sein de l'Union Européenne ou dans des pays offrant un niveau de protection adéquat. L'accès est chiffré (HTTPS/TLS) et restreint aux administrateurs authentifiés.</p>
+
+                <h4>6. Vos Droits</h4>
+                <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement et de portabilité de vos données. Vous pouvez exercer ces droits directement depuis votre tableau de bord ou en contactant le support.</p>
             </div>
-            <button class="st-btn" style="width:100%; margin-top:10px; background:var(--gemini-blue);" onclick="acceptConsent()">J'ACCEPTE & CONTINUER</button>
-            <button class="st-btn" style="width:100%; margin-top:10px; background:transparent; border:1px solid #444; color:#666;" onclick="location.href='about:blank'">REFUSER ET QUITTER</button>
+            <button class="liquid-btn" onclick="closeModal()" style="width:100%; margin-top:20px;">J'ai compris</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="tosModal" onclick="closeModal()">
+        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
+            <div class="scroll-text">
+                <h3>Conditions Générales d'Utilisation (CGU)</h3>
+                
+                <h4>1. Objet</h4>
+                <p>Les présentes CGU régissent l'accès et l'utilisation de la plateforme SmartST ("Student Operating System"). L'accès à la plateforme implique l'acceptation sans réserve de ces conditions.</p>
+
+                <h4>2. Accès au Service</h4>
+                <p>Le service est réservé aux étudiants et au personnel autorisé de l'établissement. L'utilisateur est responsable de la confidentialité de ses identifiants. Toute action effectuée depuis son compte est réputée être effectuée par lui-même.</p>
+
+                <h4>3. Propriété Intellectuelle</h4>
+                <p>SmartST, son code source, son design et ses bases de données sont la propriété exclusive de leurs auteurs respectifs. Toute reproduction ou ingénierie inverse est strictement interdite sans autorisation écrite.</p>
+
+                <h4>4. Responsabilités</h4>
+                <p>L'utilisateur s'engage à ne pas utiliser la plateforme à des fins illicites ou malveillantes. SmartST met tout en œuvre pour assurer la disponibilité du service mais ne saurait être tenu responsable des interruptions dues à la maintenance ou à des cas de force majeure.</p>
+
+                <h4>5. Limitation de Responsabilité</h4>
+                <p>Les informations académiques (notes, absences) sont fournies à titre indicatif pour le suivi personnel et ne remplacent pas les relevés officiels de l'administration.</p>
+
+                <h4>6. Modification et Droit Applicable</h4>
+                <p>Nous nous réservons le droit de modifier ces CGU à tout moment. Les présentes conditions sont soumises au droit français.</p>
+            </div>
+            <button class="liquid-btn" onclick="closeModal()" style="width:100%; margin-top:20px;">J'ai compris</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="privacyModal" onclick="closeModal()">
-        <div class="modal-box" onclick="event.stopPropagation()">
-            <h3 style="color:var(--gemini-blue); margin-top:0;">Données Personnelles</h3>
+        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
+            <h3 style="color:var(--gemini-blue); margin-top:0;">Gestion Données Personnelles</h3>
             <div class="privacy-actions">
-                <button class="st-btn" style="border:1px solid var(--gemini-green); color:var(--gemini-green); background:rgba(16, 185, 129, 0.1);" onclick="downloadData()">📥 Télécharger</button>
-                <button class="st-btn" style="border:1px solid var(--gemini-blue); color:var(--gemini-blue); background:rgba(59, 130, 246, 0.1);" onclick="window.location.href='mailto:contact@efprp.org'">📧 Contacter DPO</button>
+                <button class="liquid-btn" onclick="downloadData()">📥 Télécharger mes données</button>
+                <button class="liquid-btn" onclick="window.location.href='mailto:alexios.elizalde-xirokosta@etu.iut-tlse3.fr'">📧 Contacter DPO</button>
             </div>
-            <button class="st-btn" style="width:100%; margin-top:15px; border:1px solid var(--gemini-red); color:var(--gemini-red); background:rgba(239, 68, 68, 0.1);" onclick="eraseData()">🗑️ EFFACER (Local Reset)</button>
-            <button class="st-btn" onclick="closeModal()" style="width:100%; margin-top:15px; background:rgba(255,255,255,0.1);">Fermer</button>
+            <button class="liquid-btn" style="width:100%; margin-top:15px; border-color:var(--gemini-red); color:var(--gemini-red); background:rgba(239, 68, 68, 0.1);" onclick="eraseData()">🗑️ DROIT À L'OUBLI (Effacement Local)</button>
+            <button class="liquid-btn" onclick="closeModal()" style="width:100%; margin-top:15px;">Fermer</button>
         </div>
     </div>
 
@@ -251,7 +348,7 @@
                 <div id="stLoginMode">
                     <input type="email" id="stEmail" class="login-input" placeholder="EMAIL ÉTUDIANT">
                     <input type="password" id="stPwd" class="login-input" placeholder="MOT DE PASSE">
-                    <button class="login-btn" onclick="handleStudentAuth('login')">ENTRER</button>
+                    <button class="liquid-btn main-action-btn" onclick="handleStudentAuth('login')">ENTRER</button>
                     <div class="switch-link" onclick="toggleStMode()">Pas de compte ? Créer un compte</div>
                 </div>
 
@@ -265,7 +362,7 @@
                         <option value="C1">Groupe C1</option>
                         <option value="C2">Groupe C2</option>
                     </select>
-                    <button class="login-btn" onclick="handleStudentAuth('signup')">S'INSCRIRE</button>
+                    <button class="liquid-btn main-action-btn" onclick="handleStudentAuth('signup')">S'INSCRIRE</button>
                     <div class="switch-link" onclick="toggleStMode()">J'ai déjà un compte</div>
                 </div>
             </div>
@@ -273,7 +370,7 @@
             <div id="adminLogin" class="hidden">
                 <input type="text" id="adminUser" class="login-input" placeholder="EMAIL ADMIN" style="margin-bottom:10px;">
                 <input type="password" id="adminPwd" class="login-input" style="margin-top:0;" placeholder="MOT DE PASSE">
-                <button class="login-btn" onclick="attemptAdminLogin()">CONNEXION ADMIN</button>
+                <button class="liquid-btn main-action-btn" onclick="attemptAdminLogin()">CONNEXION ADMIN</button>
             </div>
             
             <div id="errorMsg" style="color:var(--gemini-red); margin-top:20px; font-size:0.85rem; opacity:0; transition:0.3s; text-align:center;">Erreur</div>
@@ -290,20 +387,20 @@
                 </div>
             </div>
             <div style="display:flex; gap:10px;">
-                <button class="btn-privacy" onclick="openModal('privacyModal')"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></button>
-                <button class="btn-logout admin-back" id="adminBackBtn" style="display:none;" onclick="exitAdmin()">Retour</button>
-                <button class="btn-logout" onclick="logout()">Déconnexion</button>
+                <button class="btn-privacy liquid-btn" onclick="openModal('privacyModal')" style="width:40px; height:40px; padding:0;"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></button>
+                <button class="liquid-btn btn-logout admin-back" id="adminBackBtn" style="display:none;" onclick="exitAdmin()">Retour</button>
+                <button class="liquid-btn btn-logout" onclick="logout()">Déconnexion</button>
             </div>
         </div>
 
         <div class="nav-actions">
-            <a href="index.html" class="nav-btn">Accueil</a>
-            <a href="calendar-cloud-access.html" class="nav-btn">Emploi du temps</a>
-            <a href="attendance.html" id="navAppel" class="nav-btn" style="display:none;">Appel (Admin)</a>
+            <a href="index.html" class="liquid-btn nav-btn">Accueil</a>
+            <a href="calendar-cloud-access.html" class="liquid-btn nav-btn">Emploi du temps</a>
+            <a href="attendance.html" id="navAppel" class="liquid-btn nav-btn" style="display:none;">Appel (Admin)</a>
         </div>
 
         <div class="grid">
-            <div class="card">
+            <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Assiduité</div></div>
                 <div id="warnLevel1" class="att-alert">⚠️ AVERTISSEMENT (5+ Pts)</div>
                 <div class="att-stats">
@@ -317,47 +414,52 @@
                     <div style="display:flex; gap:5px;">
                         <select id="adAbsType" class="st-input" style="flex:1"><option value="absent">Absence</option><option value="late">Retard</option></select>
                         <input type="text" id="adAbsReason" class="st-input" placeholder="Motif" style="flex:2">
-                        <button class="st-btn" style="background:var(--gemini-red)" onclick="addAbsence()">OK</button>
+                        <button class="liquid-btn st-btn" style="border-color:var(--gemini-red); color:var(--gemini-red)" onclick="addAbsence()">OK</button>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Notes</div></div>
                 <div style="text-align:center; margin-bottom:20px;"><div class="gpa-display" id="gpaVal">--</div><span>Moyenne</span></div>
                 <div class="grade-list" id="gradeList"></div>
                 <div class="add-row">
                     <input type="text" id="grName" class="st-input" placeholder="Matière" style="flex:2">
                     <input type="number" id="grVal" class="st-input" placeholder="/20" style="flex:1">
-                    <button class="st-btn" onclick="addGrade()">+</button>
+                    <button class="liquid-btn st-btn" onclick="addGrade()">+</button>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Devoirs</div></div>
                 <div class="hw-list" id="hwList"></div>
                  <div class="admin-controls" id="adminHwBox">
                     <div style="display:flex; gap:5px;">
                         <input type="text" id="adHwTxt" class="st-input" placeholder="Titre..." style="flex:2">
                         <select id="adHwTgt" class="st-input" style="flex:1"><option value="ALL">Tous</option></select>
-                        <button class="st-btn" style="background:var(--gemini-gold); color:black;" onclick="addHomework()">+</button>
+                        <button class="liquid-btn st-btn" style="border-color:var(--gemini-gold); color:var(--gemini-gold);" onclick="addHomework()">+</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="footer">Powered by <span>MCalC+</span></div>
     </div>
 
     <div id="admin-registry">
         <div class="registry-header">
             <h1>Registre Admin</h1>
             <div style="display:flex; gap:10px;">
-                <button class="btn-logout" onclick="window.location.href='setup_students.html'" style="color:var(--gemini-cyan); border:1px solid var(--gemini-cyan);">Database</button>
-                <button class="btn-logout" onclick="logout()">Déconnexion</button>
+                <button class="liquid-btn btn-logout" onclick="window.location.href='setup_students.html'" style="color:var(--gemini-cyan); border-color:var(--gemini-cyan);">Database</button>
+                <button class="liquid-btn btn-logout" onclick="logout()">Déconnexion</button>
             </div>
         </div>
         <input type="text" id="adminSearch" placeholder="Rechercher..." onkeyup="filterStudents()">
         <div class="registry-grid" id="studentGrid"></div>
+    </div>
+
+    <div class="footer-legal">
+        <button class="foot-btn liquid-btn" onclick="openModal('tosModal')">CGU</button>
+        <button class="foot-btn liquid-btn" onclick="openModal('gdprModal')">Confidentialité</button>
+        <button class="foot-btn support liquid-btn" onclick="window.location.href='supdocs.html'">Support</button>
     </div>
 
     <script type="module">
@@ -389,7 +491,7 @@
         const SESSION_KEY = 'smartst_session';
         const TIMEOUT_MS = 30 * 60 * 1000;
 
-        // UI Logic - Defined explicitly on window for stability
+        // UI Logic
         window.switchTab = (mode) => {
             isLoginAdmin = (mode === 'admin');
             document.getElementById('tabStudent').className = isLoginAdmin ? 'tab-btn' : 'tab-btn active';
@@ -416,7 +518,7 @@
         };
 
         window.onload = function() { 
-            checkConsent(); 
+            // GDPR removed from auto-check since it's in footer now
             if (!checkSession()) {
                 document.getElementById('loader').style.display='none'; 
             }
@@ -441,7 +543,7 @@
             localStorage.setItem(SESSION_KEY, JSON.stringify({ user, isAdmin: adminStatus, timestamp: Date.now() }));
         }
 
-        // --- STUDENT AUTH (EMAIL/PWD) ---
+        // --- STUDENT AUTH ---
         window.handleStudentAuth = async function(action) {
             const loader = document.getElementById('loader');
             loader.style.display = 'flex';
@@ -460,7 +562,6 @@
 
                 createUserWithEmailAndPassword(auth, email, pwd)
                     .then(async (cred) => {
-                        // GENERATE U-ID (4 DIGITS)
                         const shortId = 'U' + Math.floor(1000 + Math.random() * 9000);
                         const newUser = { id: cred.user.uid, shortId, email, nom, prenom, grp };
                         await setDoc(doc(db, "students", cred.user.uid), newUser);
@@ -497,7 +598,7 @@
             }
         };
 
-        // --- ADMIN AUTH (SECURED) ---
+        // --- ADMIN AUTH ---
         window.attemptAdminLogin = async function() {
             const u = document.getElementById('adminUser').value;
             const p = document.getElementById('adminPwd').value;
@@ -507,7 +608,6 @@
                 .then(async (userCredential) => {
                     const email = userCredential.user.email;
                     
-                    // --- SECURITY: DATABASE CHECK ---
                     const q = query(collection(db, "admins"), where("email", "==", email));
                     const snapshot = await getDocs(q);
 
@@ -535,7 +635,6 @@
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('loader').style.display = 'none';
 
-            // IF ADMIN & NOT FORCED VIEW -> SHOW REGISTRY
             if(isAdmin && !forceView) {
                 document.getElementById('admin-registry').style.display = 'block';
                 document.getElementById('dashboard').style.display = 'none';
@@ -588,18 +687,15 @@
 
             const aList = document.getElementById('absList');
             aList.innerHTML = '';
-            let abs=0, lat=0, jus=0; // Added JUS tracker
+            let abs=0, lat=0, jus=0;
             localData.attendance.forEach(a => {
                 let statusClass = 'c-red';
                 let statusText = 'ABS';
                 
                 if(a.status === 'absent') { abs++; }
                 else if(a.status === 'late') { lat++; statusClass = 'c-gold'; statusText = 'RET'; }
-                else if(a.status === 'justified') { jus++; statusClass = 'c-green'; statusText = 'JUS'; } // Green for Justified
+                else if(a.status === 'justified') { jus++; statusClass = 'c-green'; statusText = 'JUS'; }
 
-                const meta = localData.scheduleMap[a.classId] || {name:'Cours'};
-                
-                // ADMIN ACTIONS: DELETE + JUSTIFY BUTTON
                 let actions = '';
                 if(isAdmin) {
                     actions += `<div class="del-btn" onclick="window.deleteAbsence('${a.id}')">&times;</div>`;
@@ -659,7 +755,6 @@
             document.getElementById('adAbsReason').value=''; await syncData();
         }
 
-        // JUSTIFY ABSENCE FUNCTION
         window.justifyAbsence = async function(id) {
             if(confirm("Justifier cette absence ?")) {
                 await updateDoc(doc(db, "attendance", id), { status: 'justified' });
@@ -671,7 +766,6 @@
         window.deleteGrade = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "grades", id)); await syncData(); } }
         window.deleteTask = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "homework", id)); await syncData(); } }
 
-        // ADMIN REGISTRY
         window.loadAdminRegistry = async function() {
             document.getElementById('login-screen').style.display='none';
             document.getElementById('dashboard').style.display='none';
@@ -686,17 +780,10 @@
             snap.forEach(d => {
                 const s = d.data();
                 allStudents.push({id:d.id, ...s});
-                
-                // Use the new shortId if available, fallback to legacy id
                 const displayId = s.shortId || s.id;
-
                 const el = document.createElement('div');
-                el.className = 'student-card';
-                el.innerHTML = `
-                    <div class="st-card-top"><div class="st-avatar">${s.prenom[0]}</div><div class="st-grp-badge">${s.grp}</div></div>
-                    <div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${displayId}</div></div>
-                `;
-                // CLICKABLE FIX: Pass forceView=true
+                el.className = 'student-card glass-panel';
+                el.innerHTML = `<div class="st-card-top"><div class="st-avatar">${s.prenom[0]}</div><div class="st-grp-badge">${s.grp}</div></div><div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${displayId}</div></div>`;
                 el.onclick = () => loadDashboard({id:d.id, ...s}, true, true);
                 grid.appendChild(el);
             });
@@ -710,27 +797,18 @@
             filtered.forEach(s => {
                 const displayId = s.shortId || s.id;
                 const el = document.createElement('div');
-                el.className = 'student-card';
-                el.innerHTML = `
-                    <div class="st-card-top"><div class="st-avatar">${s.prenom[0]}</div><div class="st-grp-badge">${s.grp}</div></div>
-                    <div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${displayId}</div></div>
-                `;
+                el.className = 'student-card glass-panel';
+                el.innerHTML = `<div class="st-card-top"><div class="st-avatar">${s.prenom[0]}</div><div class="st-grp-badge">${s.grp}</div></div><div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${displayId}</div></div>`;
                 el.onclick = () => loadDashboard(s, true, true);
                 grid.appendChild(el);
             });
         }
 
         window.exitAdmin = () => loadAdminRegistry();
-        
-        window.logout = () => {
-            signOut(auth).then(() => { localStorage.removeItem(SESSION_KEY); location.reload(); })
-            .catch((e) => { localStorage.removeItem(SESSION_KEY); location.reload(); });
-        }
-
+        window.logout = () => { signOut(auth).then(() => { localStorage.removeItem(SESSION_KEY); location.reload(); }).catch((e) => { localStorage.removeItem(SESSION_KEY); location.reload(); }); }
         window.openModal = (id) => document.getElementById(id).style.display='flex';
         window.closeModal = () => document.querySelectorAll('.modal-overlay').forEach(e=>e.style.display='none');
-        function checkConsent() { if(!localStorage.getItem('smartst_consent_v1')) document.getElementById('consentModal').style.display='flex'; }
-        window.acceptConsent = () => { localStorage.setItem('smartst_consent_v1','true'); document.getElementById('consentModal').style.display='none'; }
+        window.downloadData = () => alert("Téléchargement des données JSON..."); // Placeholder
         window.eraseData = () => { if(confirm("Reset Local?")) { localStorage.clear(); location.reload(); } }
 
     </script>
