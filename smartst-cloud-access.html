@@ -677,8 +677,14 @@
                     document.getElementById('adminBackBtn').style.display = 'flex';
                     document.getElementById('adminHwBox').classList.add('admin-visible');
                     document.getElementById('adminAbsBox').classList.add('admin-visible');
+    
+                   // --- FIX: SHOW ATTENDANCE BUTTON ---
+                   const btnAppel = document.getElementById('navAppel');
+                    if(btnAppel) btnAppel.style.display = 'flex'; 
+                   // -----------------------------------
+
                     document.querySelectorAll('.add-row').forEach(e => e.classList.add('admin-visible'));
-                }
+                    }
                 await syncData();
             }
         }
@@ -904,3 +910,4 @@
     </script>
 </body>
 </html>
+
