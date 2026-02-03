@@ -15,17 +15,19 @@
     
     <style>
         :root {
-            --bg-deep: #000000;
-            --surface-glass: rgba(255, 255, 255, 0.03);
-            --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+            --bg-deep: #02040a;
+            --surface-glass: rgba(15, 23, 42, 0.65);
+            --border-glass: 1px solid rgba(56, 189, 248, 0.15);
             --gemini-cyan: #22d3ee;
             --gemini-blue: #3b82f6;
             --gemini-purple: #a855f7;
             --gemini-red: #f43f5e;
             --gemini-green: #10b981;
             --gemini-gold: #fbbf24;
-            --text-main: #ffffff;
+            --gemini-orange: #f97316;
+            --text-main: #f8fafc;
             --text-mute: #94a3b8;
+            --glow-blue: 0 0 30px rgba(59, 130, 246, 0.2);
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
@@ -34,7 +36,7 @@
         
         body {
             margin: 0; font-family: 'Outfit', sans-serif;
-            background: radial-gradient(circle at 50% -20%, #1a1a1a 0%, #000000 80%);
+            background: radial-gradient(circle at 50% -20%, #0f172a 0%, #02040a 80%);
             color: var(--text-main); min-height: 100dvh; overflow-x: hidden;
             display: flex; flex-direction: column;
             overscroll-behavior: none; user-select: none; -webkit-user-select: none;
@@ -55,21 +57,24 @@
 
         .liquid-btn {
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: white; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.02), 0 10px 20px rgba(0,0,0,0.5);
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.02), 0 5px 15px rgba(0,0,0,0.5);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 24px; border-radius: 50px; /* Fully Rounded */
+            font-size: 0.8rem;
         }
         .liquid-btn:hover {
             background: rgba(255, 255, 255, 0.1);
-            border-color: var(--gemini-cyan);
-            color: var(--gemini-cyan);
-            box-shadow: 0 0 30px rgba(34, 211, 238, 0.2), inset 0 0 20px rgba(34, 211, 238, 0.1);
-            transform: translateY(-2px);
+            border-color: var(--gemini-cyan); color: var(--gemini-cyan);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.15); transform: translateY(-2px);
         }
-        .liquid-btn:active { transform: scale(0.98); }
+        .liquid-btn.danger:hover {
+            border-color: var(--gemini-red); color: var(--gemini-red);
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.2);
+        }
 
         /* LOADER */
         #loader {
@@ -231,7 +236,7 @@
         .scroll-text h3 { color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; font-size: 1.5rem; }
         .privacy-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
-        @media screen and (max-width: 768px) {
+        @media (max-width: 768px) {
             body { font-size: 14px; }
             #dashboard, #admin-registry { padding: 15px; width: 100%; padding-top: var(--safe-top); padding-bottom: 80px; }
             .header { flex-direction: column; align-items: flex-start; gap: 15px; }
@@ -289,7 +294,7 @@
                 <p>Toutes les données sont hébergées sur les serveurs sécurisés de Google Firebase (Google Cloud Platform) situés au sein de l'Union Européenne ou dans des pays offrant un niveau de protection adéquat. L'accès est chiffré (HTTPS/TLS) et restreint aux administrateurs authentifiés.</p>
 
                 <h4>6. Vos Droits</h4>
-                <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement et de portabilité de vos données. Vous pouvez exercer ces droits directement depuis votre tableau de bord ou en contactant le support.</p>
+                <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement et de portabilité de vos données. Vous pouvez exercer ces droits directement depuis votre tableau de bord (Bouton "Privacy") ou en contactant le support.</p>
             </div>
             <button class="liquid-btn" onclick="closeModal()" style="width:100%; margin-top:20px;">J'ai compris</button>
         </div>
@@ -326,10 +331,19 @@
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <h3 style="color:var(--gemini-blue); margin-top:0;">Gestion Données Personnelles</h3>
             <div class="privacy-actions">
-                <button class="liquid-btn" onclick="downloadData()">📥 Télécharger mes données</button>
-                <button class="liquid-btn" onclick="window.location.href='mailto:alexios.elizalde-xirokosta@etu.iut-tlse3.fr'">📧 Contacter DPO</button>
+                <button class="liquid-btn" onclick="downloadData()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Télécharger mes données
+                </button>
+                <button class="liquid-btn" onclick="window.location.href='mailto:alexios.elizalde-xirokosta@etu.iut-tlse3.fr'">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    Contacter le Responsable
+                </button>
             </div>
-            <button class="liquid-btn" style="width:100%; margin-top:15px; border-color:var(--gemini-red); color:var(--gemini-red); background:rgba(239, 68, 68, 0.1);" onclick="eraseData()">🗑️ DROIT À L'OUBLI (Effacement Local)</button>
+            <button class="liquid-btn danger" style="width:100%; margin-top:15px;" onclick="eraseData()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                Droit à l'oubli (Effacement Local)
+            </button>
             <button class="liquid-btn" onclick="closeModal()" style="width:100%; margin-top:15px;">Fermer</button>
         </div>
     </div>
