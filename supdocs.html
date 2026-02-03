@@ -481,7 +481,7 @@
             isAdmin = data.isAdmin;
             
             if (currentUser && currentUser.nom) {
-                document.getElementById('userName').innerText = `M. ${currentUser.nom}`;
+                document.getElementById('userName').innerText = `${currentUser.nom}`;
             }
             
             if (isAdmin) enableAdminMode();
@@ -829,3 +829,4 @@
     </script>
 </body>
 </html>
+
