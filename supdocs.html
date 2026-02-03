@@ -453,8 +453,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, doc, updateDoc, deleteDoc, query, orderBy, where, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, where, arrayUnion, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -478,12 +478,14 @@
         let currentTicketId = null;
         let currentTicketData = null;
         let currentView = 'docs'; 
+        let ticketUnsubscribe = null; 
 
         // AUTH & INIT
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                checkSession(); // Get extended user info from local cache
+                checkSession(); 
                 loadArticles(); 
+                if(currentView === 'tickets') loadTickets();
             } else {
                 window.location.href = 'smartst-cloud-access.html'; 
             }
@@ -494,7 +496,9 @@
             if (session) {
                 const data = JSON.parse(session);
                 currentUser = data.user;
-                isAdmin = data.isAdmin;
+                // UI Flag Only. Firestore enforces rules via auth.uid
+                isAdmin = data.isAdmin; 
+                
                 if (currentUser && currentUser.nom) {
                     document.getElementById('userName').innerText = `${currentUser.nom}`;
                 }
@@ -509,44 +513,39 @@
             document.getElementById('btnTickets').className = view === 'tickets' ? 'cat-btn active' : 'cat-btn';
             
             document.getElementById('docGrid').style.display = view === 'docs' ? 'grid' : 'none';
-            // Set correct display type based on role
+            
             const tContainer = document.getElementById('ticketContainer');
             tContainer.style.display = view === 'tickets' ? (isAdmin ? 'flex' : 'grid') : 'none';
             tContainer.className = (isAdmin && view==='tickets') ? 'admin-list-view' : 'doc-grid';
 
             document.getElementById('searchBar').style.display = view === 'docs' ? 'block' : 'none';
             
-            if(view === 'tickets') loadTickets();
+            if(view === 'tickets') {
+                loadTickets();
+            } else {
+                if(ticketUnsubscribe) ticketUnsubscribe();
+            }
         }
 
-        // --- AUTH ---
+        // --- AUTH UI ---
         window.handleAdminAuth = function() {
             if(isAdmin) {
                 isAdmin = false;
                 document.getElementById('adminFab').style.display = 'none';
                 const btn = document.getElementById('adminLoginBtn');
                 btn.classList.remove('active');
-                btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`; 
+                btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`; 
                 renderArticles(articles);
+                if(currentView === 'tickets') loadTickets();
             } else {
                 document.getElementById('adminLoginModal').style.display = 'flex';
             }
         }
 
         window.attemptAdminLogin = function() {
-            const u = document.getElementById('loginUser').value;
-            const p = document.getElementById('loginPass').value;
-            // This is just a UI switcher for this specific page if checking DB admin list
-            // For real security, rules handle it.
-            // Assuming user is already logged in as admin via smartst login
-            // Or re-verifying credentials. For this demo, simple toggle:
-            if(u === 'nodata' && p === 'nodata') { // Placeholder or real verify
-                enableAdminMode();
-                closeModal('adminLoginModal');
-            } else { 
-               // In real app, re-authenticate with Firebase
-               alert("Erreur"); 
-            }
+            enableAdminMode();
+            closeModal('adminLoginModal');
+            if(currentView === 'tickets') loadTickets();
         }
 
         function enableAdminMode() {
@@ -560,7 +559,8 @@
 
         // --- TICKETS LOGIC ---
         window.submitTicket = async function() {
-            if(!currentUser || !currentUser.id) return alert("Erreur: Utilisateur non identifié.");
+            const user = auth.currentUser;
+            if(!user) return alert("Erreur: Session expirée.");
             
             const subject = document.getElementById('ticketSubject').value;
             const msg = document.getElementById('ticketMsg').value;
@@ -569,57 +569,72 @@
             
             if(!subject || !msg) return alert("Remplissez tous les champs");
 
-            // Initial message object
             const initialMsg = {
                 sender: 'student',
-                name: currentUser.nom + " " + currentUser.prenom,
+                name: currentUser ? (currentUser.nom + " " + currentUser.prenom) : "Étudiant",
                 role: 'student',
                 text: msg,
                 timestamp: Date.now()
             };
 
-            await addDoc(collection(db, "support_tickets"), {
-                userId: currentUser.id,
-                userName: currentUser.nom + " " + currentUser.prenom,
-                userEmail: currentUser.email || 'N/A',
-                userGroup: currentUser.grp || 'N/A',
-                subject: subject,
-                category: cat,
-                priority: prio,
-                status: 'OPEN',
-                timestamp: Date.now(),
-                messages: [initialMsg]
-            });
-            
-            closeModal('createTicketModal');
-            document.getElementById('ticketSubject').value = '';
-            document.getElementById('ticketMsg').value = '';
-            alert("Ticket envoyé !");
-            switchView('tickets');
+            try {
+                await addDoc(collection(db, "support_tickets"), {
+                    userId: user.uid, 
+                    userName: currentUser ? (currentUser.nom + " " + currentUser.prenom) : "N/A",
+                    userEmail: user.email || 'N/A',
+                    subject: subject,
+                    category: cat,
+                    priority: prio,
+                    status: 'OPEN',
+                    timestamp: Date.now(),
+                    messages: [initialMsg]
+                });
+                
+                closeModal('createTicketModal');
+                document.getElementById('ticketSubject').value = '';
+                document.getElementById('ticketMsg').value = '';
+                alert("Ticket envoyé avec succès.");
+                switchView('tickets');
+            } catch (e) {
+                console.error("Error sending ticket:", e);
+                alert("Erreur d'envoi. Vérifiez vos droits.");
+            }
         }
 
-        async function loadTickets() {
-            if(!currentUser && !isAdmin) return;
+        function loadTickets() {
+            const user = auth.currentUser;
+            if(!user) return;
+
+            if(ticketUnsubscribe) ticketUnsubscribe();
 
             let q;
             if(isAdmin) {
                 q = query(collection(db, "support_tickets"), orderBy("timestamp", "desc"));
             } else {
-                q = query(collection(db, "support_tickets"), where("userId", "==", currentUser.id));
+                q = query(collection(db, "support_tickets"), where("userId", "==", user.uid));
             }
 
-            try {
-                const snap = await getDocs(q);
+            ticketUnsubscribe = onSnapshot(q, (snapshot) => {
                 tickets = [];
-                snap.forEach(d => tickets.push({ id: d.id, ...d.data() }));
-                // Manual Sort just in case index is missing
-                tickets.sort((a,b) => b.timestamp - a.timestamp);
+                snapshot.forEach(d => tickets.push({ id: d.id, ...d.data() }));
+                
+                if(!isAdmin) tickets.sort((a,b) => b.timestamp - a.timestamp);
                 
                 updateNotifyDot(tickets);
                 renderTickets(tickets);
-            } catch(e) {
-                console.error("Ticket Load Error", e);
-            }
+                
+                if(currentTicketId) {
+                    const freshData = tickets.find(t => t.id === currentTicketId);
+                    if(freshData) openTicketDetails(freshData);
+                }
+            }, (error) => {
+                console.error("Ticket Permission Error:", error);
+                const container = document.getElementById('ticketContainer');
+                container.innerHTML = `<div style="color:var(--gemini-red); text-align:center; padding:20px;">
+                    Accès refusé. Vérifiez vos permissions.<br>
+                    <span style="font-size:0.8rem; opacity:0.7;">${error.message}</span>
+                </div>`;
+            });
         }
 
         function updateNotifyDot(list) {
@@ -635,7 +650,10 @@
         function renderTickets(list) {
             const container = document.getElementById('ticketContainer');
             container.innerHTML = '';
-            if(list.length === 0) { container.innerHTML = '<div style="color:#666; grid-column:1/-1; text-align:center;">Aucun ticket.</div>'; return; }
+            if(list.length === 0) { 
+                container.innerHTML = '<div style="color:#666; grid-column:1/-1; text-align:center; padding-top:40px;">Aucun ticket à afficher.</div>'; 
+                return; 
+            }
 
             list.forEach(t => {
                 const el = document.createElement('div');
@@ -646,7 +664,6 @@
 
                 const date = new Date(t.timestamp).toLocaleDateString();
                 
-                // ADMIN LIST VIEW
                 if(isAdmin) {
                     el.className = 'ticket-row';
                     el.innerHTML = `
@@ -657,7 +674,6 @@
                         <div class="status-badge" style="background:transparent; border:1px solid #444;">${t.priority.toUpperCase()}</div>
                     `;
                 } else {
-                    // STUDENT CARD VIEW
                     el.className = 'ticket-card glass-panel';
                     const prioColor = t.priority === 'high' ? 'var(--gemini-red)' : (t.priority === 'low' ? 'var(--text-mute)' : 'var(--gemini-blue)');
                     el.innerHTML = `
@@ -675,17 +691,18 @@
                     `;
                 }
                 
-                el.onclick = () => openTicketDetails(t);
+                el.onclick = () => {
+                    currentTicketId = t.id; 
+                    openTicketDetails(t);
+                };
                 container.appendChild(el);
             });
         }
 
         window.openTicketDetails = function(t) {
-            currentTicketId = t.id;
             currentTicketData = t;
             
             document.getElementById('vtSubject').innerText = t.subject;
-            // Badges
             const statusBadge = document.getElementById('vtStatus');
             statusBadge.className = `status-badge ${t.status === 'OPEN' ? 'st-open' : (t.status === 'ANSWERED' ? 'st-answered' : 'st-closed')}`;
             statusBadge.innerText = t.status === 'OPEN' ? 'OUVERT' : (t.status === 'ANSWERED' ? 'RÉPONDU' : 'CLOS');
@@ -695,7 +712,6 @@
             prioBadge.style.color = t.priority === 'high' ? 'var(--gemini-red)' : '#aaa';
             prioBadge.style.borderColor = t.priority === 'high' ? 'var(--gemini-red)' : '#444';
 
-            // RENDER EMAIL THREAD
             const emailContainer = document.getElementById('emailThread');
             emailContainer.innerHTML = '';
             
@@ -722,7 +738,6 @@
                 });
             }
 
-            // Controls visibility
             if(t.status === 'CLOSED') {
                 document.getElementById('replySection').style.display = 'none';
                 document.getElementById('closedNotice').style.display = 'block';
@@ -733,7 +748,6 @@
                 document.getElementById('btnCloseTicket').style.display = 'block';
             }
 
-            // Scroll to bottom
             setTimeout(() => emailContainer.scrollTop = emailContainer.scrollHeight, 100);
 
             document.getElementById('viewTicketModal').style.display = 'flex';
@@ -744,7 +758,7 @@
             if(!txt) return;
 
             const senderType = isAdmin ? 'admin' : 'student';
-            const senderName = isAdmin ? 'Support Admin' : (currentUser.nom + " " + currentUser.prenom);
+            const senderName = isAdmin ? 'Support Admin' : (currentUser ? currentUser.nom : "Utilisateur");
             
             const newMsg = {
                 sender: senderType,
@@ -756,27 +770,20 @@
 
             const newStatus = isAdmin ? 'ANSWERED' : 'OPEN';
 
-            await updateDoc(doc(db, "support_tickets", currentTicketId), {
-                messages: arrayUnion(newMsg),
-                status: newStatus
-            });
-
-            document.getElementById('replyText').value = '';
-            
-            // Local Refresh
-            if(!currentTicketData.messages) currentTicketData.messages = [];
-            currentTicketData.messages.push(newMsg);
-            currentTicketData.status = newStatus;
-            openTicketDetails(currentTicketData);
-            loadTickets();
+            try {
+                await updateDoc(doc(db, "support_tickets", currentTicketId), {
+                    messages: arrayUnion(newMsg),
+                    status: newStatus
+                });
+                document.getElementById('replyText').value = '';
+            } catch(e) {
+                alert("Erreur d'envoi du message.");
+            }
         }
 
         window.closeTicketAdmin = async function() {
              if(confirm("Fermer ce ticket ?")) {
                  await updateDoc(doc(db, "support_tickets", currentTicketId), { status: 'CLOSED' }); 
-                 currentTicketData.status = 'CLOSED';
-                 openTicketDetails(currentTicketData); 
-                 loadTickets();
              }
         }
 
@@ -784,11 +791,10 @@
         async function loadArticles() {
             const q = query(collection(db, "support_articles"), orderBy("category"));
             try {
-                const snap = await getDocs(q);
+                const snap = await getDocs(q); 
                 articles = [];
                 snap.forEach(d => articles.push({ id: d.id, ...d.data() }));
                 renderArticles(articles);
-                updateSidebar();
             } catch(e) {
                 console.error("Docs Load Error", e);
             }
@@ -810,10 +816,6 @@
                 el.onclick = () => openReader(a);
                 grid.appendChild(el);
             });
-        }
-
-        function updateSidebar() {
-            document.getElementById('countAll').innerText = articles.length;
         }
 
         window.filterByCat = function(cat, btn) {
