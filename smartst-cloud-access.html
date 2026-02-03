@@ -457,13 +457,7 @@
                     .then(async (cred) => {
                         // GENERATE U-ID (4 DIGITS)
                         const shortId = 'U' + Math.floor(1000 + Math.random() * 9000);
-                        
-                        const newUser = { 
-                            id: cred.user.uid, 
-                            shortId: shortId, // Store the U-code
-                            email, nom, prenom, grp 
-                        };
-                        
+                        const newUser = { id: cred.user.uid, shortId, email, nom, prenom, grp };
                         await setDoc(doc(db, "students", cred.user.uid), newUser);
                         saveSession(newUser, false);
                         loadDashboard(newUser, false);
@@ -498,14 +492,27 @@
             }
         };
 
-        // --- ADMIN AUTH ---
+        // --- ADMIN AUTH (SECURED) ---
         window.attemptAdminLogin = async function() {
             const u = document.getElementById('adminUser').value;
             const p = document.getElementById('adminPwd').value;
             document.getElementById('loader').style.display = 'flex'; 
 
             signInWithEmailAndPassword(auth, u, p)
-                .then((userCredential) => {
+                .then(async (userCredential) => {
+                    const email = userCredential.user.email;
+                    
+                    // --- SECURITY: DATABASE CHECK ---
+                    const q = query(collection(db, "admins"), where("email", "==", email));
+                    const snapshot = await getDocs(q);
+
+                    if (snapshot.empty) {
+                        await signOut(auth);
+                        document.getElementById('loader').style.display = 'none';
+                        alert("ACCÈS REFUSÉ: Vous n'êtes pas sur la liste des administrateurs.");
+                        return;
+                    }
+
                     const adminUser = { id: userCredential.user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
                     saveSession(adminUser, true);
                     loadDashboard(adminUser, true);
@@ -523,7 +530,7 @@
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('loader').style.display = 'none';
 
-            // IMPORTANT: If Admin is logged in, show Registry UNLESS they explicitly clicked to view a student (forceView)
+            // IF ADMIN & NOT FORCED VIEW -> SHOW REGISTRY
             if(isAdmin && !forceView) {
                 document.getElementById('admin-registry').style.display = 'block';
                 document.getElementById('dashboard').style.display = 'none';
