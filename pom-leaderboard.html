@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SmartST | Classement</title>
+    <title>SmartST | Classement Focus</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -12,48 +12,30 @@
             --border: 1px solid rgba(255,255,255,0.08);
             --cyan: #22d3ee;
             --gold: #fbbf24;
+            --silver: #e2e8f0;
+            --bronze: #b45309;
             --text-mute: #94a3b8;
         }
         body { margin:0; font-family:'Outfit', sans-serif; background: radial-gradient(circle at 50% -20%, #0f172a 0%, #02040a 80%); color:white; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:30px 20px; }
 
         /* BRAND HEADER */
-        .brand-header {
-            display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 40px;
-        }
-        .smartst-logo {
-            font-size: 2rem; font-weight: 800; letter-spacing: -1px; margin: 0;
-            background: linear-gradient(135deg, #fff 0%, var(--cyan) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .page-title {
-            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px;
-            color: var(--text-mute); font-weight: 600;
-        }
+        .brand-header { display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 40px; }
+        .smartst-logo { font-size: 2rem; font-weight: 800; letter-spacing: -1px; margin: 0; background: linear-gradient(135deg, #fff 0%, var(--cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .page-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; color: var(--text-mute); font-weight: 600; }
 
         /* CARD */
-        .leader-card {
-            width: 100%; max-width: 600px;
-            background: var(--surface); border: var(--border); border-radius: 24px;
-            overflow: hidden; backdrop-filter: blur(20px);
-        }
+        .leader-card { width: 100%; max-width: 600px; background: var(--surface); border: var(--border); border-radius: 24px; overflow: hidden; backdrop-filter: blur(20px); min-height: 200px; }
 
         /* ROWS */
-        .rank-row {
-            display: flex; align-items: center; padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
-        }
+        .rank-row { display: flex; align-items: center; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
         .rank-row:last-child { border-bottom: none; }
         .rank-row:hover { background: rgba(255,255,255,0.05); }
 
         /* RANK BADGE */
-        .rank-num {
-            width: 40px; font-size: 1.2rem; font-weight: 800; color: #64748b;
-            text-align: left;
-        }
-        /* Top 3 Styling */
-        .rank-1 .rank-num { color: #fbbf24; text-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
-        .rank-2 .rank-num { color: #e2e8f0; text-shadow: 0 0 10px rgba(226, 232, 240, 0.2); }
-        .rank-3 .rank-num { color: #b45309; }
+        .rank-num { width: 40px; font-size: 1.2rem; font-weight: 800; color: #64748b; text-align: left; }
+        .rank-1 .rank-num { color: var(--gold); text-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
+        .rank-2 .rank-num { color: var(--silver); text-shadow: 0 0 10px rgba(226, 232, 240, 0.2); }
+        .rank-3 .rank-num { color: var(--bronze); }
 
         /* INFO */
         .u-info { flex: 1; display: flex; flex-direction: column; }
@@ -61,17 +43,13 @@
         .u-grp { font-size: 0.75rem; color: var(--text-mute); font-weight: 600; margin-top: 2px; }
 
         /* SCORE */
-        .u-xp {
-            font-family: monospace; font-size: 1rem; font-weight: 700; color: var(--cyan);
-            background: rgba(34, 211, 238, 0.1); padding: 5px 10px; border-radius: 8px;
-            border: 1px solid rgba(34, 211, 238, 0.2);
-        }
+        .u-xp { font-family: monospace; font-size: 1rem; font-weight: 700; color: var(--cyan); background: rgba(34, 211, 238, 0.1); padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(34, 211, 238, 0.2); }
 
-        .back-link {
-            margin-top: 40px; color: var(--text-mute); text-decoration: none; font-size: 0.85rem; font-weight: 600;
-            display: flex; align-items: center; gap: 8px; transition: 0.3s;
-        }
+        .back-link { margin-top: 40px; color: var(--text-mute); text-decoration: none; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
         .back-link:hover { color: white; transform: translateX(-5px); }
+        
+        .loader-spin { width: 30px; height: 30px; border: 3px solid rgba(34, 211, 238, 0.3); border-top-color: var(--cyan); border-radius: 50%; animation: spin 1s infinite linear; margin: 0 auto 10px auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -82,7 +60,10 @@
     </div>
 
     <div class="leader-card" id="list">
-        <div style="text-align:center; padding:40px; color:#666;">Chargement des données...</div>
+        <div style="text-align:center; padding:60px; color:#666;">
+            <div class="loader-spin"></div>
+            Connexion au serveur...
+        </div>
     </div>
 
     <a href="pomodoro.html" class="back-link">
@@ -93,6 +74,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -105,18 +87,44 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
-        async function load() {
+        // AUTH LISTENER
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is logged in (Admin or Student) -> Load Data
+                loadLeaderboard();
+            } else {
+                // User is NOT logged in -> Show Error
+                document.getElementById('list').innerHTML = `
+                    <div style="text-align:center; padding:40px; color:#f43f5e;">
+                        <strong>Accès Refusé</strong><br>
+                        Veuillez vous connecter sur le Dashboard.
+                        <br><br>
+                        <a href="smartst-cloud-access.html" style="color:var(--cyan); text-decoration:none; font-weight:700;">SE CONNECTER</a>
+                    </div>`;
+            }
+        });
+
+        async function loadLeaderboard() {
             const list = document.getElementById('list');
             try {
+                // Query Top 20 by Pomodoro XP
                 const q = query(collection(db, "students"), orderBy("pomodoro_xp", "desc"), limit(20));
                 const snap = await getDocs(q);
                 
+                if (snap.empty) {
+                    list.innerHTML = `<div style="text-align:center; padding:40px; color:#666;">Aucune donnée disponible.</div>`;
+                    return;
+                }
+
                 list.innerHTML = '';
                 let i = 1;
+                
                 snap.forEach(doc => {
                     const s = doc.data();
                     const rankClass = i <= 3 ? `rank-${i}` : '';
+                    const xp = s.pomodoro_xp || 0;
                     
                     list.innerHTML += `
                         <div class="rank-row ${rankClass}">
@@ -125,17 +133,18 @@
                                 <div class="u-name">${s.prenom} ${s.nom.charAt(0)}.</div>
                                 <div class="u-grp">${s.grp}</div>
                             </div>
-                            <div class="u-xp">${s.pomodoro_xp || 0} XP</div>
+                            <div class="u-xp">${xp} XP</div>
                         </div>
                     `;
                     i++;
                 });
             } catch(e) {
-                console.error(e);
-                list.innerHTML = `<div style="text-align:center; padding:30px; color:#f43f5e;">Accès Restreint. Veuillez vous connecter.</div>`;
+                console.error("Leaderboard Error:", e);
+                list.innerHTML = `<div style="text-align:center; padding:30px; color:#f43f5e;">
+                    Erreur d'accès.<br>Vérifiez vos permissions Firebase.
+                </div>`;
             }
         }
-        load();
     </script>
 </body>
 </html>
