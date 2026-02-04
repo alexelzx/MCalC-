@@ -198,12 +198,10 @@
         <div class="login-card">
             <h1 class="brand-title">SmartST</h1>
             <div class="brand-sub">Student Operating System</div>
-            
             <div class="login-tabs">
                 <button class="tab-btn active" id="tabStudent" onclick="switchTab('student')">ÉTUDIANT</button>
                 <button class="tab-btn" id="tabAdmin" onclick="switchTab('admin')">ADMIN</button>
             </div>
-
             <div id="studentLogin">
                 <div id="stLoginMode">
                     <input type="email" id="stEmail" class="login-input" placeholder="EMAIL ÉTUDIANT">
@@ -211,7 +209,6 @@
                     <button class="liquid-btn main-action-btn" onclick="handleStudentAuth('login')">ENTRER</button>
                     <div class="switch-link" onclick="toggleStMode()">Pas de compte ? Créer un compte</div>
                 </div>
-
                 <div id="stSignupMode" class="hidden">
                     <input type="email" id="suEmail" class="login-input" placeholder="EMAIL (ex: prenom.nom@etu...)">
                     <input type="password" id="suPwd" class="login-input" placeholder="MOT DE PASSE">
@@ -226,13 +223,11 @@
                     <div class="switch-link" onclick="toggleStMode()">J'ai déjà un compte</div>
                 </div>
             </div>
-            
             <div id="adminLogin" class="hidden">
                 <input type="text" id="adminUser" class="login-input" placeholder="EMAIL ADMIN" style="margin-bottom:10px;">
                 <input type="password" id="adminPwd" class="login-input" style="margin-top:0;" placeholder="MOT DE PASSE">
                 <button class="liquid-btn main-action-btn" onclick="attemptAdminLogin()">CONNEXION ADMIN</button>
             </div>
-            
             <div id="errorMsg" style="color:var(--gemini-red); margin-top:20px; font-size:0.85rem; opacity:0; transition:0.3s; text-align:center;">Erreur</div>
         </div>
     </div>
@@ -252,13 +247,11 @@
                 <button class="liquid-btn btn-logout" onclick="logout()">Déconnexion</button>
             </div>
         </div>
-
         <div class="nav-actions">
             <a href="index.html" class="liquid-btn nav-btn">Accueil</a>
             <a href="calendar-cloud-access.html" class="liquid-btn nav-btn">Emploi du temps</a>
             <a href="attendance.html" id="navAppel" class="liquid-btn nav-btn" style="display:none;">Appel (Admin)</a>
         </div>
-
         <div class="grid">
             <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Assiduité</div></div>
@@ -278,7 +271,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Notes</div></div>
                 <div style="text-align:center; margin-bottom:20px;"><div class="gpa-display" id="gpaVal">--</div><span>Moyenne</span></div>
@@ -289,7 +281,6 @@
                     <button class="liquid-btn st-btn" onclick="addGrade()">+</button>
                 </div>
             </div>
-
             <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Devoirs</div></div>
                 <div class="hw-list" id="hwList"></div>
@@ -345,7 +336,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         const messaging = getMessaging(app);
-        
         const VAPID_KEY = "BCkGPek8Vhg6dkdb31PaZbn82al9eWDzQp6eFhAXuMOQaR0kPprDfh5k6cBp9CjkdQMHbb10CxvRvJljq2-SUCE";
 
         let currentUser = null;
@@ -354,75 +344,72 @@
         let isSignupMode = false;
         let localData = { grades: [], attendance: [], homework: [], scheduleMap: {} };
         let allStudents = []; 
-
         const SESSION_KEY = 'smartst_session';
         const TIMEOUT_MS = 30 * 60 * 1000;
 
-        // UI Logic
+        // UI Helpers
         window.switchTab = (mode) => {
             isLoginAdmin = (mode === 'admin');
             document.getElementById('tabStudent').className = isLoginAdmin ? 'tab-btn' : 'tab-btn active';
             document.getElementById('tabAdmin').className = isLoginAdmin ? 'tab-btn active' : 'tab-btn';
-            if(isLoginAdmin) {
-                document.getElementById('studentLogin').classList.add('hidden');
-                document.getElementById('adminLogin').classList.remove('hidden');
-            } else {
-                document.getElementById('studentLogin').classList.remove('hidden');
-                document.getElementById('adminLogin').classList.add('hidden');
-            }
+            if(isLoginAdmin) { document.getElementById('studentLogin').classList.add('hidden'); document.getElementById('adminLogin').classList.remove('hidden'); }
+            else { document.getElementById('studentLogin').classList.remove('hidden'); document.getElementById('adminLogin').classList.add('hidden'); }
         };
-
         window.toggleStMode = () => {
             isSignupMode = !isSignupMode;
-            if(isSignupMode) {
-                document.getElementById('stLoginMode').classList.add('hidden');
-                document.getElementById('stSignupMode').classList.remove('hidden');
-            } else {
-                document.getElementById('stLoginMode').classList.remove('hidden');
-                document.getElementById('stSignupMode').classList.add('hidden');
-            }
+            if(isSignupMode) { document.getElementById('stLoginMode').classList.add('hidden'); document.getElementById('stSignupMode').classList.remove('hidden'); }
+            else { document.getElementById('stLoginMode').classList.remove('hidden'); document.getElementById('stSignupMode').classList.add('hidden'); }
         };
 
-        // --- AUTH & DATA LOADING ---
-        // CRITICAL FIX: We now listen for the Auth state FIRST.
-        // This prevents the "Insufficient Permissions" error by ensuring
-        // the user is logged in before we try to read from Firestore.
+        // --- AUTH & DATA LOADING (ROBUST) ---
+        // We wait for Firebase to initialize BEFORE loading dashboard
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is authenticated by Firebase. Now we load the UI session.
+                // User is authenticated. Now we check session storage for UI details
                 const stored = localStorage.getItem(SESSION_KEY);
                 if (stored) {
                     const session = JSON.parse(stored);
-                    if (Date.now() - session.timestamp < TIMEOUT_MS) {
-                        // Session is valid AND Auth is valid. Go ahead.
-                        loadDashboard(session.user, session.isAdmin);
-                    } else {
-                        // Session expired
-                        localStorage.removeItem(SESSION_KEY);
-                        document.getElementById('loader').style.display='none';
-                    }
+                    // Update the session user ID to match the real Auth ID to prevent permission errors
+                    session.user.id = user.uid; 
+                    loadDashboard(session.user, session.isAdmin);
                 } else {
+                    // Session lost but auth valid -> Force re-login to be safe
+                    signOut(auth);
                     document.getElementById('loader').style.display='none';
                 }
             } else {
-                // No user logged in
+                // No user
                 document.getElementById('loader').style.display='none';
             }
         });
 
-        // --- PUSH NOTIFICATION LOGIC ---
+        // --- PUSH NOTIFICATION LOGIC (FIXED FOR GITHUB PAGES) ---
         async function enableNotifications(user) {
             try {
-                // Check if browser supports notifications
                 if (!("Notification" in window)) return;
 
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted') {
-                    // Try to get the token
-                    const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+                    
+                    // 1. MANUALLY REGISTER SW TO FIX 404
+                    // This forces the browser to look in the current folder, not root
+                    let reg;
+                    try {
+                        reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                        console.log("SW Registered at ./firebase-messaging-sw.js");
+                    } catch(swError) {
+                        console.warn("SW Registration failed (likely path issue):", swError);
+                        return;
+                    }
+
+                    // 2. GET TOKEN
+                    const token = await getToken(messaging, { 
+                        vapidKey: VAPID_KEY,
+                        serviceWorkerRegistration: reg 
+                    });
+
                     if (token) {
                         console.log("FCM Token:", token);
-                        // Only save to DB if we are NOT in Admin Mode (Admins don't have student docs)
                         if (!isAdmin) {
                             try {
                                 await updateDoc(doc(db, "students", user.id), {
@@ -430,97 +417,14 @@
                                     notificationsEnabled: true
                                 });
                             } catch(e) {
-                                console.log("Token generated but could not save to DB (User might include Admin logic)");
+                                console.log("Token save skipped.");
                             }
                         }
                     }
                 }
             } catch (error) {
-                // Fail gracefully so the app doesn't crash
-                console.log("Notification setup skipped or failed (404/Permission denied)");
+                console.log("Notification setup skipped.");
             }
-        }
-
-        // --- AUTH FUNCTIONS ---
-        window.handleStudentAuth = async function(action) {
-            const loader = document.getElementById('loader');
-            loader.style.display = 'flex';
-
-            if (action === 'signup') {
-                const email = document.getElementById('suEmail').value;
-                const pwd = document.getElementById('suPwd').value;
-                const nom = document.getElementById('suNom').value;
-                const prenom = document.getElementById('suPrenom').value;
-                const grp = document.getElementById('suGroup').value;
-
-                if(!email || !pwd || !nom || !prenom || !grp) {
-                    loader.style.display='none';
-                    return alert("Remplissez tous les champs.");
-                }
-
-                createUserWithEmailAndPassword(auth, email, pwd)
-                    .then(async (cred) => {
-                        const shortId = 'U' + Math.floor(1000 + Math.random() * 9000);
-                        const newUser = { id: cred.user.uid, shortId, email, nom, prenom, grp };
-                        await setDoc(doc(db, "students", cred.user.uid), newUser);
-                        saveSession(newUser, false);
-                        // Auth listener will pick this up
-                    })
-                    .catch((error) => {
-                        loader.style.display='none';
-                        alert("Erreur Inscription: " + error.message);
-                    });
-
-            } else {
-                const email = document.getElementById('stEmail').value;
-                const pwd = document.getElementById('stPwd').value;
-
-                signInWithEmailAndPassword(auth, email, pwd)
-                    .then(async (cred) => {
-                        const docRef = doc(db, "students", cred.user.uid);
-                        const docSnap = await getDoc(docRef);
-                        if(docSnap.exists()) {
-                            const user = { id: docSnap.id, ...docSnap.data() };
-                            saveSession(user, false);
-                            // Auth listener handles the load
-                        } else {
-                            loader.style.display='none';
-                            alert("Compte existant mais aucune donnée étudiante trouvée.");
-                        }
-                    })
-                    .catch((error) => {
-                        loader.style.display='none';
-                        alert("Erreur Connexion: " + error.message);
-                    });
-            }
-        };
-
-        window.attemptAdminLogin = async function() {
-            const u = document.getElementById('adminUser').value;
-            const p = document.getElementById('adminPwd').value;
-            document.getElementById('loader').style.display = 'flex'; 
-
-            signInWithEmailAndPassword(auth, u, p)
-                .then(async (userCredential) => {
-                    const email = userCredential.user.email;
-                    const q = query(collection(db, "admins"), where("email", "==", email));
-                    const snapshot = await getDocs(q);
-
-                    if (snapshot.empty) {
-                        await signOut(auth);
-                        document.getElementById('loader').style.display = 'none';
-                        alert("ACCÈS REFUSÉ: Vous n'êtes pas sur la liste des administrateurs.");
-                        return;
-                    }
-
-                    const adminUser = { id: userCredential.user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
-                    saveSession(adminUser, true);
-                    // Auth listener handles the load
-                })
-                .catch((error) => {
-                    document.getElementById('loader').style.display = 'none';
-                    alert("Erreur: " + error.message);
-                });
         }
 
         // --- DASHBOARD LOADER ---
@@ -528,9 +432,9 @@
             currentUser = user;
             isAdmin = adminMode;
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('loader').style.display = 'none';
+            document.getElementById('loader').style.display = 'none'; // SAFETY: Ensure loader is gone
 
-            // TRIGGER NOTIFICATIONS REQUEST HERE
+            // Trigger Notifications (fails gracefully if broken)
             enableNotifications(user);
 
             if(isAdmin && !forceView) {
@@ -550,130 +454,128 @@
                     document.getElementById('adminAbsBox').classList.add('admin-visible');
                     document.querySelectorAll('.add-row').forEach(e => e.classList.add('admin-visible'));
                 }
-                await syncData();
+                
+                try {
+                    await syncData();
+                } catch(e) {
+                    console.error("Sync Failed:", e);
+                    // Even if sync fails, ensure loader is off
+                    document.getElementById('loader').style.display = 'none';
+                }
             }
         }
 
         async function syncData() {
-            // This query now runs ONLY after Auth is confirmed by onAuthStateChanged
+            // SAFETY: Do not run if no user
+            if(!currentUser) return; 
+
             localData = { grades: [], attendance: [], homework: [], scheduleMap: {} };
-            const schSnap = await getDocs(collection(db, "schedule"));
-            schSnap.forEach(d => localData.scheduleMap[d.id] = d.data());
+            
+            try {
+                // Schedule (Public Read)
+                const schSnap = await getDocs(collection(db, "schedule"));
+                schSnap.forEach(d => localData.scheduleMap[d.id] = d.data());
 
-            const grQ = query(collection(db, "grades"), where("userId", "==", currentUser.id));
-            const grS = await getDocs(grQ);
-            grS.forEach(d => localData.grades.push({ ...d.data(), id: d.id }));
+                // Grades (Private)
+                const grQ = query(collection(db, "grades"), where("userId", "==", currentUser.id));
+                const grS = await getDocs(grQ);
+                grS.forEach(d => localData.grades.push({ ...d.data(), id: d.id }));
 
-            const atQ = query(collection(db, "attendance"), where("studentId", "==", currentUser.id));
-            const atS = await getDocs(atQ);
-            atS.forEach(d => localData.attendance.push({ ...d.data(), id: d.id }));
+                // Attendance (Private)
+                const atQ = query(collection(db, "attendance"), where("studentId", "==", currentUser.id));
+                const atS = await getDocs(atQ);
+                atS.forEach(d => localData.attendance.push({ ...d.data(), id: d.id }));
 
-            const hwSnap = await getDocs(collection(db, "homework"));
-            hwSnap.forEach(d => localData.homework.push({ ...d.data(), id: d.id }));
+                // Homework (Public Read)
+                const hwSnap = await getDocs(collection(db, "homework"));
+                hwSnap.forEach(d => localData.homework.push({ ...d.data(), id: d.id }));
 
-            renderAll();
+                renderAll();
+            } catch(error) {
+                console.error("Permission Error during Sync:", error);
+                // We do NOT re-throw here to prevent crashing the UI loop
+            }
         }
 
+        // --- AUTH FUNCTIONS (UNCHANGED LOGIC) ---
+        window.handleStudentAuth = async function(action) {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+            if (action === 'signup') {
+                const email = document.getElementById('suEmail').value;
+                const pwd = document.getElementById('suPwd').value;
+                const nom = document.getElementById('suNom').value;
+                const prenom = document.getElementById('suPrenom').value;
+                const grp = document.getElementById('suGroup').value;
+                if(!email || !pwd || !nom || !prenom || !grp) { loader.style.display='none'; return alert("Remplissez tous les champs."); }
+                createUserWithEmailAndPassword(auth, email, pwd).then(async (cred) => {
+                    const shortId = 'U' + Math.floor(1000 + Math.random() * 9000);
+                    const newUser = { id: cred.user.uid, shortId, email, nom, prenom, grp };
+                    await setDoc(doc(db, "students", cred.user.uid), newUser);
+                    saveSession(newUser, false);
+                }).catch((error) => { loader.style.display='none'; alert("Erreur Inscription: " + error.message); });
+            } else {
+                const email = document.getElementById('stEmail').value;
+                const pwd = document.getElementById('stPwd').value;
+                signInWithEmailAndPassword(auth, email, pwd).then(async (cred) => {
+                    const docRef = doc(db, "students", cred.user.uid);
+                    const docSnap = await getDoc(docRef);
+                    if(docSnap.exists()) {
+                        const user = { id: docSnap.id, ...docSnap.data() };
+                        saveSession(user, false);
+                    } else { loader.style.display='none'; alert("Compte existant mais aucune donnée étudiante trouvée."); }
+                }).catch((error) => { loader.style.display='none'; alert("Erreur Connexion: " + error.message); });
+            }
+        };
+
+        window.attemptAdminLogin = async function() {
+            const u = document.getElementById('adminUser').value;
+            const p = document.getElementById('adminPwd').value;
+            document.getElementById('loader').style.display = 'flex'; 
+            signInWithEmailAndPassword(auth, u, p).then(async (userCredential) => {
+                const email = userCredential.user.email;
+                const q = query(collection(db, "admins"), where("email", "==", email));
+                const snapshot = await getDocs(q);
+                if (snapshot.empty) { await signOut(auth); document.getElementById('loader').style.display = 'none'; alert("ACCÈS REFUSÉ"); return; }
+                const adminUser = { id: userCredential.user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
+                saveSession(adminUser, true);
+            }).catch((error) => { document.getElementById('loader').style.display = 'none'; alert("Erreur: " + error.message); });
+        }
+
+        // --- RENDER FUNCTIONS (UNCHANGED) ---
         function renderAll() {
-            const gList = document.getElementById('gradeList');
-            gList.innerHTML = '';
-            let gSum = 0;
-            localData.grades.forEach(g => {
-                gSum += parseFloat(g.val);
-                gList.innerHTML += `<div class="item-row"><span>${g.name}</span><div style="display:flex;align-items:center;"><span class="val-hl">${g.val}</span>${isAdmin?`<div class="del-btn" onclick="window.deleteGrade('${g.id}')">&times;</div>`:''}</div></div>`;
-            });
+            const gList = document.getElementById('gradeList'); gList.innerHTML = ''; let gSum = 0;
+            localData.grades.forEach(g => { gSum += parseFloat(g.val); gList.innerHTML += `<div class="item-row"><span>${g.name}</span><div style="display:flex;align-items:center;"><span class="val-hl">${g.val}</span>${isAdmin?`<div class="del-btn" onclick="window.deleteGrade('${g.id}')">&times;</div>`:''}</div></div>`; });
             document.getElementById('gpaVal').innerText = localData.grades.length ? (gSum/localData.grades.length).toFixed(2) : '--';
-
-            const aList = document.getElementById('absList');
-            aList.innerHTML = '';
-            let abs=0, lat=0, jus=0;
+            const aList = document.getElementById('absList'); aList.innerHTML = ''; let abs=0, lat=0, jus=0;
             localData.attendance.forEach(a => {
-                let statusClass = 'c-red';
-                let statusText = 'ABS';
-                if(a.status === 'absent') { abs++; }
-                else if(a.status === 'late') { lat++; statusClass = 'c-gold'; statusText = 'RET'; }
-                else if(a.status === 'justified') { jus++; statusClass = 'c-green'; statusText = 'JUS'; }
-
-                let actions = '';
-                if(isAdmin) {
-                    actions += `<div class="del-btn" onclick="window.deleteAbsence('${a.id}')">&times;</div>`;
-                    if(a.status === 'absent') actions += `<div class="ok-btn" onclick="window.justifyAbsence('${a.id}')">✓</div>`;
-                }
-
+                let statusClass = 'c-red', statusText = 'ABS';
+                if(a.status === 'absent') { abs++; } else if(a.status === 'late') { lat++; statusClass = 'c-gold'; statusText = 'RET'; } else if(a.status === 'justified') { jus++; statusClass = 'c-green'; statusText = 'JUS'; }
+                let actions = ''; if(isAdmin) { actions += `<div class="del-btn" onclick="window.deleteAbsence('${a.id}')">&times;</div>`; if(a.status === 'absent') actions += `<div class="ok-btn" onclick="window.justifyAbsence('${a.id}')">✓</div>`; }
                 aList.innerHTML += `<div class="item-row"><div><strong>${a.date}</strong><br><small>${a.reason || 'Aucun motif'}</small></div><div style="display:flex; align-items:center;"><span class="${statusClass}" style="font-weight:700;">${statusText}</span>${actions}</div></div>`;
             });
-            document.getElementById('countAbs').innerText = abs;
-            document.getElementById('countLate').innerText = lat;
-            document.getElementById('countJus').innerText = jus;
-            document.getElementById('warnLevel1').style.display = (abs+lat) > 5 ? 'block' : 'none';
-
-            const hList = document.getElementById('hwList');
-            hList.innerHTML = '';
-            localData.homework.forEach(h => {
-                const done = h.doneBy && h.doneBy.includes(currentUser.id);
-                hList.innerHTML += `<div class="hw-item ${done?'done':''}"><div class="hw-check ${done?'done':''}" onclick="window.toggleTask('${h.id}', ${done})"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="hw-text">${h.text}</div>${isAdmin?`<div class="del-btn" onclick="window.deleteTask('${h.id}')">&times;</div>`:''}</div>`;
-            });
+            document.getElementById('countAbs').innerText = abs; document.getElementById('countLate').innerText = lat; document.getElementById('countJus').innerText = jus; document.getElementById('warnLevel1').style.display = (abs+lat) > 5 ? 'block' : 'none';
+            const hList = document.getElementById('hwList'); hList.innerHTML = '';
+            localData.homework.forEach(h => { const done = h.doneBy && h.doneBy.includes(currentUser.id); hList.innerHTML += `<div class="hw-item ${done?'done':''}"><div class="hw-check ${done?'done':''}" onclick="window.toggleTask('${h.id}', ${done})"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="hw-text">${h.text}</div>${isAdmin?`<div class="del-btn" onclick="window.deleteTask('${h.id}')">&times;</div>`:''}</div>`; });
         }
 
-        window.toggleTask = async function(id, isDone) {
-            const task = localData.homework.find(h=>h.id===id);
-            let doneBy = task.doneBy || [];
-            if(isDone) doneBy = doneBy.filter(i=>i!==currentUser.id); else doneBy.push(currentUser.id);
-            await updateDoc(doc(db, "homework", id), { doneBy });
-            await syncData();
-        }
-
+        // --- ACTION FUNCTIONS ---
+        window.toggleTask = async function(id, isDone) { const task = localData.homework.find(h=>h.id===id); let doneBy = task.doneBy || []; if(isDone) doneBy = doneBy.filter(i=>i!==currentUser.id); else doneBy.push(currentUser.id); await updateDoc(doc(db, "homework", id), { doneBy }); await syncData(); }
         window.addGrade = async function() { const n = document.getElementById('grName').value; const v = document.getElementById('grVal').value; if(n && v) { await addDoc(collection(db, "grades"), { userId: currentUser.id, name: n, val: v }); document.getElementById('grName').value=''; document.getElementById('grVal').value=''; await syncData(); } }
         window.addHomework = async function() { const t = document.getElementById('adHwTxt').value; const tgt = document.getElementById('adHwTgt').value; if(t) { await addDoc(collection(db, "homework"), { text: t, targetType: tgt, targetVal: tgt==='ALL'?'ALL':currentUser.grp }); document.getElementById('adHwTxt').value=''; await syncData(); } }
-        window.addAbsence = async function() { const t = document.getElementById('adAbsType').value; const r = document.getElementById('adAbsReason').value; const now = new Date(); const dateStr = now.toISOString().split('T')[0]; await addDoc(collection(db, "attendance"), { studentId: currentUser.id, date: dateStr, status: t, reason: r, timestamp: now, classId: 'MANUAL' }); document.getElementById('adAbsReason').value=''; await syncData(); }
+        window.addAbsence = async function() { const t = document.getElementById('adAbsType').value; const r = document.getElementById('adAbsReason').value; const now = new Date(); await addDoc(collection(db, "attendance"), { studentId: currentUser.id, date: now.toISOString().split('T')[0], status: t, reason: r, timestamp: now, classId: 'MANUAL' }); document.getElementById('adAbsReason').value=''; await syncData(); }
         window.justifyAbsence = async function(id) { if(confirm("Justifier cette absence ?")) { await updateDoc(doc(db, "attendance", id), { status: 'justified' }); await syncData(); } }
         window.deleteAbsence = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "attendance", id)); await syncData(); } }
         window.deleteGrade = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "grades", id)); await syncData(); } }
         window.deleteTask = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "homework", id)); await syncData(); } }
-
-        window.loadAdminRegistry = async function() {
-            document.getElementById('login-screen').style.display='none';
-            document.getElementById('dashboard').style.display='none';
-            document.getElementById('admin-registry').style.display='block';
-            const q = query(collection(db, "students"), orderBy("nom"));
-            const snap = await getDocs(q);
-            const grid = document.getElementById('studentGrid');
-            grid.innerHTML = '';
-            allStudents = [];
-            snap.forEach(d => {
-                const s = d.data();
-                allStudents.push({id:d.id, ...s});
-                const displayId = s.shortId || s.id;
-                const el = document.createElement('div');
-                el.className = 'student-card glass-panel';
-                el.innerHTML = `<div class="st-card-top"><div class="st-avatar">${s.prenom[0]}</div><div class="st-grp-badge">${s.grp}</div></div><div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${displayId}</div></div>`;
-                el.onclick = () => loadDashboard({id:d.id, ...s}, true, true);
-                grid.appendChild(el);
-            });
-        }
-
-        window.filterStudents = function() {
-            const term = document.getElementById('adminSearch').value.toLowerCase();
-            const filtered = allStudents.filter(s => s.nom.toLowerCase().includes(term) || (s.shortId || s.id).toLowerCase().includes(term));
-            const grid = document.getElementById('studentGrid');
-            grid.innerHTML = '';
-            filtered.forEach(s => {
-                const displayId = s.shortId || s.id;
-                const el = document.createElement('div');
-                el.className = 'student-card glass-panel';
-                el.innerHTML = `<div class="st-card-top"><div class="st-avatar">${s.prenom[0]}</div><div class="st-grp-badge">${s.grp}</div></div><div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${displayId}</div></div>`;
-                el.onclick = () => loadDashboard(s, true, true);
-                grid.appendChild(el);
-            });
-        }
-
+        window.loadAdminRegistry = async function() { document.getElementById('login-screen').style.display='none'; document.getElementById('dashboard').style.display='none'; document.getElementById('admin-registry').style.display='block'; const q = query(collection(db, "students"), orderBy("nom")); const snap = await getDocs(q); const grid = document.getElementById('studentGrid'); grid.innerHTML = ''; allStudents = []; snap.forEach(d => { const s = d.data(); allStudents.push({id:d.id, ...s}); const displayId = s.shortId || s.id; const el = document.createElement('div'); el.className = 'student-card glass-panel'; el.innerHTML = `<div class="st-card-top"><div class="st-avatar">${s.prenom[0]}</div><div class="st-grp-badge">${s.grp}</div></div><div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${displayId}</div></div>`; el.onclick = () => loadDashboard({id:d.id, ...s}, true, true); grid.appendChild(el); }); }
+        window.filterStudents = function() { const term = document.getElementById('adminSearch').value.toLowerCase(); const filtered = allStudents.filter(s => s.nom.toLowerCase().includes(term) || (s.shortId || s.id).toLowerCase().includes(term)); const grid = document.getElementById('studentGrid'); grid.innerHTML = ''; filtered.forEach(s => { const displayId = s.shortId || s.id; const el = document.createElement('div'); el.className = 'student-card glass-panel'; el.innerHTML = `<div class="st-card-top"><div class="st-avatar">${s.prenom[0]}</div><div class="st-grp-badge">${s.grp}</div></div><div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${displayId}</div></div>`; el.onclick = () => loadDashboard(s, true, true); grid.appendChild(el); }); }
         window.exitAdmin = () => loadAdminRegistry();
         window.logout = () => { signOut(auth).then(() => { localStorage.removeItem(SESSION_KEY); location.reload(); }).catch((e) => { localStorage.removeItem(SESSION_KEY); location.reload(); }); }
         window.openModal = (id) => document.getElementById(id).style.display='flex';
         window.closeModal = () => document.querySelectorAll('.modal-overlay').forEach(e=>e.style.display='none');
-        window.downloadData = () => { if(!currentUser) return alert("Veuillez vous connecter pour télécharger vos données."); const exportData = { userProfile: currentUser, academicData: localData, exportDate: new Date().toISOString(), platform: "SmartST Student OS" }; const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "smartst_data_export.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
-        window.deleteAccount = async () => { if(!confirm("ATTENTION: Action irréversible.")) return; const loader = document.getElementById('loader'); loader.style.display = 'flex'; try { const uid = currentUser.id; const batch = writeBatch(db); const gradesQ = query(collection(db, "grades"), where("userId", "==", uid)); const gradesSnap = await getDocs(gradesQ); gradesSnap.forEach(doc => batch.delete(doc.ref)); const attQ = query(collection(db, "attendance"), where("studentId", "==", uid)); const attSnap = await getDocs(attQ); attSnap.forEach(doc => batch.delete(doc.ref)); const tickQ = query(collection(db, "support_tickets"), where("userId", "==", uid)); const tickSnap = await getDocs(tickQ); tickSnap.forEach(doc => batch.delete(doc.ref)); const studentRef = doc(db, "students", uid); batch.delete(studentRef); await batch.commit(); const user = auth.currentUser; if(user) await deleteUser(user); localStorage.clear(); alert("Compte supprimé avec succès."); location.reload(); } catch (error) { console.error(error); loader.style.display = 'none'; alert("Erreur: Une reconnexion récente est nécessaire pour supprimer le compte."); } }
-        
+        window.downloadData = () => { if(!currentUser) return alert("Veuillez vous connecter."); const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ userProfile: currentUser, academicData: localData, exportDate: new Date().toISOString() }, null, 2)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "smartst_data_export.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
+        window.deleteAccount = async () => { if(!confirm("Action irréversible.")) return; const loader = document.getElementById('loader'); loader.style.display = 'flex'; try { const uid = currentUser.id; const batch = writeBatch(db); const gradesQ = query(collection(db, "grades"), where("userId", "==", uid)); const gradesSnap = await getDocs(gradesQ); gradesSnap.forEach(doc => batch.delete(doc.ref)); const attQ = query(collection(db, "attendance"), where("studentId", "==", uid)); const attSnap = await getDocs(attQ); attSnap.forEach(doc => batch.delete(doc.ref)); const tickQ = query(collection(db, "support_tickets"), where("userId", "==", uid)); const tickSnap = await getDocs(tickQ); tickSnap.forEach(doc => batch.delete(doc.ref)); const studentRef = doc(db, "students", uid); batch.delete(studentRef); await batch.commit(); const user = auth.currentUser; if(user) await deleteUser(user); localStorage.clear(); alert("Compte supprimé."); location.reload(); } catch (error) { loader.style.display = 'none'; alert("Erreur: Reconnexion requise."); } }
         function saveSession(user, adminStatus) { localStorage.setItem(SESSION_KEY, JSON.stringify({ user, isAdmin: adminStatus, timestamp: Date.now() })); }
     </script>
 </body>
