@@ -432,6 +432,8 @@
         // 1. FIREBASE SETUP
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, addDoc, doc, deleteDoc, query, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        // ADDED AUTHENTICATION IMPORT
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -445,6 +447,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app); // INITIALIZE AUTH
 
         // STATE
         let roadmapData = [];
@@ -485,7 +488,6 @@
                 });
 
                 // DYNAMIC LINE WIDTH CALCULATION
-                // We ensure the line stretches to cover all items
                 setTimeout(() => {
                     const scrollW = container.scrollWidth;
                     container.querySelector('.timeline-line').style.width = scrollW + 'px';
@@ -528,7 +530,7 @@
             document.getElementById('dMeta').innerHTML = `${data.date} • ${statusBadge}`;
         }
 
-        // --- NEWS LOGIC (NEW) ---
+        // --- NEWS LOGIC ---
         window.openNews = async function() {
             document.getElementById('newsModal').style.display = 'flex';
             await loadNews();
@@ -566,11 +568,17 @@
                 });
             } catch(e) {
                 console.error("News Load Error:", e);
-                container.innerHTML = '<div style="color:var(--gemini-red);">Erreur de chargement.</div>';
+                container.innerHTML = '<div style="color:var(--gemini-red); text-align:center;">Impossible de charger les news.<br>Vérifiez votre connexion.</div>';
             }
         }
 
         window.addNewsItem = async function() {
+            // SECURITY CHECK: Are we logged in?
+            if (!auth.currentUser) {
+                alert("ERREUR: Vous n'êtes pas identifié.\nVeuillez vous connecter sur le Dashboard (SmartST) d'abord, puis revenez ici.");
+                return;
+            }
+
             const data = {
                 date: document.getElementById('nDate').value,
                 version: document.getElementById('nVer').value,
@@ -581,15 +589,21 @@
             
             if(!data.title || !data.body) return alert("Titre et contenu requis.");
 
-            await addDoc(collection(db, "news"), data);
-            
-            // Clear inputs
-            document.getElementById('nDate').value = "";
-            document.getElementById('nVer').value = "";
-            document.getElementById('nTitle').value = "";
-            document.getElementById('nBody').value = "";
-            
-            loadNews();
+            try {
+                await addDoc(collection(db, "news"), data);
+                alert("Actualité publiée avec succès !");
+                
+                // Clear inputs
+                document.getElementById('nDate').value = "";
+                document.getElementById('nVer').value = "";
+                document.getElementById('nTitle').value = "";
+                document.getElementById('nBody').value = "";
+                
+                loadNews();
+            } catch (e) {
+                console.error(e);
+                alert("Erreur lors de la publication : " + e.message);
+            }
         }
 
         // --- AUTO-SEEDER ---
@@ -630,6 +644,11 @@
         }
 
         window.addRoadmapItem = async function() {
+            // Check auth for roadmap too
+            if (!auth.currentUser) {
+                alert("Connectez-vous sur le Dashboard d'abord.");
+                return;
+            }
             const data = {
                 date: document.getElementById('newDate').value,
                 title: document.getElementById('newTitle').value,
@@ -645,6 +664,7 @@
         }
 
         window.deleteSelectedItem = async function() {
+            if (!auth.currentUser) return alert("Non connecté.");
             if(selectedItemId && confirm("Supprimer cet élément ?")) {
                 await deleteDoc(doc(db, "roadmap", selectedItemId));
                 document.getElementById('detailBox').style.display = 'none';
@@ -664,3 +684,4 @@
     </script>
 </body>
 </html>
+
