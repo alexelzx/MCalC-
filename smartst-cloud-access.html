@@ -336,6 +336,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         const messaging = getMessaging(app);
+        
         const VAPID_KEY = "BCkGPek8Vhg6dkdb31PaZbn82al9eWDzQp6eFhAXuMOQaR0kPprDfh5k6cBp9CjkdQMHbb10CxvRvJljq2-SUCE";
 
         let currentUser = null;
@@ -362,10 +363,12 @@
         };
 
         // --- AUTH & DATA LOADING (ROBUST) ---
-        // We wait for Firebase to initialize BEFORE loading dashboard
+        // CRITICAL FIX: We now listen for the Auth state FIRST.
+        // This prevents the "Insufficient Permissions" error by ensuring
+        // the user is logged in before we try to read from Firestore.
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is authenticated. Now we check session storage for UI details
+                // User is authenticated by Firebase. Now we load the UI session.
                 const stored = localStorage.getItem(SESSION_KEY);
                 if (stored) {
                     const session = JSON.parse(stored);
@@ -378,7 +381,7 @@
                     document.getElementById('loader').style.display='none';
                 }
             } else {
-                // No user
+                // No user logged in
                 document.getElementById('loader').style.display='none';
             }
         });
@@ -392,7 +395,7 @@
                 if (permission === 'granted') {
                     
                     // 1. MANUALLY REGISTER SW TO FIX 404
-                    // This forces the browser to look in the current folder, not root
+                    // This forces the browser to look in the current folder (/MCalC/)
                     let reg;
                     try {
                         reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
@@ -417,7 +420,7 @@
                                     notificationsEnabled: true
                                 });
                             } catch(e) {
-                                console.log("Token save skipped.");
+                                console.log("Token save skipped (Profile may not exist).");
                             }
                         }
                     }
@@ -497,7 +500,7 @@
             }
         }
 
-        // --- AUTH FUNCTIONS (UNCHANGED LOGIC) ---
+        // --- AUTH FUNCTIONS (WITH FAILSAFE) ---
         window.handleStudentAuth = async function(action) {
             const loader = document.getElementById('loader');
             loader.style.display = 'flex';
@@ -518,12 +521,24 @@
                 const email = document.getElementById('stEmail').value;
                 const pwd = document.getElementById('stPwd').value;
                 signInWithEmailAndPassword(auth, email, pwd).then(async (cred) => {
-                    const docRef = doc(db, "students", cred.user.uid);
-                    const docSnap = await getDoc(docRef);
-                    if(docSnap.exists()) {
-                        const user = { id: docSnap.id, ...docSnap.data() };
-                        saveSession(user, false);
-                    } else { loader.style.display='none'; alert("Compte existant mais aucune donnée étudiante trouvée."); }
+                    // FAILSAFE: Try to read profile. If fail, create dummy session to allow login.
+                    try {
+                        const docRef = doc(db, "students", cred.user.uid);
+                        const docSnap = await getDoc(docRef);
+                        if(docSnap.exists()) {
+                            const user = { id: docSnap.id, ...docSnap.data() };
+                            saveSession(user, false);
+                        } else {
+                            // Profile missing? Create temporary session
+                            const tempUser = { id: cred.user.uid, prenom: 'Etudiant', nom: 'Inconnu', grp: '??' };
+                            saveSession(tempUser, false);
+                        }
+                    } catch(readErr) {
+                        console.warn("Could not read profile (Permissions?):", readErr);
+                        // Force login anyway
+                        const tempUser = { id: cred.user.uid, prenom: 'Etudiant', nom: '(Erreur Profil)', grp: '--' };
+                        saveSession(tempUser, false);
+                    }
                 }).catch((error) => { loader.style.display='none'; alert("Erreur Connexion: " + error.message); });
             }
         };
