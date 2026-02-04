@@ -498,6 +498,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, orderBy, deleteDoc, addDoc, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -511,6 +512,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const messaging = getMessaging(app);
+        
+        // YOUR NOTIFICATION KEY
+        const VAPID_KEY = "BCkGPek8Vhg6dkdb31PaZbn82al9eWDzQp6eFhAXuMOQaR0kPprDfh5k6cBp9CjkdQMHbb10CxvRvJljq2-SUCE";
 
         // Global State
         let currentUser = null;
@@ -572,6 +577,33 @@
 
         function saveSession(user, adminStatus) {
             localStorage.setItem(SESSION_KEY, JSON.stringify({ user, isAdmin: adminStatus, timestamp: Date.now() }));
+        }
+
+        // --- PUSH NOTIFICATION LOGIC ---
+        async function enableNotifications(user) {
+            // Only ask real students, not admins (admins don't usually have a 'students' doc)
+            if (isAdmin) return;
+
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+                    if (token) {
+                        console.log("FCM Token:", token);
+                        // Safe update: only if student profile exists
+                        try {
+                            await updateDoc(doc(db, "students", user.id), {
+                                fcmToken: token,
+                                notificationsEnabled: true
+                            });
+                        } catch(e) {
+                            console.log("Could not save token to DB (User might be Admin or Doc missing)");
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error setting up notifications:", error);
+            }
         }
 
         // --- STUDENT AUTH ---
@@ -666,6 +698,9 @@
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('loader').style.display = 'none';
 
+            // TRIGGER NOTIFICATIONS REQUEST HERE
+            enableNotifications(user);
+
             if(isAdmin && !forceView) {
                 document.getElementById('admin-registry').style.display = 'block';
                 document.getElementById('dashboard').style.display = 'none';
@@ -681,7 +716,6 @@
                     document.getElementById('adminBackBtn').style.display = 'flex';
                     document.getElementById('adminHwBox').classList.add('admin-visible');
                     document.getElementById('adminAbsBox').classList.add('admin-visible');
-                    // Removed individual student attendance button logic here
                     document.querySelectorAll('.add-row').forEach(e => e.classList.add('admin-visible'));
                 }
                 await syncData();
@@ -909,4 +943,3 @@
     </script>
 </body>
 </html>
-
