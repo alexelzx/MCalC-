@@ -3,17 +3,17 @@
 **MCalC+** has evolved from a simple grade simulator into a comprehensive **Student Operating System (SmartST)**. Designed for the **BUT Information-Communication** at **IUT Toulouse III - Paul Sabatier**, it now bridges the gap between academic simulation and daily student life management via a unified, cloud-connected interface.
 
 > **Current Version:** v2.4.1 (Gemini Liquid Update)  
-> **Status:** 🔒 SmartST (Closed Alpha) | ✅ Calculator (Public Beta)
+> **Status:** 🚀 **SmartST (Public Beta)** | ✅ **Calculator (Live)**
 
 ## 🚧 DEVELOPMENT STATUS / STATUT
-* 🔒 **SmartST OS (Dashboard & Calendar):** **Closed Alpha**. Requires an access key to enter.
+* 🚀 **SmartST OS (Dashboard & Calendar):** **Public Beta**. Now accessible to all authorized students (C1/C2).
 * ✅ **Calculator (BUT 1, BUT 2, BUT 3):** **Live**. S1 & S2 coefficients are active.
 
 ## 📅 PROJECT ROADMAP 2026
-* **Jan 2026:** Launch of MCalC+ Base (Calculator).
-* **Early Feb:** Release of **SmartST** (Student OS) & **Smart Calendar**. *(*Only for BUT 1 C1 and C2*)
-* **Early March:** New features to the SmartST system and global redesign. Possibility to switch between dark/white theme.
-* **May:** Mobile Native PWA & Global Dashboard.
+* **JAN 2026:** ✅ Launch of MCalC+ Base (Calculator).
+* **FEB 2026:** 🚀 **Official Public Beta:** SmartST Student OS & Live Calendar integration.
+* **MAR 2026:** 🎨 **UI Overhaul:** Global redesign & Light/Dark Mode toggle.
+* **MAY 2026:** 📱 **Mobile Native:** PWA Version & Global Dashboard.
 
 ---
 
