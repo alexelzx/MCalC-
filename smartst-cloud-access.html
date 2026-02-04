@@ -323,6 +323,7 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, deleteUser, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
 
+        // CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
             authDomain: "smartst-os.firebaseapp.com",
@@ -338,107 +339,75 @@
         const messaging = getMessaging(app);
         
         const VAPID_KEY = "BCkGPek8Vhg6dkdb31PaZbn82al9eWDzQp6eFhAXuMOQaR0kPprDfh5k6cBp9CjkdQMHbb10CxvRvJljq2-SUCE";
+        const SESSION_KEY = 'smartst_session';
+        const TIMEOUT_MS = 30 * 60 * 1000;
 
+        // STATE
         let currentUser = null;
         let isAdmin = false; 
         let isLoginAdmin = false; 
         let isSignupMode = false;
         let localData = { grades: [], attendance: [], homework: [], scheduleMap: {} };
         let allStudents = []; 
-        const SESSION_KEY = 'smartst_session';
-        const TIMEOUT_MS = 30 * 60 * 1000;
 
-        // UI Helpers
-        window.switchTab = (mode) => {
-            isLoginAdmin = (mode === 'admin');
-            document.getElementById('tabStudent').className = isLoginAdmin ? 'tab-btn' : 'tab-btn active';
-            document.getElementById('tabAdmin').className = isLoginAdmin ? 'tab-btn active' : 'tab-btn';
-            if(isLoginAdmin) { document.getElementById('studentLogin').classList.add('hidden'); document.getElementById('adminLogin').classList.remove('hidden'); }
-            else { document.getElementById('studentLogin').classList.remove('hidden'); document.getElementById('adminLogin').classList.add('hidden'); }
-        };
-        window.toggleStMode = () => {
-            isSignupMode = !isSignupMode;
-            if(isSignupMode) { document.getElementById('stLoginMode').classList.add('hidden'); document.getElementById('stSignupMode').classList.remove('hidden'); }
-            else { document.getElementById('stLoginMode').classList.remove('hidden'); document.getElementById('stSignupMode').classList.add('hidden'); }
-        };
-
-        // --- AUTH & DATA LOADING (ROBUST) ---
-        // CRITICAL FIX: We now listen for the Auth state FIRST.
-        // This prevents the "Insufficient Permissions" error by ensuring
-        // the user is logged in before we try to read from Firestore.
-        onAuthStateChanged(auth, (user) => {
+        // --- AUTH STATE LISTENER ---
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // User is authenticated by Firebase. Now we load the UI session.
+                // User logged in. Check if we have session data locally.
                 const stored = localStorage.getItem(SESSION_KEY);
                 if (stored) {
                     const session = JSON.parse(stored);
-                    // Update the session user ID to match the real Auth ID to prevent permission errors
-                    session.user.id = user.uid; 
-                    loadDashboard(session.user, session.isAdmin);
-                } else {
-                    // Session lost but auth valid -> Force re-login to be safe
-                    signOut(auth);
-                    document.getElementById('loader').style.display='none';
-                }
-            } else {
-                // No user logged in
-                document.getElementById('loader').style.display='none';
-            }
-        });
-
-        // --- PUSH NOTIFICATION LOGIC (FIXED FOR GITHUB PAGES) ---
-        async function enableNotifications(user) {
-            try {
-                if (!("Notification" in window)) return;
-
-                const permission = await Notification.requestPermission();
-                if (permission === 'granted') {
-                    
-                    // 1. MANUALLY REGISTER SW TO FIX 404
-                    // This forces the browser to look in the current folder (/MCalC/)
-                    let reg;
-                    try {
-                        reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
-                        console.log("SW Registered at ./firebase-messaging-sw.js");
-                    } catch(swError) {
-                        console.warn("SW Registration failed (likely path issue):", swError);
+                    // If session matches user, load dashboard directly
+                    if (session.user.id === user.uid) {
+                        loadDashboard(session.user, session.isAdmin);
                         return;
                     }
-
-                    // 2. GET TOKEN
-                    const token = await getToken(messaging, { 
-                        vapidKey: VAPID_KEY,
-                        serviceWorkerRegistration: reg 
-                    });
-
-                    if (token) {
-                        console.log("FCM Token:", token);
-                        if (!isAdmin) {
-                            try {
-                                await updateDoc(doc(db, "students", user.id), {
-                                    fcmToken: token,
-                                    notificationsEnabled: true
-                                });
-                            } catch(e) {
-                                console.log("Token save skipped (Profile may not exist).");
-                            }
+                }
+                
+                // If no local session, fetch from DB
+                // This fixes the "No Data" issue on reload
+                if (user.uid === "WA5k4NI4mWWsmzdLgRS9tGRRfVz2") {
+                    // Admin Recovery
+                    const adminUser = { id: user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
+                    saveSession(adminUser, true);
+                    loadDashboard(adminUser, true);
+                } else {
+                    // Student Recovery
+                    try {
+                        const docRef = doc(db, "students", user.uid);
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            const userData = { id: docSnap.id, ...docSnap.data() };
+                            saveSession(userData, false);
+                            loadDashboard(userData, false);
+                        } else {
+                            // If doc doesn't exist, just stay logged in but show error
+                            console.error("Profile not found in DB");
+                            document.getElementById('loader').style.display='none';
                         }
+                    } catch (e) {
+                        console.error("Error fetching profile:", e);
+                        document.getElementById('loader').style.display='none';
                     }
                 }
-            } catch (error) {
-                console.log("Notification setup skipped.");
+            } else {
+                // User logged out
+                document.getElementById('loader').style.display='none';
+                document.getElementById('login-screen').style.display='flex';
             }
-        }
+        });
 
         // --- DASHBOARD LOADER ---
         window.loadDashboard = async function(user, adminMode, forceView = false) {
             currentUser = user;
             isAdmin = adminMode;
+            
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('loader').style.display = 'none'; // SAFETY: Ensure loader is gone
+            document.getElementById('loader').style.display = 'none';
 
-            // Trigger Notifications (fails gracefully if broken)
-            enableNotifications(user);
+            // TRIGGER NOTIFICATIONS (NON-BLOCKING)
+            // We run this *after* the dashboard loads so it doesn't stop the login
+            setTimeout(() => enableNotifications(user), 2000);
 
             if(isAdmin && !forceView) {
                 document.getElementById('admin-registry').style.display = 'block';
@@ -458,88 +427,112 @@
                     document.querySelectorAll('.add-row').forEach(e => e.classList.add('admin-visible'));
                 }
                 
-                try {
-                    await syncData();
-                } catch(e) {
-                    console.error("Sync Failed:", e);
-                    // Even if sync fails, ensure loader is off
-                    document.getElementById('loader').style.display = 'none';
-                }
+                await syncData();
             }
         }
 
+        // --- DATA SYNC ---
         async function syncData() {
-            // SAFETY: Do not run if no user
-            if(!currentUser) return; 
-
+            if(!currentUser) return;
+            
+            // Show loader briefly while syncing
+            const loader = document.getElementById('loader');
+            // loader.style.display = 'flex'; // Optional: keep loader hidden for cleaner UX
+            
             localData = { grades: [], attendance: [], homework: [], scheduleMap: {} };
             
             try {
-                // Schedule (Public Read)
+                // 1. Schedule (Public)
                 const schSnap = await getDocs(collection(db, "schedule"));
                 schSnap.forEach(d => localData.scheduleMap[d.id] = d.data());
 
-                // Grades (Private)
-                const grQ = query(collection(db, "grades"), where("userId", "==", currentUser.id));
-                const grS = await getDocs(grQ);
-                grS.forEach(d => localData.grades.push({ ...d.data(), id: d.id }));
-
-                // Attendance (Private)
-                const atQ = query(collection(db, "attendance"), where("studentId", "==", currentUser.id));
-                const atS = await getDocs(atQ);
-                atS.forEach(d => localData.attendance.push({ ...d.data(), id: d.id }));
-
-                // Homework (Public Read)
+                // 2. Homework (Public)
                 const hwSnap = await getDocs(collection(db, "homework"));
                 hwSnap.forEach(d => localData.homework.push({ ...d.data(), id: d.id }));
 
+                // 3. Personal Data (Requires Auth)
+                if(currentUser && currentUser.id) {
+                    const grQ = query(collection(db, "grades"), where("userId", "==", currentUser.id));
+                    const grS = await getDocs(grQ);
+                    grS.forEach(d => localData.grades.push({ ...d.data(), id: d.id }));
+
+                    const atQ = query(collection(db, "attendance"), where("studentId", "==", currentUser.id));
+                    const atS = await getDocs(atQ);
+                    atS.forEach(d => localData.attendance.push({ ...d.data(), id: d.id }));
+                }
+
                 renderAll();
-            } catch(error) {
-                console.error("Permission Error during Sync:", error);
-                // We do NOT re-throw here to prevent crashing the UI loop
+                
+            } catch(e) {
+                console.error("Sync Error:", e);
+            } finally {
+                loader.style.display = 'none';
             }
         }
 
-        // --- AUTH FUNCTIONS (WITH FAILSAFE) ---
+        // --- NOTIFICATIONS (SIMPLE & SAFE) ---
+        async function enableNotifications(user) {
+            try {
+                if (!("Notification" in window)) return;
+
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    // FIX 404: Use ./ to force current directory lookup
+                    let reg;
+                    try {
+                        reg = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
+                    } catch(err) {
+                        console.log("SW Registration failed (Path issue?):", err);
+                        return; 
+                    }
+
+                    const token = await getToken(messaging, { 
+                        vapidKey: VAPID_KEY,
+                        serviceWorkerRegistration: reg 
+                    });
+
+                    if (token && !isAdmin) {
+                        // Save token silently. If it fails, we don't care.
+                        // We use updateDoc (not setDoc) to avoid overwriting profile
+                        updateDoc(doc(db, "students", user.id), {
+                            fcmToken: token,
+                            notificationsEnabled: true
+                        }).catch(e => console.log("Token save skipped"));
+                    }
+                }
+            } catch (error) {
+                console.log("Notification setup skipped.");
+            }
+        }
+
+        // --- AUTH ACTIONS ---
         window.handleStudentAuth = async function(action) {
             const loader = document.getElementById('loader');
             loader.style.display = 'flex';
-            if (action === 'signup') {
-                const email = document.getElementById('suEmail').value;
-                const pwd = document.getElementById('suPwd').value;
-                const nom = document.getElementById('suNom').value;
-                const prenom = document.getElementById('suPrenom').value;
-                const grp = document.getElementById('suGroup').value;
-                if(!email || !pwd || !nom || !prenom || !grp) { loader.style.display='none'; return alert("Remplissez tous les champs."); }
-                createUserWithEmailAndPassword(auth, email, pwd).then(async (cred) => {
-                    const shortId = 'U' + Math.floor(1000 + Math.random() * 9000);
-                    const newUser = { id: cred.user.uid, shortId, email, nom, prenom, grp };
+
+            const email = document.getElementById(action === 'signup' ? 'suEmail' : 'stEmail').value;
+            const pwd = document.getElementById(action === 'signup' ? 'suPwd' : 'stPwd').value;
+
+            if(!email || !pwd) { loader.style.display='none'; return alert("Champs requis."); }
+
+            try {
+                if (action === 'signup') {
+                    const nom = document.getElementById('suNom').value;
+                    const prenom = document.getElementById('suPrenom').value;
+                    const grp = document.getElementById('suGroup').value;
+                    
+                    const cred = await createUserWithEmailAndPassword(auth, email, pwd);
+                    const newUser = { id: cred.user.uid, shortId: 'U'+Math.floor(Math.random()*9000), email, nom, prenom, grp };
                     await setDoc(doc(db, "students", cred.user.uid), newUser);
                     saveSession(newUser, false);
-                }).catch((error) => { loader.style.display='none'; alert("Erreur Inscription: " + error.message); });
-            } else {
-                const email = document.getElementById('stEmail').value;
-                const pwd = document.getElementById('stPwd').value;
-                signInWithEmailAndPassword(auth, email, pwd).then(async (cred) => {
-                    // FAILSAFE: Try to read profile. If fail, create dummy session to allow login.
-                    try {
-                        const docRef = doc(db, "students", cred.user.uid);
-                        const docSnap = await getDoc(docRef);
-                        if(docSnap.exists()) {
-                            const user = { id: docSnap.id, ...docSnap.data() };
-                            saveSession(user, false);
-                        } else {
-                            // Profile missing? Create temporary session
-                            const tempUser = { id: cred.user.uid, prenom: 'Etudiant', nom: 'Inconnu', grp: '??' };
-                            saveSession(tempUser, false);
-                        }
-                    } catch(readErr) {
-                        console.warn("Could not read profile (Permissions?):", readErr);
-                        // Force login anyway
-                        const tempUser = { id: cred.user.uid, prenom: 'Etudiant', nom: '(Erreur Profil)', grp: '--' };
-                        saveSession(tempUser, false);
-                    }
-                }).catch((error) => { loader.style.display='none'; alert("Erreur Connexion: " + error.message); });
+                    // onAuthStateChanged will trigger loadDashboard
+                } else {
+                    await signInWithEmailAndPassword(auth, email, pwd);
+                    // onAuthStateChanged will trigger loadDashboard
+                }
+            } catch (error) {
+                loader.style.display='none';
+                alert("Erreur: " + error.message);
             }
         };
 
@@ -547,17 +540,53 @@
             const u = document.getElementById('adminUser').value;
             const p = document.getElementById('adminPwd').value;
             document.getElementById('loader').style.display = 'flex'; 
-            signInWithEmailAndPassword(auth, u, p).then(async (userCredential) => {
-                const email = userCredential.user.email;
-                const q = query(collection(db, "admins"), where("email", "==", email));
+
+            try {
+                const cred = await signInWithEmailAndPassword(auth, u, p);
+                // Hardcoded Master Check for stability
+                if (cred.user.uid === "WA5k4NI4mWWsmzdLgRS9tGRRfVz2") {
+                    const adminUser = { id: cred.user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
+                    saveSession(adminUser, true);
+                    return; // Auth listener will load dashboard
+                }
+
+                // Database Check for other admins
+                const q = query(collection(db, "admins"), where("email", "==", cred.user.email));
                 const snapshot = await getDocs(q);
-                if (snapshot.empty) { await signOut(auth); document.getElementById('loader').style.display = 'none'; alert("ACCÈS REFUSÉ"); return; }
-                const adminUser = { id: userCredential.user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
+
+                if (snapshot.empty) {
+                    await signOut(auth);
+                    throw new Error("Compte non autorisé.");
+                }
+
+                const adminUser = { id: cred.user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
                 saveSession(adminUser, true);
-            }).catch((error) => { document.getElementById('loader').style.display = 'none'; alert("Erreur: " + error.message); });
+            } catch(error) {
+                document.getElementById('loader').style.display = 'none';
+                alert(error.message);
+            }
         }
 
-        // --- RENDER FUNCTIONS (UNCHANGED) ---
+        // --- HELPER FUNCTIONS ---
+        function saveSession(user, adminStatus) {
+            localStorage.setItem(SESSION_KEY, JSON.stringify({ user, isAdmin: adminStatus, timestamp: Date.now() }));
+        }
+
+        // --- UI LOGIC (Unchanged) ---
+        window.switchTab = (mode) => {
+            isLoginAdmin = (mode === 'admin');
+            document.getElementById('tabStudent').className = isLoginAdmin ? 'tab-btn' : 'tab-btn active';
+            document.getElementById('tabAdmin').className = isLoginAdmin ? 'tab-btn active' : 'tab-btn';
+            if(isLoginAdmin) { document.getElementById('studentLogin').classList.add('hidden'); document.getElementById('adminLogin').classList.remove('hidden'); }
+            else { document.getElementById('studentLogin').classList.remove('hidden'); document.getElementById('adminLogin').classList.add('hidden'); }
+        };
+        window.toggleStMode = () => {
+            isSignupMode = !isSignupMode;
+            if(isSignupMode) { document.getElementById('stLoginMode').classList.add('hidden'); document.getElementById('stSignupMode').classList.remove('hidden'); }
+            else { document.getElementById('stLoginMode').classList.remove('hidden'); document.getElementById('stSignupMode').classList.add('hidden'); }
+        };
+        
+        // --- DATA DISPLAY (Unchanged) ---
         function renderAll() {
             const gList = document.getElementById('gradeList'); gList.innerHTML = ''; let gSum = 0;
             localData.grades.forEach(g => { gSum += parseFloat(g.val); gList.innerHTML += `<div class="item-row"><span>${g.name}</span><div style="display:flex;align-items:center;"><span class="val-hl">${g.val}</span>${isAdmin?`<div class="del-btn" onclick="window.deleteGrade('${g.id}')">&times;</div>`:''}</div></div>`; });
@@ -595,3 +624,4 @@
     </script>
 </body>
 </html>
+
