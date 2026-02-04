@@ -105,9 +105,9 @@
         .p-desc { font-size: 0.95rem; color: var(--text-mute); line-height: 1.6; }
         
         .badge-alpha {
-            position: absolute; top: 20px; right: 20px; background: rgba(251, 191, 36, 0.1);
-            color: var(--gemini-gold); font-size: 0.7rem; font-weight: 800; padding: 6px 12px;
-            border-radius: 20px; border: 1px solid rgba(251, 191, 36, 0.3); letter-spacing: 1px;
+            position: absolute; top: 20px; right: 20px; background: rgba(16, 185, 129, 0.1);
+            color: var(--gemini-green); font-size: 0.7rem; font-weight: 800; padding: 6px 12px;
+            border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.3); letter-spacing: 1px;
             display: flex; align-items: center; gap: 6px;
         }
 
@@ -166,23 +166,6 @@
             display: flex; flex-direction: column; align-items: center;
         }
         
-        /* ALPHA ACCESS MODAL */
-        .alpha-title { color: var(--gemini-gold); margin: 0 0 10px 0; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .alpha-desc { color: var(--text-mute); font-size: 0.9rem; line-height: 1.6; margin-bottom: 25px; }
-        .alpha-input {
-            width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 12px; color: white; font-size: 1.5rem; letter-spacing: 5px; text-align: center;
-            margin-bottom: 20px; text-transform: uppercase; transition: 0.3s;
-        }
-        .alpha-input:focus { border-color: var(--gemini-gold); box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
-        .alpha-btn {
-            width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 1rem; font-weight: 800;
-            background: var(--gemini-gold); color: black; cursor: pointer; transition: 0.2s;
-        }
-        .alpha-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(251, 191, 36, 0.4); }
-        .alpha-error { border-color: var(--gemini-red) !important; animation: shake 0.3s; }
-        .alpha-success { border-color: var(--gemini-green) !important; box-shadow: 0 0 30px rgba(16, 185, 129, 0.4) !important; }
-
         /* --- ADVANCED ROADMAP STYLES --- */
         .modal-roadmap { max-width: 900px; width: 95%; align-items: flex-start; text-align: left; }
         
@@ -317,10 +300,10 @@
     </div>
 
     <div id="main-menu">
-        <div class="portal-card" onclick="openAlphaModal()">
+        <div class="portal-card" onclick="navTo('smartst-cloud-access.html')">
             <div class="badge-alpha">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                ALPHA FERMÉE
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                NOUVEAUTÉ !
             </div>
             <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
@@ -417,21 +400,6 @@
         </a>
     </div>
 
-    <div class="modal-overlay" id="alphaModal" onclick="closeAlpha()">
-        <div class="modal-box" onclick="event.stopPropagation()">
-            <h2 class="alpha-title">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                ACCÈS RESTREINT
-            </h2>
-            <p class="alpha-desc">
-                SmartST est actuellement en phase de <b>test Alpha</b>.<br>
-                Veuillez saisir votre code d'accès unique.
-            </p>
-            <input type="text" id="alphaCode" class="alpha-input" placeholder="CODE">
-            <button class="alpha-btn" onclick="checkAlpha()">VALIDER</button>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="roadmapModal" onclick="closeModal('roadmapModal')">
         <div class="modal-box modal-roadmap" onclick="event.stopPropagation()">
             <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:10px;">
@@ -441,7 +409,7 @@
             
             <div class="timeline-container" id="timelineContainer">
                 <div class="timeline-line"></div>
-                </div>
+            </div>
 
             <div id="detailBox" style="display:none; width:100%; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-top:15px; animation:fadeIn 0.3s;">
                 <h3 id="dTitle" style="margin:0; color:white;"></h3>
@@ -624,25 +592,6 @@
         }
 
         // --- NAVIGATION ---
-        window.openAlphaModal = function() {
-            document.getElementById('alphaModal').style.display = 'flex';
-            document.getElementById('alphaCode').focus();
-        }
-        window.closeAlpha = function() {
-            document.getElementById('alphaModal').style.display = 'none';
-            document.getElementById('alphaCode').value = '';
-            document.getElementById('alphaCode').classList.remove('alpha-error', 'alpha-success');
-        }
-        window.checkAlpha = function() {
-            const input = document.getElementById('alphaCode');
-            if(input.value.trim().toUpperCase() === 'AEX516') {
-                input.classList.remove('alpha-error'); input.classList.add('alpha-success');
-                setTimeout(() => navTo('smartst-cloud-access.html'), 800);
-            } else {
-                input.classList.add('alpha-error');
-                setTimeout(() => input.classList.remove('alpha-error'), 300);
-            }
-        }
         window.showCalculator = function() { document.getElementById('main-menu').style.display='none'; document.getElementById('calc-view').style.display='block'; }
         window.hideCalculator = function() { document.getElementById('calc-view').style.display='none'; document.getElementById('main-menu').style.display='flex'; }
         window.navTo = function(url) {
@@ -651,9 +600,6 @@
         }
         window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
         window.onclick = function(e) { if(e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; }
-        document.getElementById('alphaCode').addEventListener('keydown', (e) => { if(e.key==='Enter') checkAlpha(); });
     </script>
 </body>
 </html>
-
-
