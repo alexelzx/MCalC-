@@ -581,23 +581,26 @@
 
         // --- PUSH NOTIFICATION LOGIC ---
         async function enableNotifications(user) {
-            // Only ask real students, not admins (admins don't usually have a 'students' doc)
-            if (isAdmin) return;
-
+            // Note: Removed admin check so you can test it on your device
             try {
                 const permission = await Notification.requestPermission();
                 if (permission === 'granted') {
+                    // This creates the connection between this browser and your project
                     const token = await getToken(messaging, { vapidKey: VAPID_KEY });
                     if (token) {
                         console.log("FCM Token:", token);
-                        // Safe update: only if student profile exists
-                        try {
-                            await updateDoc(doc(db, "students", user.id), {
-                                fcmToken: token,
-                                notificationsEnabled: true
-                            });
-                        } catch(e) {
-                            console.log("Could not save token to DB (User might be Admin or Doc missing)");
+                        
+                        // We attempt to save the token. If it fails (e.g. Admin doesn't have a doc),
+                        // we catch the error so the app doesn't crash.
+                        if (!isAdmin) {
+                            try {
+                                await updateDoc(doc(db, "students", user.id), {
+                                    fcmToken: token,
+                                    notificationsEnabled: true
+                                });
+                            } catch(e) {
+                                console.log("Token generated but could not save to DB (User might be Admin)");
+                            }
                         }
                     }
                 }
