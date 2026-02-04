@@ -128,7 +128,7 @@
             display: flex; flex-direction: column; justify-content: space-between;
             border-left: 4px solid; backdrop-filter: blur(10px); z-index: 10;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.2s; cursor: pointer;
-            overflow: hidden; /* Ensures text doesn't spill out */
+            overflow: hidden; 
         }
         .event-card:hover { transform: scale(1.02); z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
@@ -137,31 +137,63 @@
         .type-TP { background: rgba(249, 115, 22, 0.15); border-color: var(--gemini-orange); }
         .type-SAE { background: rgba(168, 85, 247, 0.15); border-color: var(--gemini-purple); }
 
-        .status-cancelled { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--gemini-red) !important; opacity: 0.9; }
-        .status-cancelled .evt-title { text-decoration: line-through; opacity: 0.5; }
-        .status-postponed { background: repeating-linear-gradient(45deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.05) 10px, rgba(255,255,255,0.01) 10px, rgba(255,255,255,0.01) 20px) !important; border-color: var(--gemini-blue) !important; opacity: 0.9; }
+        /* --- UPDATED STATUS STYLES (STRIPES + DIMMING) --- */
         
-        /* --- NEW STATUS OVERLAY CSS --- */
+        /* CANCELLED */
+        .status-cancelled { 
+            /* Red Stripes */
+            background: repeating-linear-gradient(
+                135deg,
+                rgba(239, 68, 68, 0.05),
+                rgba(239, 68, 68, 0.05) 10px,
+                rgba(0, 0, 0, 0.2) 10px,
+                rgba(0, 0, 0, 0.2) 20px
+            ) !important;
+            border-color: #333 !important; 
+        }
+
+        /* POSTPONED */
+        .status-postponed { 
+            /* Blue/Grey Stripes */
+            background: repeating-linear-gradient(
+                135deg,
+                rgba(59, 130, 246, 0.05),
+                rgba(59, 130, 246, 0.05) 10px,
+                rgba(0, 0, 0, 0.2) 10px,
+                rgba(0, 0, 0, 0.2) 20px
+            ) !important;
+            border-color: #333 !important; 
+        }
+
+        /* Dim the CONTENT inside the cancelled/postponed cards so they look inactive */
+        .status-cancelled .evt-top, .status-cancelled .evt-title, .status-cancelled .evt-bot,
+        .status-postponed .evt-top, .status-postponed .evt-title, .status-postponed .evt-bot {
+            opacity: 0.2; /* Very dimmed */
+            filter: grayscale(100%); /* Remove color from text/badges */
+        }
+        
+        /* --- PROFESSIONAL STATUS STAMP (CENTERED, NO ROTATION) --- */
         .status-text-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg);
-            font-size: 1.2rem;
-            font-weight: 900;
+            transform: translate(-50%, -50%); /* Centered, 0 rotation */
+            font-size: 1rem;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 2px;
             z-index: 15;
             pointer-events: none;
-            border: 3px solid currentColor;
-            padding: 5px 10px;
-            border-radius: 8px;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(2px);
+            border: 2px solid currentColor;
+            padding: 8px 16px;
+            border-radius: 4px; /* Professional boxy look */
+            background: #000; /* Solid black background for legibility */
             white-space: nowrap;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
         }
-        .st-cancelled-text { color: #f43f5e; border-color: #f43f5e; box-shadow: 0 0 15px rgba(244, 63, 94, 0.3); } /* Red */
-        .st-postponed-text { color: #3b82f6; border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); } /* Blue */
+        
+        .st-cancelled-text { color: #f43f5e; border-color: #f43f5e; } /* Red */
+        .st-postponed-text { color: #3b82f6; border-color: #3b82f6; } /* Blue */
 
         .evt-top { display: flex; justify-content: space-between; align-items: flex-start; }
         .evt-group-badge { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.3); }
