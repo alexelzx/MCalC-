@@ -128,6 +128,7 @@
             display: flex; flex-direction: column; justify-content: space-between;
             border-left: 4px solid; backdrop-filter: blur(10px); z-index: 10;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.2s; cursor: pointer;
+            overflow: hidden; /* Ensures text doesn't spill out */
         }
         .event-card:hover { transform: scale(1.02); z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
@@ -136,9 +137,31 @@
         .type-TP { background: rgba(249, 115, 22, 0.15); border-color: var(--gemini-orange); }
         .type-SAE { background: rgba(168, 85, 247, 0.15); border-color: var(--gemini-purple); }
 
-        .status-cancelled { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--gemini-red) !important; opacity: 0.8; }
-        .status-cancelled .evt-title { text-decoration: line-through; opacity: 0.6; }
-        .status-postponed { background: repeating-linear-gradient(45deg, rgba(255,255,255,0.03), rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.01) 10px, rgba(255,255,255,0.01) 20px) !important; border-color: #64748b !important; opacity: 0.6; filter: grayscale(0.5); }
+        .status-cancelled { background: rgba(239, 68, 68, 0.15) !important; border-color: var(--gemini-red) !important; opacity: 0.9; }
+        .status-cancelled .evt-title { text-decoration: line-through; opacity: 0.5; }
+        .status-postponed { background: repeating-linear-gradient(45deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.05) 10px, rgba(255,255,255,0.01) 10px, rgba(255,255,255,0.01) 20px) !important; border-color: var(--gemini-blue) !important; opacity: 0.9; }
+        
+        /* --- NEW STATUS OVERLAY CSS --- */
+        .status-text-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 1.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 15;
+            pointer-events: none;
+            border: 3px solid currentColor;
+            padding: 5px 10px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(2px);
+            white-space: nowrap;
+        }
+        .st-cancelled-text { color: #f43f5e; border-color: #f43f5e; box-shadow: 0 0 15px rgba(244, 63, 94, 0.3); } /* Red */
+        .st-postponed-text { color: #3b82f6; border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); } /* Blue */
 
         .evt-top { display: flex; justify-content: space-between; align-items: flex-start; }
         .evt-group-badge { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.3); }
@@ -448,7 +471,16 @@
                         else if(evt.groups.includes('C1')) badgeHtml = '<span class="evt-group-badge badge-grp">C1</span>';
                         else if(evt.groups.includes('C2')) badgeHtml = '<span class="evt-group-badge badge-grp">C2</span>';
 
+                        // --- INSERT STATUS TEXT ---
+                        let statusOverlay = '';
+                        if(evt.status === 'cancelled') {
+                            statusOverlay = '<div class="status-text-overlay st-cancelled-text">ANNULÉ</div>';
+                        } else if(evt.status === 'postponed') {
+                            statusOverlay = '<div class="status-text-overlay st-postponed-text">REPORTÉ</div>';
+                        }
+
                         card.innerHTML = `
+                            ${statusOverlay}
                             <div class="evt-top">
                                 <div style="display:flex; gap:5px; align-items:center;">
                                     <span class="evt-type">${evt.type}</span>
