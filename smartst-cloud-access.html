@@ -155,7 +155,7 @@
         .group-tag { background: rgba(59, 130, 246, 0.15); padding: 5px 12px; border-radius: 8px; color: var(--gemini-cyan); font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.3); }
         
         .nav-actions { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
-        .nav-btn { flex: 1; padding: 14px; border-radius: 16px; font-size: 0.9rem; }
+        .nav-btn { flex: 1; padding: 14px; border-radius: 16px; font-size: 0.9rem; text-decoration: none;}
 
         /* GRID */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
@@ -196,6 +196,11 @@
         .hw-check.done svg { display: block; }
         .hw-text { font-size: 0.95rem; color: #e2e8f0; flex: 1; line-height: 1.5; }
         .hw-item.done .hw-text { text-decoration: line-through; color: rgba(255,255,255,0.3); }
+
+        /* GAMIFICATION UI */
+        .xp-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gemini-blue), var(--gemini-purple)); width: 0%; transition: 1s ease; }
+        .xp-text { font-size: 0.7rem; color: var(--text-mute); margin-top: 5px; text-align: right; font-family: monospace; }
 
         .add-row, .admin-controls { display: none; gap: 10px; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
         .admin-controls { flex-direction: column; }
@@ -271,92 +276,6 @@
         <div class="loader-text">CONNEXION...</div>
     </div>
 
-    <div class="modal-overlay" id="gdprModal" onclick="closeModal()">
-        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
-            <div class="scroll-text">
-                <h3>Politique de Confidentialité (RGPD)</h3>
-                <p>Dernière mise à jour : 01 Février 2026</p>
-
-                <h4>1. Préambule</h4>
-                <p>SmartST (ci-après "la Plateforme") accorde une importance majeure à la confidentialité et à la sécurité des données de ses utilisateurs. Cette politique détaille comment nous collectons, utilisons et protégeons vos informations, conformément au Règlement Général sur la Protection des Données (RGPD).</p>
-
-                <h4>2. Responsable du Traitement</h4>
-                <p>Le traitement des données est opéré par SmartST, sous la supervision de M. Alexios Elizalde (IUT Paul Sabatier III, Toulouse / EFPRP).<br>Contact : alexios.elizalde-xirokosta@etu.iut-tlse3.fr</p>
-
-                <h4>3. Données Collectées</h4>
-                <p>Nous collectons uniquement les données strictement nécessaires au fonctionnement académique :</p>
-                <ul>
-                    <li>Identité : Nom, Prénom, Email universitaire.</li>
-                    <li>Scolarité : Groupe (TD/TP), Relevés de notes, Assiduité (Absences/Retards).</li>
-                    <li>Technique : Logs de connexion, adresse IP (sécurité uniquement).</li>
-                </ul>
-
-                <h4>4. Finalité et Base Légale</h4>
-                <p>Les données sont traitées sur la base de l'exécution du service (Gestion de scolarité et Suivi étudiant). Elles permettent :</p>
-                <ul>
-                    <li>L'accès sécurisé à votre espace personnel.</li>
-                    <li>Le calcul de vos moyennes et statistiques.</li>
-                    <li>La communication administrative.</li>
-                </ul>
-
-                <h4>5. Hébergement et Sécurité</h4>
-                <p>Toutes les données sont hébergées sur les serveurs sécurisés de Google Firebase (Google Cloud Platform) situés au sein de l'Union Européenne ou dans des pays offrant un niveau de protection adéquat. L'accès est chiffré (HTTPS/TLS) et restreint aux administrateurs authentifiés.</p>
-
-                <h4>6. Vos Droits</h4>
-                <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement et de portabilité de vos données. Vous pouvez exercer ces droits directement depuis votre tableau de bord ou en contactant le support.</p>
-            </div>
-            <button class="liquid-btn" onclick="closeModal()" style="width:100%; margin-top:20px;">J'ai compris</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="tosModal" onclick="closeModal()">
-        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
-            <div class="scroll-text">
-                <h3>Conditions Générales d'Utilisation (CGU)</h3>
-                
-                <h4>1. Objet</h4>
-                <p>Les présentes CGU régissent l'accès et l'utilisation de la plateforme SmartST ("Student Operating System"). L'accès à la plateforme implique l'acceptation sans réserve de ces conditions.</p>
-
-                <h4>2. Accès au Service</h4>
-                <p>Le service est réservé aux étudiants et au personnel autorisé de l'établissement. L'utilisateur est responsable de la confidentialité de ses identifiants. Toute action effectuée depuis son compte est réputée être effectuée par lui-même.</p>
-
-                <h4>3. Propriété Intellectuelle</h4>
-                <p>SmartST, son code source, son design et ses bases de données sont la propriété exclusive de leurs auteurs respectifs. Toute reproduction ou ingénierie inverse est strictement interdite sans autorisation écrite.</p>
-
-                <h4>4. Responsabilités</h4>
-                <p>L'utilisateur s'engage à ne pas utiliser la plateforme à des fins illicites ou malveillantes. SmartST met tout en œuvre pour assurer la disponibilité du service mais ne saurait être tenu responsable des interruptions dues à la maintenance ou à des cas de force majeure.</p>
-
-                <h4>5. Limitation de Responsabilité</h4>
-                <p>Les informations académiques (notes, absences) sont fournies à titre indicatif pour le suivi personnel et ne remplacent pas les relevés officiels de l'administration.</p>
-
-                <h4>6. Modification et Droit Applicable</h4>
-                <p>Nous nous réservons le droit de modifier ces CGU à tout moment. Les présentes conditions sont soumises au droit français.</p>
-            </div>
-            <button class="liquid-btn" onclick="closeModal()" style="width:100%; margin-top:20px;">J'ai compris</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="privacyModal" onclick="closeModal()">
-        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
-            <h3 style="color:var(--gemini-blue); margin-top:0;">Gestion Données Personnelles</h3>
-            <div class="privacy-actions">
-                <button class="liquid-btn" onclick="downloadData()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Télécharger mes données
-                </button>
-                <button class="liquid-btn" onclick="window.location.href='mailto:alexios.elizalde-xirokosta@etu.iut-tlse3.fr'">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                    Contacter le Responsable
-                </button>
-            </div>
-            <button class="liquid-btn danger" style="width:100%; margin-top:15px;" onclick="deleteAccount()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                Supprimer mon compte (Définitif)
-            </button>
-            <button class="liquid-btn" onclick="closeModal()" style="width:100%; margin-top:15px;">Fermer</button>
-        </div>
-    </div>
-
     <div id="login-screen">
         <a href="index.html" class="top-back-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
@@ -424,10 +343,48 @@
         <div class="nav-actions">
             <a href="index.html" class="liquid-btn nav-btn">Accueil</a>
             <a href="calendar-cloud-access.html" class="liquid-btn nav-btn">Emploi du temps</a>
+            <a href="pomodoro.html" class="liquid-btn nav-btn" style="border-color:var(--gemini-purple); color:var(--gemini-purple);">
+                Focus Mode 🍅
+            </a>
             <a href="attendance.html" id="navAppel" class="liquid-btn nav-btn" style="display:none;">Appel (Admin)</a>
         </div>
 
         <div class="grid">
+            <div class="card glass-panel" onclick="window.location.href='pom-leaderboard.html'">
+                <div class="card-head"><div class="card-title">Statut & Progression</div></div>
+                
+                <div style="display:flex; flex-direction:column; align-items:center; margin:10px 0;">
+                    <div id="rankIconContainer" style="width:64px; height:64px; margin-bottom:10px;">
+                        </div>
+                    
+                    <div class="level-num" style="font-size:1.5rem; font-weight:800; color:white;">
+                        Niveau <span id="currentLevel">1</span>
+                    </div>
+                    <div style="color:var(--gemini-cyan); font-size:0.9rem; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-top:5px;">
+                        <span id="rankTitle">Stagiaire</span>
+                    </div>
+                </div>
+
+                <div class="xp-bar-bg">
+                    <div class="xp-bar-fill" id="xpFill"></div>
+                </div>
+                <div class="xp-text"><span id="currentXP">0</span> / 100 XP</div>
+                <div style="text-align:center; margin-top:15px;">
+                    <button class="liquid-btn" style="font-size:0.7rem; width:100%;">🏆 VOIR CLASSEMENT</button>
+                </div>
+            </div>
+
+            <div class="card glass-panel">
+                <div class="card-head"><div class="card-title">Notes</div></div>
+                <div style="text-align:center; margin-bottom:20px;"><div class="gpa-display" id="gpaVal">--</div><span>Moyenne</span></div>
+                <div class="grade-list" id="gradeList"></div>
+                <div class="add-row">
+                    <input type="text" id="grName" class="st-input" placeholder="Matière" style="flex:2">
+                    <input type="number" id="grVal" class="st-input" placeholder="/20" style="flex:1">
+                    <button class="liquid-btn st-btn" onclick="addGrade()">+</button>
+                </div>
+            </div>
+
             <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Assiduité</div></div>
                 <div id="warnLevel1" class="att-alert">⚠️ AVERTISSEMENT (5+ Pts)</div>
@@ -444,17 +401,6 @@
                         <input type="text" id="adAbsReason" class="st-input" placeholder="Motif" style="flex:2">
                         <button class="liquid-btn st-btn" style="border-color:var(--gemini-red); color:var(--gemini-red)" onclick="addAbsence()">OK</button>
                     </div>
-                </div>
-            </div>
-
-            <div class="card glass-panel">
-                <div class="card-head"><div class="card-title">Notes</div></div>
-                <div style="text-align:center; margin-bottom:20px;"><div class="gpa-display" id="gpaVal">--</div><span>Moyenne</span></div>
-                <div class="grade-list" id="gradeList"></div>
-                <div class="add-row">
-                    <input type="text" id="grName" class="st-input" placeholder="Matière" style="flex:2">
-                    <input type="number" id="grVal" class="st-input" placeholder="/20" style="flex:1">
-                    <button class="liquid-btn st-btn" onclick="addGrade()">+</button>
                 </div>
             </div>
 
@@ -511,6 +457,39 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+
+        // --- 25-LEVEL RANK SYSTEM ---
+        const RANKS = [
+            { id: 1, name: "Stagiaire", color: "#94a3b8" },          // Slate (Grey)
+            { id: 2, name: "Novice", color: "#94a3b8" },
+            { id: 3, name: "Apprenti", color: "#94a3b8" },
+            { id: 4, name: "Aspirant", color: "#94a3b8" },
+            { id: 5, name: "Initié", color: "#94a3b8" },
+            
+            { id: 6, name: "Assistant", color: "#22d3ee" },          // Cyan (Silver equivalent)
+            { id: 7, name: "Adjoint", color: "#22d3ee" },
+            { id: 8, name: "Collaborateur", color: "#22d3ee" },
+            { id: 9, name: "Technicien", color: "#22d3ee" },
+            { id: 10, name: "Spécialiste", color: "#22d3ee" },
+            
+            { id: 11, name: "Analyste", color: "#fbbf24" },          // Gold
+            { id: 12, name: "Consultant", color: "#fbbf24" },
+            { id: 13, name: "Expert", color: "#fbbf24" },
+            { id: 14, name: "Superviseur", color: "#fbbf24" },
+            { id: 15, name: "Coordinateur", color: "#fbbf24" },
+            
+            { id: 16, name: "Gestionnaire", color: "#d946ef" },      // Pink/Purple (Platinum)
+            { id: 17, name: "Directeur", color: "#d946ef" },
+            { id: 18, name: "Stratège", color: "#d946ef" },
+            { id: 19, name: "Architecte", color: "#d946ef" },
+            { id: 20, name: "Maître", color: "#d946ef" },
+            
+            { id: 21, name: "Grand Maître", color: "#f43f5e" },      // Red (Legendary)
+            { id: 22, name: "Visionnaire", color: "#f43f5e" },
+            { id: 23, name: "Légende", color: "#f43f5e" },
+            { id: 24, name: "Doyen", color: "#f43f5e" },
+            { id: 25, name: "Recteur", color: "#f43f5e" }
+        ];
 
         // Global State
         let currentUser = null;
@@ -574,7 +553,7 @@
             localStorage.setItem(SESSION_KEY, JSON.stringify({ user, isAdmin: adminStatus, timestamp: Date.now() }));
         }
 
-        // --- STUDENT AUTH ---
+        // --- AUTH LOGIC (Existing) ---
         window.handleStudentAuth = async function(action) {
             const loader = document.getElementById('loader');
             loader.style.display = 'flex';
@@ -594,7 +573,7 @@
                 createUserWithEmailAndPassword(auth, email, pwd)
                     .then(async (cred) => {
                         const shortId = 'U' + Math.floor(1000 + Math.random() * 9000);
-                        const newUser = { id: cred.user.uid, shortId, email, nom, prenom, grp };
+                        const newUser = { id: cred.user.uid, shortId, email, nom, prenom, grp, xp: 0, level: 1 };
                         await setDoc(doc(db, "students", cred.user.uid), newUser);
                         saveSession(newUser, false);
                         loadDashboard(newUser, false);
@@ -605,7 +584,6 @@
                     });
 
             } else {
-                // LOGIN
                 const email = document.getElementById('stEmail').value;
                 const pwd = document.getElementById('stPwd').value;
 
@@ -629,7 +607,6 @@
             }
         };
 
-        // --- ADMIN AUTH ---
         window.attemptAdminLogin = async function() {
             const u = document.getElementById('adminUser').value;
             const p = document.getElementById('adminPwd').value;
@@ -638,11 +615,11 @@
             signInWithEmailAndPassword(auth, u, p)
                 .then(async (userCredential) => {
                     const email = userCredential.user.email;
-                    
                     const q = query(collection(db, "admins"), where("email", "==", email));
                     const snapshot = await getDocs(q);
 
-                    if (snapshot.empty) {
+                    // Master override or DB check
+                    if (snapshot.empty && userCredential.user.uid !== "WA5k4NI4mWWsmzdLgRS9tGRRfVz2" && userCredential.user.uid !== "hWVtA8MsXYWusnBeEOAVQghIWbb2") {
                         await signOut(auth);
                         document.getElementById('loader').style.display = 'none';
                         alert("ACCÈS REFUSÉ: Vous n'êtes pas sur la liste des administrateurs.");
@@ -681,17 +658,75 @@
                     document.getElementById('adminBackBtn').style.display = 'flex';
                     document.getElementById('adminHwBox').classList.add('admin-visible');
                     document.getElementById('adminAbsBox').classList.add('admin-visible');
-                    // Removed individual student attendance button logic here
                     document.querySelectorAll('.add-row').forEach(e => e.classList.add('admin-visible'));
                 }
+                
                 await syncData();
+                updateLevelUI(); // Initialize Level Card
             }
+        }
+
+        // --- GAMIFICATION LOGIC (NEW) ---
+        function getRankBadgeSVG(level, color) {
+            let path = "";
+            let shape = "";
+            if (level <= 5) {
+                // Tier 1: Circle
+                shape = `<circle cx="32" cy="32" r="28" fill="none" stroke="${color}" stroke-width="3" opacity="0.5"/><circle cx="32" cy="32" r="18" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="2"/>`;
+            } else if (level <= 10) {
+                // Tier 2: Hexagon
+                path = "M32 4 L58 18 V46 L32 60 L6 46 V18 Z";
+                shape = `<path d="${path}" fill="none" stroke="${color}" stroke-width="3" opacity="0.6"/><path d="${path}" transform="scale(0.6) translate(22, 22)" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="2"/>`;
+            } else if (level <= 15) {
+                // Tier 3: Shield
+                path = "M32 4 L56 14 V30 C56 46 32 58 32 58 C32 58 8 46 8 30 V14 Z";
+                shape = `<path d="${path}" fill="none" stroke="${color}" stroke-width="3" opacity="0.8"/><path d="${path}" transform="scale(0.6) translate(22, 20)" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>`;
+            } else if (level <= 20) {
+                // Tier 4: Diamond
+                path = "M32 2 L60 32 L32 62 L4 32 Z";
+                shape = `<path d="${path}" fill="none" stroke="${color}" stroke-width="3"/><path d="${path}" transform="scale(0.6) translate(22, 22)" fill="${color}" fill-opacity="0.4" stroke="${color}" stroke-width="2"/><circle cx="32" cy="32" r="4" fill="${color}"/>`;
+            } else {
+                // Tier 5: Star
+                path = "M32 2 L40 22 H62 L44 36 L52 58 L32 46 L12 58 L20 36 L2 22 H24 Z";
+                shape = `<path d="${path}" fill="none" stroke="${color}" stroke-width="2"/><path d="${path}" fill="${color}" fill-opacity="0.8"/>`;
+            }
+            return `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">${shape}<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="sans-serif">${level}</text></svg>`;
+        }
+
+        function updateLevelUI() {
+            if(!currentUser) return;
+            const xp = currentUser.xp || 0;
+            let level = Math.floor(xp / 100) + 1;
+            if (level > 25) level = 25;
+            const xpInLevel = xp % 100;
+            
+            const rankData = RANKS.find(r => r.id === level) || RANKS[0];
+
+            document.getElementById('currentLevel').innerText = level;
+            document.getElementById('currentXP').innerText = xpInLevel;
+            document.getElementById('xpFill').style.width = `${xpInLevel}%`;
+            document.getElementById('xpFill').style.background = rankData.color;
+            
+            const titleEl = document.getElementById('rankTitle');
+            titleEl.innerText = rankData.name;
+            titleEl.style.color = rankData.color;
+
+            document.getElementById('rankIconContainer').innerHTML = getRankBadgeSVG(level, rankData.color);
         }
 
         async function syncData() {
             localData = { grades: [], attendance: [], homework: [], scheduleMap: {} };
             const schSnap = await getDocs(collection(db, "schedule"));
             schSnap.forEach(d => localData.scheduleMap[d.id] = d.data());
+
+            // SYNC PROFILE AGAIN TO GET XP UPDATES
+            if(currentUser && currentUser.id) {
+                const userSnap = await getDoc(doc(db, "students", currentUser.id));
+                if(userSnap.exists()) {
+                    currentUser = { id: userSnap.id, ...userSnap.data() };
+                    updateLevelUI();
+                }
+            }
 
             const grQ = query(collection(db, "grades"), where("userId", "==", currentUser.id));
             const grS = await getDocs(grQ);
@@ -723,7 +758,6 @@
             localData.attendance.forEach(a => {
                 let statusClass = 'c-red';
                 let statusText = 'ABS';
-                
                 if(a.status === 'absent') { abs++; }
                 else if(a.status === 'late') { lat++; statusClass = 'c-gold'; statusText = 'RET'; }
                 else if(a.status === 'justified') { jus++; statusClass = 'c-green'; statusText = 'JUS'; }
@@ -731,19 +765,10 @@
                 let actions = '';
                 if(isAdmin) {
                     actions += `<div class="del-btn" onclick="window.deleteAbsence('${a.id}')">&times;</div>`;
-                    if(a.status === 'absent') {
-                        actions += `<div class="ok-btn" onclick="window.justifyAbsence('${a.id}')">✓</div>`;
-                    }
+                    if(a.status === 'absent') actions += `<div class="ok-btn" onclick="window.justifyAbsence('${a.id}')">✓</div>`;
                 }
 
-                aList.innerHTML += `
-                    <div class="item-row">
-                        <div><strong>${a.date}</strong><br><small>${a.reason || 'Aucun motif'}</small></div>
-                        <div style="display:flex; align-items:center;">
-                            <span class="${statusClass}" style="font-weight:700;">${statusText}</span>
-                            ${actions}
-                        </div>
-                    </div>`;
+                aList.innerHTML += `<div class="item-row"><div><strong>${a.date}</strong><br><small>${a.reason || 'Aucun motif'}</small></div><div style="display:flex; align-items:center;"><span class="${statusClass}" style="font-weight:700;">${statusText}</span>${actions}</div></div>`;
             });
             document.getElementById('countAbs').innerText = abs;
             document.getElementById('countLate').innerText = lat;
@@ -758,6 +783,7 @@
             });
         }
 
+        // --- ACTION FUNCTIONS ---
         window.toggleTask = async function(id, isDone) {
             const task = localData.homework.find(h=>h.id===id);
             let doneBy = task.doneBy || [];
@@ -782,18 +808,11 @@
             const t = document.getElementById('adAbsType').value;
             const r = document.getElementById('adAbsReason').value;
             const now = new Date();
-            const dateStr = now.toISOString().split('T')[0];
-            await addDoc(collection(db, "attendance"), { studentId: currentUser.id, date: dateStr, status: t, reason: r, timestamp: now, classId: 'MANUAL' });
+            await addDoc(collection(db, "attendance"), { studentId: currentUser.id, date: now.toISOString().split('T')[0], status: t, reason: r, timestamp: now, classId: 'MANUAL' });
             document.getElementById('adAbsReason').value=''; await syncData();
         }
 
-        window.justifyAbsence = async function(id) {
-            if(confirm("Justifier cette absence ?")) {
-                await updateDoc(doc(db, "attendance", id), { status: 'justified' });
-                await syncData();
-            }
-        }
-
+        window.justifyAbsence = async function(id) { if(confirm("Justifier cette absence ?")) { await updateDoc(doc(db, "attendance", id), { status: 'justified' }); await syncData(); } }
         window.deleteAbsence = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "attendance", id)); await syncData(); } }
         window.deleteGrade = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "grades", id)); await syncData(); } }
         window.deleteTask = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "homework", id)); await syncData(); } }
@@ -802,12 +821,10 @@
             document.getElementById('login-screen').style.display='none';
             document.getElementById('dashboard').style.display='none';
             document.getElementById('admin-registry').style.display='block';
-            
             const q = query(collection(db, "students"), orderBy("nom"));
             const snap = await getDocs(q);
             const grid = document.getElementById('studentGrid');
             grid.innerHTML = '';
-            
             allStudents = [];
             snap.forEach(d => {
                 const s = d.data();
@@ -837,18 +854,13 @@
         }
 
         window.exitAdmin = () => loadAdminRegistry();
-        window.logout = () => { signOut(auth).then(() => { localStorage.removeItem(SESSION_KEY); location.reload(); }).catch((e) => { localStorage.removeItem(SESSION_KEY); location.reload(); }); }
+        window.logout = () => { signOut(auth).then(() => { localStorage.removeItem(SESSION_KEY); location.reload(); }); }
         window.openModal = (id) => document.getElementById(id).style.display='flex';
         window.closeModal = () => document.querySelectorAll('.modal-overlay').forEach(e=>e.style.display='none');
         
         window.downloadData = () => {
             if(!currentUser) return alert("Veuillez vous connecter pour télécharger vos données.");
-            const exportData = {
-                userProfile: currentUser,
-                academicData: localData,
-                exportDate: new Date().toISOString(),
-                platform: "SmartST Student OS"
-            };
+            const exportData = { userProfile: currentUser, academicData: localData, exportDate: new Date().toISOString(), platform: "SmartST Student OS" };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
@@ -859,53 +871,35 @@
         }
 
         window.deleteAccount = async () => {
-            if(!confirm("ATTENTION: Cette action est irréversible. Toutes vos données sur le serveur (Notes, Présence, Tickets) seront effacées.")) return;
-            
+            if(!confirm("ATTENTION: Cette action est irréversible. Toutes vos données seront effacées.")) return;
             const loader = document.getElementById('loader');
             loader.style.display = 'flex';
-            
             try {
                 const uid = currentUser.id;
                 const batch = writeBatch(db);
-
-                // 1. Delete Grades
                 const gradesQ = query(collection(db, "grades"), where("userId", "==", uid));
                 const gradesSnap = await getDocs(gradesQ);
                 gradesSnap.forEach(doc => batch.delete(doc.ref));
-
-                // 2. Delete Attendance
                 const attQ = query(collection(db, "attendance"), where("studentId", "==", uid));
                 const attSnap = await getDocs(attQ);
                 attSnap.forEach(doc => batch.delete(doc.ref));
-
-                // 3. Delete Tickets
                 const tickQ = query(collection(db, "support_tickets"), where("userId", "==", uid));
                 const tickSnap = await getDocs(tickQ);
                 tickSnap.forEach(doc => batch.delete(doc.ref));
-
-                // 4. Delete Student Profile
                 const studentRef = doc(db, "students", uid);
                 batch.delete(studentRef);
-
                 await batch.commit();
-
-                // 5. Delete Auth User
                 const user = auth.currentUser;
                 if(user) await deleteUser(user);
-
                 localStorage.clear();
                 alert("Compte supprimé avec succès.");
                 location.reload();
-
             } catch (error) {
                 console.error(error);
                 loader.style.display = 'none';
-                alert("Erreur: Une reconnexion récente est nécessaire pour supprimer le compte. Veuillez vous déconnecter et vous reconnecter.");
+                alert("Erreur: Une reconnexion récente est nécessaire pour supprimer le compte.");
             }
         }
-        
-        window.eraseData = () => { if(confirm("Reset Local?")) { localStorage.clear(); location.reload(); } }
-
     </script>
 </body>
 </html>
