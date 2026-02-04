@@ -344,7 +344,7 @@
             <a href="index.html" class="liquid-btn nav-btn">Accueil</a>
             <a href="calendar-cloud-access.html" class="liquid-btn nav-btn">Emploi du temps</a>
             <a href="pomodoro.html" class="liquid-btn nav-btn" style="border-color:var(--gemini-purple); color:var(--gemini-purple);">
-                Focus Mode 🍅
+                Focus Mode
             </a>
             <a href="attendance.html" id="navAppel" class="liquid-btn nav-btn" style="display:none;">Appel (Admin)</a>
         </div>
@@ -442,7 +442,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, orderBy, deleteDoc, addDoc, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, orderBy, deleteDoc, addDoc, updateDoc, writeBatch, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -460,31 +460,31 @@
 
         // --- 25-LEVEL RANK SYSTEM ---
         const RANKS = [
-            { id: 1, name: "Stagiaire", color: "#94a3b8" },          // Slate (Grey)
+            { id: 1, name: "Stagiaire", color: "#94a3b8" },          
             { id: 2, name: "Novice", color: "#94a3b8" },
             { id: 3, name: "Apprenti", color: "#94a3b8" },
             { id: 4, name: "Aspirant", color: "#94a3b8" },
             { id: 5, name: "Initié", color: "#94a3b8" },
             
-            { id: 6, name: "Assistant", color: "#22d3ee" },          // Cyan (Silver equivalent)
+            { id: 6, name: "Assistant", color: "#22d3ee" },          
             { id: 7, name: "Adjoint", color: "#22d3ee" },
             { id: 8, name: "Collaborateur", color: "#22d3ee" },
             { id: 9, name: "Technicien", color: "#22d3ee" },
             { id: 10, name: "Spécialiste", color: "#22d3ee" },
             
-            { id: 11, name: "Analyste", color: "#fbbf24" },          // Gold
+            { id: 11, name: "Analyste", color: "#fbbf24" },          
             { id: 12, name: "Consultant", color: "#fbbf24" },
             { id: 13, name: "Expert", color: "#fbbf24" },
             { id: 14, name: "Superviseur", color: "#fbbf24" },
             { id: 15, name: "Coordinateur", color: "#fbbf24" },
             
-            { id: 16, name: "Gestionnaire", color: "#d946ef" },      // Pink/Purple (Platinum)
+            { id: 16, name: "Gestionnaire", color: "#d946ef" },      
             { id: 17, name: "Directeur", color: "#d946ef" },
             { id: 18, name: "Stratège", color: "#d946ef" },
             { id: 19, name: "Architecte", color: "#d946ef" },
             { id: 20, name: "Maître", color: "#d946ef" },
             
-            { id: 21, name: "Grand Maître", color: "#f43f5e" },      // Red (Legendary)
+            { id: 21, name: "Grand Maître", color: "#f43f5e" },      
             { id: 22, name: "Visionnaire", color: "#f43f5e" },
             { id: 23, name: "Légende", color: "#f43f5e" },
             { id: 24, name: "Doyen", color: "#f43f5e" },
@@ -693,6 +693,20 @@
             return `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">${shape}<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="sans-serif">${level}</text></svg>`;
         }
 
+        async function addXP(amount) {
+            if(!currentUser || isAdmin) return; // Admins don't get XP
+            const userRef = doc(db, "students", currentUser.id);
+            try {
+                await updateDoc(userRef, { xp: increment(amount) });
+                // Local UI update for instant feedback
+                currentUser.xp = (currentUser.xp || 0) + amount;
+                updateLevelUI();
+                console.log(`+${amount} XP Saved!`);
+            } catch(e) {
+                console.error("XP Error:", e);
+            }
+        }
+
         function updateLevelUI() {
             if(!currentUser) return;
             const xp = currentUser.xp || 0;
@@ -787,7 +801,11 @@
         window.toggleTask = async function(id, isDone) {
             const task = localData.homework.find(h=>h.id===id);
             let doneBy = task.doneBy || [];
-            if(isDone) doneBy = doneBy.filter(i=>i!==currentUser.id); else doneBy.push(currentUser.id);
+            if(isDone) doneBy = doneBy.filter(i=>i!==currentUser.id); 
+            else {
+                doneBy.push(currentUser.id);
+                await addXP(10); // Reward for completing homework
+            }
             await updateDoc(doc(db, "homework", id), { doneBy });
             await syncData();
         }
@@ -795,7 +813,13 @@
         window.addGrade = async function() {
             const n = document.getElementById('grName').value;
             const v = document.getElementById('grVal').value;
-            if(n && v) { await addDoc(collection(db, "grades"), { userId: currentUser.id, name: n, val: v }); document.getElementById('grName').value=''; document.getElementById('grVal').value=''; await syncData(); }
+            if(n && v) { 
+                await addDoc(collection(db, "grades"), { userId: currentUser.id, name: n, val: v }); 
+                await addXP(20); // Reward for adding a grade
+                document.getElementById('grName').value=''; 
+                document.getElementById('grVal').value=''; 
+                await syncData(); 
+            }
         }
 
         window.addHomework = async function() {
