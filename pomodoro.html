@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SmartST | Focus</title>
+    <title>SmartST | Mode Focus</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -82,51 +82,51 @@
 
     <div id="screen-onboard" class="screen active">
         <div class="glass-panel">
-            <h1>Focus Session</h1>
-            <h2>Productivity Protocol</h2>
-            <p>Define your tasks. Set your estimated duration. Execute without distraction.</p>
+            <h1>Session Focus</h1>
+            <h2>Protocole de Productivité</h2>
+            <p>Définissez vos tâches. Estimez la durée. Exécutez sans distraction.</p>
             <div style="text-align:left; background:rgba(255,255,255,0.02); padding:20px; border-radius:16px; border:var(--border); margin-bottom:30px;">
                 <div style="margin-bottom:15px; display:flex; gap:10px; align-items:center;">
                     <div style="width:6px; height:6px; background:var(--cyan); border-radius:50%;"></div>
-                    <span style="font-size:0.9rem; color:#ccc;">Performance Tracking</span>
+                    <span style="font-size:0.9rem; color:#ccc;">Suivi de Performance</span>
                 </div>
                 <div style="margin-bottom:15px; display:flex; gap:10px; align-items:center;">
                     <div style="width:6px; height:6px; background:var(--cyan); border-radius:50%;"></div>
-                    <span style="font-size:0.9rem; color:#ccc;">Time Management Analytics</span>
+                    <span style="font-size:0.9rem; color:#ccc;">Analyse Gestion du Temps</span>
                 </div>
                 <div style="display:flex; gap:10px; align-items:center;">
                     <div style="width:6px; height:6px; background:var(--gold); border-radius:50%;"></div>
-                    <span style="font-size:0.9rem; color:#ccc;">XP Rewards (+50 XP/Task)</span>
+                    <span style="font-size:0.9rem; color:#ccc;">Gain XP (+50 XP/Tâche)</span>
                 </div>
             </div>
-            <button class="btn" onclick="nextScreen('setup')">INITIALIZE</button>
+            <button class="btn" onclick="nextScreen('setup')">INITIALISER</button>
         </div>
     </div>
 
     <div id="screen-setup" class="screen">
         <div class="glass-panel" style="max-width:500px;">
-            <h1>Session Plan</h1>
-            <h2>Define Objectives</h2>
+            <h1>Plan de Session</h1>
+            <h2>Définir les Objectifs</h2>
             
             <div id="taskList">
                 <div class="task-row">
-                    <input type="text" class="input-field t-name" placeholder="Task Name (e.g., Report Review)">
+                    <input type="text" class="input-field t-name" placeholder="Nom de la tâche (ex: Révision)">
                     <input type="number" class="input-field t-time" placeholder="Min" value="25">
                 </div>
             </div>
             
-            <button class="btn btn-secondary" onclick="addTaskRow()" style="margin-bottom:20px; font-size:0.75rem;">+ ADD OBJECTIVE</button>
+            <button class="btn btn-secondary" onclick="addTaskRow()" style="margin-bottom:20px; font-size:0.75rem;">+ AJOUTER UN OBJECTIF</button>
             
             <div style="display:flex; justify-content:space-between; align-items:center; border-top:var(--border); padding-top:20px; margin-bottom:30px;">
-                <span style="color:var(--text-mute); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;">Total Estimation</span>
+                <span style="color:var(--text-mute); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;">Estimation Totale</span>
                 <span id="totalTimeDisplay" style="color:white; font-weight:700; font-size:1.2rem;">25 min</span>
             </div>
-            <button class="btn" onclick="startSession()">START SESSION</button>
+            <button class="btn" onclick="startSession()">LANCER LA SESSION</button>
         </div>
     </div>
 
     <div id="screen-active" class="screen">
-        <div class="task-label" id="activeTaskName">SEQUENCE 1/1</div>
+        <div class="task-label" id="activeTaskName">SÉQUENCE 1/1</div>
         <div class="timer-container" id="timerRing">
             <div class="timer-ring"></div>
             <div class="timer-active-ring"></div>
@@ -135,26 +135,26 @@
         
         <div class="glass-panel" style="padding:25px; border-color:var(--cyan);">
             <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                <span style="color:var(--text-mute); font-size:0.7rem; letter-spacing:1px; text-transform:uppercase;">Current Objective</span>
-                <span style="color:var(--cyan); font-weight:700; font-size:0.7rem; letter-spacing:1px;" id="taskTimer">TARGET: 25 MIN</span>
+                <span style="color:var(--text-mute); font-size:0.7rem; letter-spacing:1px; text-transform:uppercase;">Objectif en Cours</span>
+                <span style="color:var(--cyan); font-weight:700; font-size:0.7rem; letter-spacing:1px;" id="taskTimer">CIBLE : 25 MIN</span>
             </div>
             <h3 id="currentTaskTitle" style="margin:0 0 25px 0; color:white; font-size:1.2rem; font-weight:500;">...</h3>
             <button class="btn" onclick="completeTask()" style="border-color:var(--green); color:var(--green); background:rgba(16, 185, 129, 0.1);">
-                MARK COMPLETE
+                MARQUER COMME TERMINÉ
             </button>
         </div>
     </div>
 
     <div id="screen-summary" class="screen">
         <div class="glass-panel">
-            <h1 style="color:var(--gold);">SESSION REPORT</h1>
+            <h1 style="color:var(--gold);">RAPPORT DE SESSION</h1>
             <div style="font-size:3.5rem; font-weight:800; color:white; margin:10px 0;" id="finalScore">+0 XP</div>
-            <p style="margin-bottom:30px;">Performance Analysis</p>
+            <p style="margin-bottom:30px;">Analyse de Performance</p>
             
             <div id="summaryList" style="text-align:left; margin-bottom:30px; border-top:var(--border);"></div>
             
-            <button class="btn" onclick="window.location.href='pom-leaderboard.html'">VIEW LEADERBOARD</button>
-            <button class="btn btn-secondary" onclick="window.location.href='smartst-cloud-access.html'" style="margin-top:15px;">RETURN TO DASHBOARD</button>
+            <button class="btn" onclick="window.location.href='pom-leaderboard.html'">VOIR LE CLASSEMENT</button>
+            <button class="btn btn-secondary" onclick="window.location.href='smartst-cloud-access.html'" style="margin-top:15px;">RETOUR TABLEAU DE BORD</button>
         </div>
     </div>
 
@@ -198,7 +198,7 @@
         window.addTaskRow = () => {
             const div = document.createElement('div');
             div.className = 'task-row';
-            div.innerHTML = `<input type="text" class="input-field t-name" placeholder="Task Name"><input type="number" class="input-field t-time" placeholder="Min" value="15">`;
+            div.innerHTML = `<input type="text" class="input-field t-name" placeholder="Nom Tâche"><input type="number" class="input-field t-time" placeholder="Min" value="15">`;
             document.getElementById('taskList').appendChild(div);
             updateTotalEst();
         }
@@ -219,7 +219,7 @@
                 if(name && min) tasks.push({ name, estSeconds: min * 60 });
             });
 
-            if(tasks.length === 0) return alert("Task list cannot be empty.");
+            if(tasks.length === 0) return alert("La liste des tâches ne peut pas être vide.");
 
             sessionTimeLeft = tasks.reduce((acc, t) => acc + t.estSeconds, 0);
             currentTaskIndex = 0;
@@ -245,9 +245,9 @@
         function startTask(index) {
             if(index >= tasks.length) { endSession(); return; }
             const task = tasks[index];
-            document.getElementById('activeTaskName').innerText = `SEQUENCE ${index + 1}/${tasks.length}`;
+            document.getElementById('activeTaskName').innerText = `SÉQUENCE ${index + 1}/${tasks.length}`;
             document.getElementById('currentTaskTitle').innerText = task.name;
-            document.getElementById('taskTimer').innerText = `TARGET: ${Math.floor(task.estSeconds/60)} MIN`;
+            document.getElementById('taskTimer').innerText = `CIBLE : ${Math.floor(task.estSeconds/60)} MIN`;
             taskStartTime = Date.now();
         }
 
@@ -256,11 +256,11 @@
             const timeTaken = (Date.now() - taskStartTime) / 1000;
             
             let xpEarned = 0;
-            let status = "OVERTIME";
+            let status = "DÉPASSEMENT";
             
             if (timeTaken <= task.estSeconds) {
                 xpEarned = 50;
-                status = "AHEAD OF SCHEDULE";
+                status = "EN AVANCE";
             }
 
             totalXP += xpEarned;
