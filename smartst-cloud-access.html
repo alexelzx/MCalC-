@@ -65,6 +65,7 @@
             cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
             padding: 12px 24px; border-radius: 50px; /* Fully Rounded */
             font-size: 0.8rem;
+            text-decoration: none;
         }
         .liquid-btn:hover {
             background: rgba(255, 255, 255, 0.1);
@@ -196,11 +197,6 @@
         .hw-check.done svg { display: block; }
         .hw-text { font-size: 0.95rem; color: #e2e8f0; flex: 1; line-height: 1.5; }
         .hw-item.done .hw-text { text-decoration: line-through; color: rgba(255,255,255,0.3); }
-
-        /* GAMIFICATION UI */
-        .xp-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-top: 10px; }
-        .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gemini-blue), var(--gemini-purple)); width: 0%; transition: 1s ease; }
-        .xp-text { font-size: 0.7rem; color: var(--text-mute); margin-top: 5px; text-align: right; font-family: monospace; }
 
         .add-row, .admin-controls { display: none; gap: 10px; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
         .admin-controls { flex-direction: column; }
@@ -350,30 +346,6 @@
         </div>
 
         <div class="grid">
-            <div class="card glass-panel" onclick="window.location.href='pom-leaderboard.html'">
-                <div class="card-head"><div class="card-title">Statut & Progression</div></div>
-                
-                <div style="display:flex; flex-direction:column; align-items:center; margin:10px 0;">
-                    <div id="rankIconContainer" style="width:64px; height:64px; margin-bottom:10px;">
-                        </div>
-                    
-                    <div class="level-num" style="font-size:1.5rem; font-weight:800; color:white;">
-                        Niveau <span id="currentLevel">1</span>
-                    </div>
-                    <div style="color:var(--gemini-cyan); font-size:0.9rem; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-top:5px;">
-                        <span id="rankTitle">Stagiaire</span>
-                    </div>
-                </div>
-
-                <div class="xp-bar-bg">
-                    <div class="xp-bar-fill" id="xpFill"></div>
-                </div>
-                <div class="xp-text"><span id="currentXP">0</span> / 100 XP</div>
-                <div style="text-align:center; margin-top:15px;">
-                    <button class="liquid-btn" style="font-size:0.7rem; width:100%;">🏆 VOIR CLASSEMENT</button>
-                </div>
-            </div>
-
             <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Notes</div></div>
                 <div style="text-align:center; margin-bottom:20px;"><div class="gpa-display" id="gpaVal">--</div><span>Moyenne</span></div>
@@ -443,7 +415,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, orderBy, deleteDoc, addDoc, updateDoc, writeBatch, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, deleteUser, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -458,40 +430,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // --- 25-LEVEL RANK SYSTEM ---
-        const RANKS = [
-            { id: 1, name: "Stagiaire", color: "#94a3b8" },          
-            { id: 2, name: "Novice", color: "#94a3b8" },
-            { id: 3, name: "Apprenti", color: "#94a3b8" },
-            { id: 4, name: "Aspirant", color: "#94a3b8" },
-            { id: 5, name: "Initié", color: "#94a3b8" },
-            
-            { id: 6, name: "Assistant", color: "#22d3ee" },          
-            { id: 7, name: "Adjoint", color: "#22d3ee" },
-            { id: 8, name: "Collaborateur", color: "#22d3ee" },
-            { id: 9, name: "Technicien", color: "#22d3ee" },
-            { id: 10, name: "Spécialiste", color: "#22d3ee" },
-            
-            { id: 11, name: "Analyste", color: "#fbbf24" },          
-            { id: 12, name: "Consultant", color: "#fbbf24" },
-            { id: 13, name: "Expert", color: "#fbbf24" },
-            { id: 14, name: "Superviseur", color: "#fbbf24" },
-            { id: 15, name: "Coordinateur", color: "#fbbf24" },
-            
-            { id: 16, name: "Gestionnaire", color: "#d946ef" },      
-            { id: 17, name: "Directeur", color: "#d946ef" },
-            { id: 18, name: "Stratège", color: "#d946ef" },
-            { id: 19, name: "Architecte", color: "#d946ef" },
-            { id: 20, name: "Maître", color: "#d946ef" },
-            
-            { id: 21, name: "Grand Maître", color: "#f43f5e" },      
-            { id: 22, name: "Visionnaire", color: "#f43f5e" },
-            { id: 23, name: "Légende", color: "#f43f5e" },
-            { id: 24, name: "Doyen", color: "#f43f5e" },
-            { id: 25, name: "Recteur", color: "#f43f5e" }
-        ];
-
-        // Global State
         let currentUser = null;
         let isAdmin = false; 
         let isLoginAdmin = false; 
@@ -662,74 +600,23 @@
                 }
                 
                 await syncData();
-                updateLevelUI(); // Initialize Level Card
             }
-        }
-
-        // --- GAMIFICATION LOGIC (NEW) ---
-        function getRankBadgeSVG(level, color) {
-            let path = "";
-            let shape = "";
-            if (level <= 5) {
-                // Tier 1: Circle
-                shape = `<circle cx="32" cy="32" r="28" fill="none" stroke="${color}" stroke-width="3" opacity="0.5"/><circle cx="32" cy="32" r="18" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="2"/>`;
-            } else if (level <= 10) {
-                // Tier 2: Hexagon
-                path = "M32 4 L58 18 V46 L32 60 L6 46 V18 Z";
-                shape = `<path d="${path}" fill="none" stroke="${color}" stroke-width="3" opacity="0.6"/><path d="${path}" transform="scale(0.6) translate(22, 22)" fill="${color}" fill-opacity="0.2" stroke="${color}" stroke-width="2"/>`;
-            } else if (level <= 15) {
-                // Tier 3: Shield
-                path = "M32 4 L56 14 V30 C56 46 32 58 32 58 C32 58 8 46 8 30 V14 Z";
-                shape = `<path d="${path}" fill="none" stroke="${color}" stroke-width="3" opacity="0.8"/><path d="${path}" transform="scale(0.6) translate(22, 20)" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"/>`;
-            } else if (level <= 20) {
-                // Tier 4: Diamond
-                path = "M32 2 L60 32 L32 62 L4 32 Z";
-                shape = `<path d="${path}" fill="none" stroke="${color}" stroke-width="3"/><path d="${path}" transform="scale(0.6) translate(22, 22)" fill="${color}" fill-opacity="0.4" stroke="${color}" stroke-width="2"/><circle cx="32" cy="32" r="4" fill="${color}"/>`;
-            } else {
-                // Tier 5: Star
-                path = "M32 2 L40 22 H62 L44 36 L52 58 L32 46 L12 58 L20 36 L2 22 H24 Z";
-                shape = `<path d="${path}" fill="none" stroke="${color}" stroke-width="2"/><path d="${path}" fill="${color}" fill-opacity="0.8"/>`;
-            }
-            return `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">${shape}<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="sans-serif">${level}</text></svg>`;
         }
 
         async function addXP(amount) {
-            if(!currentUser || isAdmin) return; // Admins don't get XP
+            if(!currentUser || isAdmin) return; 
             const userRef = doc(db, "students", currentUser.id);
             try {
+                // Background update only
                 await updateDoc(userRef, { xp: increment(amount) });
-                // Local UI update for instant feedback
-                currentUser.xp = (currentUser.xp || 0) + amount;
-                updateLevelUI();
                 console.log(`+${amount} XP Saved!`);
-            } catch(e) {
-                console.error("XP Error:", e);
-            }
+            } catch(e) { console.error("XP Error:", e); }
         }
 
-        function updateLevelUI() {
-            if(!currentUser) return;
-            const xp = currentUser.xp || 0;
-            let level = Math.floor(xp / 100) + 1;
-            if (level > 25) level = 25;
-            const xpInLevel = xp % 100;
-            
-            const rankData = RANKS.find(r => r.id === level) || RANKS[0];
-
-            document.getElementById('currentLevel').innerText = level;
-            document.getElementById('currentXP').innerText = xpInLevel;
-            document.getElementById('xpFill').style.width = `${xpInLevel}%`;
-            document.getElementById('xpFill').style.background = rankData.color;
-            
-            const titleEl = document.getElementById('rankTitle');
-            titleEl.innerText = rankData.name;
-            titleEl.style.color = rankData.color;
-
-            document.getElementById('rankIconContainer').innerHTML = getRankBadgeSVG(level, rankData.color);
-        }
-
+        // --- DATA SYNC ---
         async function syncData() {
             localData = { grades: [], attendance: [], homework: [], scheduleMap: {} };
+            
             const schSnap = await getDocs(collection(db, "schedule"));
             schSnap.forEach(d => localData.scheduleMap[d.id] = d.data());
 
@@ -738,7 +625,6 @@
                 const userSnap = await getDoc(doc(db, "students", currentUser.id));
                 if(userSnap.exists()) {
                     currentUser = { id: userSnap.id, ...userSnap.data() };
-                    updateLevelUI();
                 }
             }
 
@@ -802,9 +688,9 @@
             const task = localData.homework.find(h=>h.id===id);
             let doneBy = task.doneBy || [];
             if(isDone) doneBy = doneBy.filter(i=>i!==currentUser.id); 
-            else {
-                doneBy.push(currentUser.id);
-                await addXP(10); // Reward for completing homework
+            else { 
+                doneBy.push(currentUser.id); 
+                addXP(10); // Reward for completing homework
             }
             await updateDoc(doc(db, "homework", id), { doneBy });
             await syncData();
@@ -815,10 +701,8 @@
             const v = document.getElementById('grVal').value;
             if(n && v) { 
                 await addDoc(collection(db, "grades"), { userId: currentUser.id, name: n, val: v }); 
-                await addXP(20); // Reward for adding a grade
-                document.getElementById('grName').value=''; 
-                document.getElementById('grVal').value=''; 
-                await syncData(); 
+                addXP(20); // Reward for adding a grade
+                document.getElementById('grName').value=''; document.getElementById('grVal').value=''; await syncData(); 
             }
         }
 
