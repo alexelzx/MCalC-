@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SmartST | Focus Session</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #02040a;
+            --glass: rgba(255,255,255,0.05);
+            --border: 1px solid rgba(255,255,255,0.1);
+            --cyan: #22d3ee;
+            --green: #10b981;
+            --red: #f43f5e;
+            --gold: #fbbf24;
+        }
+        body { margin:0; font-family:'Outfit', sans-serif; background: radial-gradient(circle at 50% -20%, #0f172a 0%, #02040a 80%); color:white; height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+        
+        /* SCREENS */
+        .screen { display:none; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%; padding:20px; animation:fadeIn 0.5s ease; }
+        .screen.active { display:flex; }
+
+        /* UI ELEMENTS */
+        .glass-panel { background:var(--glass); border:var(--border); border-radius:24px; padding:30px; width:100%; max-width:400px; text-align:center; backdrop-filter:blur(10px); }
+        h1 { font-size:2rem; margin:0 0 10px 0; background:linear-gradient(to right, #fff, var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        p { color:#94a3b8; font-size:0.9rem; line-height:1.6; }
+        
+        .liquid-btn { background:var(--cyan); color:black; font-weight:800; border:none; padding:15px 30px; border-radius:50px; cursor:pointer; margin-top:20px; width:100%; font-size:1rem; transition:0.3s; box-shadow:0 0 20px rgba(34, 211, 238, 0.3); }
+        .liquid-btn:hover { transform:scale(1.05); box-shadow:0 0 40px rgba(34, 211, 238, 0.5); }
+        .liquid-btn.secondary { background:rgba(255,255,255,0.1); color:white; box-shadow:none; }
+
+        /* INPUT LIST */
+        #taskList { width:100%; max-height:200px; overflow-y:auto; margin:20px 0; }
+        .task-row { display:flex; gap:10px; margin-bottom:10px; }
+        .t-input { background:rgba(0,0,0,0.3); border:1px solid #333; color:white; padding:10px; border-radius:10px; flex:1; }
+        .t-time { width:70px; text-align:center; }
+
+        /* TIMER ZONE */
+        .timer-circle { width:280px; height:280px; border-radius:50%; border:4px solid rgba(255,255,255,0.05); display:flex; flex-direction:column; justify-content:center; align-items:center; margin:30px 0; position:relative; box-shadow:0 0 50px rgba(0,0,0,0.5); }
+        .time-val { font-size:4rem; font-weight:800; font-variant-numeric:tabular-nums; }
+        .current-task { font-size:1rem; color:var(--cyan); margin-top:10px; font-weight:600; text-transform:uppercase; letter-spacing:2px; }
+        
+        /* GAMIFICATION POPUPS */
+        .xp-popup { position:absolute; top:40%; left:50%; transform:translate(-50%, -50%) scale(0); color:var(--gold); font-size:3rem; font-weight:900; text-shadow:0 0 20px var(--gold); pointer-events:none; transition:0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index:100; }
+        .xp-popup.show { transform:translate(-50%, -50%) scale(1); opacity:0; animation:floatUp 1.5s forwards; }
+
+        @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+        @keyframes floatUp { 0%{opacity:1; transform:translate(-50%, -50%) scale(1);} 100%{opacity:0; transform:translate(-50%, -150%) scale(1.5);} }
+    </style>
+</head>
+<body>
+
+    <div id="screen-onboard" class="screen active">
+        <div class="glass-panel">
+            <h1>Session Focus</h1>
+            <p>Bienvenue dans votre zone de productivité.</p>
+            <div style="text-align:left; margin:20px 0; font-size:0.9rem; color:#ccc;">
+                🎯 <b>Définissez</b> vos objectifs et le temps estimé.<br><br>
+                ⏱️ <b>Travaillez</b> contre la montre.<br><br>
+                🏆 <b>Gagnez</b> 50 XP pour chaque tâche finie <u>avant</u> la fin du chrono prévu. 0 XP si vous êtes en retard.
+            </div>
+            <button class="liquid-btn" onclick="nextScreen('setup')">COMMENCER</button>
+        </div>
+    </div>
+
+    <div id="screen-setup" class="screen">
+        <div class="glass-panel" style="max-width:500px;">
+            <h1>Planification</h1>
+            <p>Listez vos tâches dans l'ordre de priorité.</p>
+            
+            <div id="taskList">
+                <div class="task-row">
+                    <input type="text" class="t-input name" placeholder="Tâche 1 (ex: Intro Rapport)">
+                    <input type="number" class="t-input t-time" placeholder="Min" value="25">
+                </div>
+            </div>
+            
+            <button class="liquid-btn secondary" onclick="addTaskRow()" style="font-size:0.8rem; padding:10px;">+ Ajouter une tâche</button>
+            <div style="margin:20px 0; border-top:1px solid #333; padding-top:15px;">
+                <span style="color:#666; font-size:0.8rem;">TEMPS TOTAL ESTIMÉ:</span>
+                <div id="totalTimeDisplay" style="font-size:1.5rem; font-weight:700; color:white;">25 min</div>
+            </div>
+            <button class="liquid-btn" onclick="startSession()">LANCER LA SESSION 🚀</button>
+        </div>
+    </div>
+
+    <div id="screen-active" class="screen">
+        <div class="xp-popup" id="xpPopup">+50 XP</div>
+        <div class="current-task" id="activeTaskName">INITIALISATION...</div>
+        <div class="timer-circle">
+            <div class="time-val" id="timerDisplay">00:00</div>
+            <div style="font-size:0.8rem; color:#666; margin-top:5px;">TEMPS RESTANT (GLOBAL)</div>
+        </div>
+        
+        <div class="glass-panel" style="background:rgba(0,0,0,0.5); padding:20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <span style="color:#94a3b8; font-size:0.8rem;">OBJECTIF EN COURS</span>
+                <span style="color:var(--cyan); font-weight:700; font-size:0.8rem;" id="taskTimer">...</span>
+            </div>
+            <h3 id="currentTaskTitle" style="margin:0; color:white; font-size:1.2rem;">...</h3>
+            <button class="liquid-btn" onclick="completeTask()" style="background:var(--green); margin-top:20px;">
+                ✅ TERMINÉ
+            </button>
+        </div>
+    </div>
+
+    <div id="screen-summary" class="screen">
+        <div class="glass-panel">
+            <h1 style="color:var(--gold);">SESSION TERMINÉE</h1>
+            <div style="font-size:4rem; font-weight:800; color:var(--gold); margin:20px 0;" id="finalScore">0</div>
+            <p style="color:var(--gold); text-transform:uppercase; letter-spacing:2px; font-weight:700;">POINTS XP GAGNÉS</p>
+            
+            <div id="summaryList" style="text-align:left; margin:30px 0; max-height:150px; overflow-y:auto; font-size:0.85rem;"></div>
+            
+            <button class="liquid-btn" onclick="window.location.href='pom-leaderboard.html'">🏆 VOIR LE CLASSEMENT</button>
+            <button class="liquid-btn secondary" onclick="window.location.href='smartst-cloud-access.html'">RETOUR DASHBOARD</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, updateDoc, getDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
+            authDomain: "smartst-os.firebaseapp.com",
+            projectId: "smartst-os",
+            storageBucket: "smartst-os.firebasestorage.app",
+            messagingSenderId: "866980185011",
+            appId: "1:866980185011:web:03006fe6a81634d5dec1c6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let currentUser = null;
+        let tasks = [];
+        let currentTaskIndex = 0;
+        let sessionTotalTime = 0;
+        let sessionTimeLeft = 0;
+        let taskStartTime = 0;
+        let globalTimer = null;
+        let totalXP = 0;
+        let sessionLog = [];
+
+        onAuthStateChanged(auth, (user) => {
+            if(user) currentUser = user;
+            else window.location.href = 'index.html';
+        });
+
+        window.nextScreen = (id) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(`screen-${id}`).classList.add('active');
+        }
+
+        window.addTaskRow = () => {
+            const div = document.createElement('div');
+            div.className = 'task-row';
+            div.innerHTML = `<input type="text" class="t-input name" placeholder="Tâche..."><input type="number" class="t-input t-time" placeholder="Min" value="15">`;
+            document.getElementById('taskList').appendChild(div);
+            updateTotalEst();
+        }
+
+        document.getElementById('taskList').addEventListener('input', updateTotalEst);
+
+        function updateTotalEst() {
+            let total = 0;
+            document.querySelectorAll('.t-time').forEach(i => total += parseInt(i.value || 0));
+            document.getElementById('totalTimeDisplay').innerText = total + " min";
+        }
+
+        window.startSession = () => {
+            // Build Task Array
+            tasks = [];
+            const rows = document.querySelectorAll('.task-row');
+            rows.forEach(r => {
+                const name = r.querySelector('.name').value;
+                const min = parseInt(r.querySelector('.t-time').value);
+                if(name && min) tasks.push({ name, estSeconds: min * 60 });
+            });
+
+            if(tasks.length === 0) return alert("Ajoutez au moins une tâche !");
+
+            // Init Session
+            sessionTotalTime = tasks.reduce((acc, t) => acc + t.estSeconds, 0);
+            sessionTimeLeft = sessionTotalTime;
+            currentTaskIndex = 0;
+            totalXP = 0;
+            sessionLog = [];
+            
+            nextScreen('active');
+            startGlobalTimer();
+            startTask(0);
+        }
+
+        function startGlobalTimer() {
+            globalTimer = setInterval(() => {
+                sessionTimeLeft--;
+                const m = Math.floor(sessionTimeLeft / 60).toString().padStart(2,'0');
+                const s = (sessionTimeLeft % 60).toString().padStart(2,'0');
+                document.getElementById('timerDisplay').innerText = `${m}:${s}`;
+                
+                if(sessionTimeLeft <= 0) endSession();
+            }, 1000);
+        }
+
+        function startTask(index) {
+            if(index >= tasks.length) {
+                endSession();
+                return;
+            }
+            const task = tasks[index];
+            document.getElementById('activeTaskName').innerText = `TÂCHE ${index + 1}/${tasks.length}`;
+            document.getElementById('currentTaskTitle').innerText = task.name;
+            document.getElementById('taskTimer').innerText = `OBJECTIF: ${Math.floor(task.estSeconds/60)} MIN`;
+            taskStartTime = Date.now();
+        }
+
+        window.completeTask = () => {
+            const task = tasks[currentTaskIndex];
+            const timeTaken = (Date.now() - taskStartTime) / 1000; // seconds
+            
+            let xpEarned = 0;
+            let status = "EN RETARD ⚠️";
+            
+            // LOGIC: Did they finish faster than estimated?
+            if (timeTaken <= task.estSeconds) {
+                xpEarned = 50;
+                status = "EN AVANCE 🔥";
+                showPopup();
+            }
+
+            totalXP += xpEarned;
+            sessionLog.push({ name: task.name, xp: xpEarned, status });
+
+            currentTaskIndex++;
+            startTask(currentTaskIndex);
+        }
+
+        function showPopup() {
+            const p = document.getElementById('xpPopup');
+            p.classList.remove('show');
+            void p.offsetWidth; // trigger reflow
+            p.classList.add('show');
+        }
+
+        async function endSession() {
+            clearInterval(globalTimer);
+            nextScreen('summary');
+            document.getElementById('finalScore').innerText = "+" + totalXP;
+            
+            const list = document.getElementById('summaryList');
+            list.innerHTML = '';
+            sessionLog.forEach(l => {
+                const col = l.xp > 0 ? '#10b981' : '#f43f5e';
+                list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #333;"><span>${l.name}</span><span style="color:${col}; font-weight:700;">${l.status} (+${l.xp})</span></div>`;
+            });
+
+            // SAVE TO FIREBASE
+            if(currentUser && totalXP > 0) {
+                try {
+                    const userRef = doc(db, "students", currentUser.uid);
+                    await updateDoc(userRef, {
+                        pomodoro_xp: increment(totalXP),
+                        xp: increment(totalXP) // Also adds to global Dashboard level
+                    });
+                } catch(e) { console.error("Save error:", e); }
+            }
+        }
+    </script>
+</body>
+</html>

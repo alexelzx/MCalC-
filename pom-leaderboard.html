@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SmartST | Classement Focus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { margin:0; font-family:'Outfit', sans-serif; background:#02040a; color:white; display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:20px; }
+        .leader-card { width:100%; max-width:500px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:20px; margin-top:20px; }
+        .rank-row { display:flex; align-items:center; padding:15px; border-bottom:1px solid rgba(255,255,255,0.05); }
+        .rank-num { font-size:1.5rem; font-weight:800; width:40px; color:#666; }
+        .rank-1 { color:#fbbf24; text-shadow:0 0 10px #fbbf24; }
+        .rank-2 { color:#94a3b8; }
+        .rank-3 { color:#b45309; }
+        .u-info { flex:1; }
+        .u-name { font-weight:700; font-size:1.1rem; }
+        .u-xp { font-weight:800; color:#22d3ee; }
+        .back-btn { margin-top:30px; color:#666; text-decoration:none; font-weight:600; }
+    </style>
+</head>
+<body>
+    <h1 style="color:#22d3ee; margin:0;">TOP FOCUS 🧠</h1>
+    <p style="color:#666; margin-top:5px;">Les étudiants les plus productifs</p>
+
+    <div class="leader-card" id="list">
+        <div style="text-align:center; padding:20px;">Chargement du classement...</div>
+    </div>
+
+    <a href="pomodoro.html" class="back-btn">← Retour au Timer</a>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
+            authDomain: "smartst-os.firebaseapp.com",
+            projectId: "smartst-os",
+            storageBucket: "smartst-os.firebasestorage.app",
+            messagingSenderId: "866980185011",
+            appId: "1:866980185011:web:03006fe6a81634d5dec1c6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function load() {
+            const list = document.getElementById('list');
+            try {
+                // Get Top 20 based on 'pomodoro_xp'
+                const q = query(collection(db, "students"), orderBy("pomodoro_xp", "desc"), limit(20));
+                const snap = await getDocs(q);
+                
+                list.innerHTML = '';
+                let i = 1;
+                snap.forEach(doc => {
+                    const s = doc.data();
+                    const rankClass = i === 1 ? 'rank-1' : (i === 2 ? 'rank-2' : (i === 3 ? 'rank-3' : ''));
+                    list.innerHTML += `
+                        <div class="rank-row">
+                            <div class="rank-num ${rankClass}">#${i}</div>
+                            <div class="u-info">
+                                <div class="u-name">${s.prenom} ${s.nom.charAt(0)}.</div>
+                                <div style="font-size:0.8rem; color:#666;">${s.grp}</div>
+                            </div>
+                            <div class="u-xp">${s.pomodoro_xp || 0} XP</div>
+                        </div>
+                    `;
+                    i++;
+                });
+            } catch(e) {
+                console.error(e);
+                list.innerHTML = `<div style="text-align:center; color:#f43f5e;">Erreur ou accès refusé. Connectez-vous.</div>`;
+            }
+        }
+        load();
+    </script>
+</body>
+</html>
