@@ -3,31 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SmartST | Classement Focus</title>
+    <title>SmartST | Classement</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { margin:0; font-family:'Outfit', sans-serif; background:#02040a; color:white; display:flex; flex-direction:column; align-items:center; min-height:100vh; padding:20px; }
-        .leader-card { width:100%; max-width:500px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:20px; margin-top:20px; }
-        .rank-row { display:flex; align-items:center; padding:15px; border-bottom:1px solid rgba(255,255,255,0.05); }
-        .rank-num { font-size:1.5rem; font-weight:800; width:40px; color:#666; }
-        .rank-1 { color:#fbbf24; text-shadow:0 0 10px #fbbf24; }
-        .rank-2 { color:#94a3b8; }
-        .rank-3 { color:#b45309; }
-        .u-info { flex:1; }
-        .u-name { font-weight:700; font-size:1.1rem; }
-        .u-xp { font-weight:800; color:#22d3ee; }
-        .back-btn { margin-top:30px; color:#666; text-decoration:none; font-weight:600; }
+        :root {
+            --bg-deep: #02040a;
+            --surface: rgba(255,255,255,0.03);
+            --border: 1px solid rgba(255,255,255,0.08);
+            --cyan: #22d3ee;
+            --gold: #fbbf24;
+            --text-mute: #94a3b8;
+        }
+        body { margin:0; font-family:'Outfit', sans-serif; background: radial-gradient(circle at 50% -20%, #0f172a 0%, #02040a 80%); color:white; min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:30px 20px; }
+
+        /* BRAND HEADER */
+        .brand-header {
+            display: flex; flex-direction: column; align-items: center; gap: 5px; margin-bottom: 40px;
+        }
+        .smartst-logo {
+            font-size: 2rem; font-weight: 800; letter-spacing: -1px; margin: 0;
+            background: linear-gradient(135deg, #fff 0%, var(--cyan) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .page-title {
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px;
+            color: var(--text-mute); font-weight: 600;
+        }
+
+        /* CARD */
+        .leader-card {
+            width: 100%; max-width: 600px;
+            background: var(--surface); border: var(--border); border-radius: 24px;
+            overflow: hidden; backdrop-filter: blur(20px);
+        }
+
+        /* ROWS */
+        .rank-row {
+            display: flex; align-items: center; padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
+        }
+        .rank-row:last-child { border-bottom: none; }
+        .rank-row:hover { background: rgba(255,255,255,0.05); }
+
+        /* RANK BADGE */
+        .rank-num {
+            width: 40px; font-size: 1.2rem; font-weight: 800; color: #64748b;
+            text-align: left;
+        }
+        /* Top 3 Styling */
+        .rank-1 .rank-num { color: #fbbf24; text-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
+        .rank-2 .rank-num { color: #e2e8f0; text-shadow: 0 0 10px rgba(226, 232, 240, 0.2); }
+        .rank-3 .rank-num { color: #b45309; }
+
+        /* INFO */
+        .u-info { flex: 1; display: flex; flex-direction: column; }
+        .u-name { font-weight: 700; font-size: 1rem; color: white; }
+        .u-grp { font-size: 0.75rem; color: var(--text-mute); font-weight: 600; margin-top: 2px; }
+
+        /* SCORE */
+        .u-xp {
+            font-family: monospace; font-size: 1rem; font-weight: 700; color: var(--cyan);
+            background: rgba(34, 211, 238, 0.1); padding: 5px 10px; border-radius: 8px;
+            border: 1px solid rgba(34, 211, 238, 0.2);
+        }
+
+        .back-link {
+            margin-top: 40px; color: var(--text-mute); text-decoration: none; font-size: 0.85rem; font-weight: 600;
+            display: flex; align-items: center; gap: 8px; transition: 0.3s;
+        }
+        .back-link:hover { color: white; transform: translateX(-5px); }
     </style>
 </head>
 <body>
-    <h1 style="color:#22d3ee; margin:0;">TOP FOCUS 🧠</h1>
-    <p style="color:#666; margin-top:5px;">Les étudiants les plus productifs</p>
 
-    <div class="leader-card" id="list">
-        <div style="text-align:center; padding:20px;">Chargement du classement...</div>
+    <div class="brand-header">
+        <div class="smartst-logo">SmartST</div>
+        <div class="page-title">Classement Focus</div>
     </div>
 
-    <a href="pomodoro.html" class="back-btn">← Retour au Timer</a>
+    <div class="leader-card" id="list">
+        <div style="text-align:center; padding:40px; color:#666;">Chargement des données...</div>
+    </div>
+
+    <a href="pomodoro.html" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Retour au Mode Focus
+    </a>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -48,7 +109,6 @@
         async function load() {
             const list = document.getElementById('list');
             try {
-                // Get Top 20 based on 'pomodoro_xp'
                 const q = query(collection(db, "students"), orderBy("pomodoro_xp", "desc"), limit(20));
                 const snap = await getDocs(q);
                 
@@ -56,13 +116,14 @@
                 let i = 1;
                 snap.forEach(doc => {
                     const s = doc.data();
-                    const rankClass = i === 1 ? 'rank-1' : (i === 2 ? 'rank-2' : (i === 3 ? 'rank-3' : ''));
+                    const rankClass = i <= 3 ? `rank-${i}` : '';
+                    
                     list.innerHTML += `
-                        <div class="rank-row">
-                            <div class="rank-num ${rankClass}">#${i}</div>
+                        <div class="rank-row ${rankClass}">
+                            <div class="rank-num">#${i}</div>
                             <div class="u-info">
                                 <div class="u-name">${s.prenom} ${s.nom.charAt(0)}.</div>
-                                <div style="font-size:0.8rem; color:#666;">${s.grp}</div>
+                                <div class="u-grp">${s.grp}</div>
                             </div>
                             <div class="u-xp">${s.pomodoro_xp || 0} XP</div>
                         </div>
@@ -71,7 +132,7 @@
                 });
             } catch(e) {
                 console.error(e);
-                list.innerHTML = `<div style="text-align:center; color:#f43f5e;">Erreur ou accès refusé. Connectez-vous.</div>`;
+                list.innerHTML = `<div style="text-align:center; padding:30px; color:#f43f5e;">Accès Restreint. Veuillez vous connecter.</div>`;
             }
         }
         load();
