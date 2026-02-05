@@ -137,63 +137,29 @@
         .type-TP { background: rgba(249, 115, 22, 0.15); border-color: var(--gemini-orange); }
         .type-SAE { background: rgba(168, 85, 247, 0.15); border-color: var(--gemini-purple); }
 
-        /* --- UPDATED STATUS STYLES (STRIPES + DIMMING) --- */
-        
-        /* CANCELLED */
+        /* STATUS STYLES */
         .status-cancelled { 
-            /* Red Stripes */
-            background: repeating-linear-gradient(
-                135deg,
-                rgba(239, 68, 68, 0.05),
-                rgba(239, 68, 68, 0.05) 10px,
-                rgba(0, 0, 0, 0.2) 10px,
-                rgba(0, 0, 0, 0.2) 20px
-            ) !important;
+            background: repeating-linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.05) 10px, rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.2) 20px) !important;
             border-color: #333 !important; 
         }
-
-        /* POSTPONED */
         .status-postponed { 
-            /* Blue/Grey Stripes */
-            background: repeating-linear-gradient(
-                135deg,
-                rgba(59, 130, 246, 0.05),
-                rgba(59, 130, 246, 0.05) 10px,
-                rgba(0, 0, 0, 0.2) 10px,
-                rgba(0, 0, 0, 0.2) 20px
-            ) !important;
+            background: repeating-linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.05) 10px, rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.2) 20px) !important;
             border-color: #333 !important; 
         }
-
-        /* Dim the CONTENT inside the cancelled/postponed cards so they look inactive */
         .status-cancelled .evt-top, .status-cancelled .evt-title, .status-cancelled .evt-bot,
         .status-postponed .evt-top, .status-postponed .evt-title, .status-postponed .evt-bot {
-            opacity: 0.2; /* Very dimmed */
-            filter: grayscale(100%); /* Remove color from text/badges */
+            opacity: 0.2; filter: grayscale(100%);
         }
         
-        /* --- PROFESSIONAL STATUS STAMP (CENTERED, NO ROTATION) --- */
         .status-text-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%); /* Centered, 0 rotation */
-            font-size: 1rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            z-index: 15;
-            pointer-events: none;
-            border: 2px solid currentColor;
-            padding: 8px 16px;
-            border-radius: 4px; /* Professional boxy look */
-            background: #000; /* Solid black background for legibility */
-            white-space: nowrap;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
+            z-index: 15; pointer-events: none; border: 2px solid currentColor;
+            padding: 8px 16px; border-radius: 4px; background: #000; white-space: nowrap;
             box-shadow: 0 4px 20px rgba(0,0,0,0.8);
         }
-        
-        .st-cancelled-text { color: #f43f5e; border-color: #f43f5e; } /* Red */
-        .st-postponed-text { color: #3b82f6; border-color: #3b82f6; } /* Blue */
+        .st-cancelled-text { color: #f43f5e; border-color: #f43f5e; }
+        .st-postponed-text { color: #3b82f6; border-color: #3b82f6; }
 
         .evt-top { display: flex; justify-content: space-between; align-items: flex-start; }
         .evt-group-badge { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.3); }
@@ -227,7 +193,6 @@
         .btn-danger:hover { background: var(--gemini-red); color: white; }
         .login-title { text-align: center; font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; }
 
-        /* --- MOBILE APP MODE --- */
         @media screen and (max-width: 768px) {
             body { font-size: 14px; }
             .calendar-container { justify-content: flex-start; -webkit-overflow-scrolling: touch; }
@@ -254,9 +219,7 @@
         </div>
         <div class="controls">
             <select id="weekSelect" class="st-select" onchange="renderCalendar()">
-                <option value="6">Sem A</option>
-                <option value="7">Sem B</option>
-            </select>
+                </select>
             <select id="groupSelect" class="st-select" onchange="renderCalendar()">
                 <option value="C1">Groupe C1</option>
                 <option value="C2">Groupe C2</option>
@@ -402,10 +365,29 @@
             if(!localStorage.getItem('smartst_session')) {
                 window.location.href = 'smartst-cloud-access.html'; 
             }
+            // Initialize 4-week selection
+            generateWeekOptions();
         };
 
+        // --- NEW: Generate 4 Weeks (1 Month) of Options ---
+        function generateWeekOptions() {
+            const selector = document.getElementById('weekSelect');
+            selector.innerHTML = ''; // Clear existing
+            
+            // Configuration: Start Week. Change this to match current academic week.
+            // Currently set to 6 based on your previous "Sem A" = 6
+            const startWeek = 6; 
+            
+            for (let i = 0; i < 4; i++) {
+                const weekNum = startWeek + i;
+                const option = document.createElement('option');
+                option.value = weekNum;
+                option.innerText = `Semaine ${weekNum}`;
+                selector.appendChild(option);
+            }
+        }
+
         // --- REAL AUTH LISTENER ---
-        // This detects if you are signed in as the Admin or just a Student
         onAuthStateChanged(auth, (user) => {
             if (user && user.uid === ADMIN_UID) {
                 console.log("Admin privileges active.");
@@ -467,6 +449,8 @@
             const week = document.getElementById('weekSelect').value;
             const group = document.getElementById('groupSelect').value;
 
+            // Handle date display for currently selected week
+            // Note: DB needs keys like "6", "7", "8", "9" for full functionality
             const weekDates = dateData[week] || ["...", "...", "...", "...", "..."];
             for(let i=0; i<5; i++) {
                 const el = document.getElementById(`date-${i}`);
