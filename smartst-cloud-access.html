@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SmartST | Student OS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MCalC+ | Calendar</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,7 +16,7 @@
     <style>
         :root {
             --bg-deep: #02040a;
-            --surface-glass: rgba(15, 23, 42, 0.65);
+            --surface-glass: rgba(20, 24, 30, 0.85);
             --border-glass: 1px solid rgba(56, 189, 248, 0.15);
             --gemini-cyan: #22d3ee;
             --gemini-blue: #3b82f6;
@@ -27,9 +27,6 @@
             --gemini-orange: #f97316;
             --text-main: #f8fafc;
             --text-mute: #94a3b8;
-            --glow-blue: 0 0 30px rgba(59, 130, 246, 0.2);
-            --safe-top: env(safe-area-inset-top);
-            --safe-bottom: env(safe-area-inset-bottom);
         }
 
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -37,385 +34,395 @@
         body {
             margin: 0; font-family: 'Outfit', sans-serif;
             background: radial-gradient(circle at 50% -20%, #0f172a 0%, #02040a 80%);
-            color: var(--text-main); min-height: 100dvh; overflow-x: hidden;
+            color: var(--text-main); min-height: 100vh; overflow-x: hidden;
             display: flex; flex-direction: column;
-            overscroll-behavior: none; user-select: none; -webkit-user-select: none;
         }
 
-        input, textarea, select { user-select: text; -webkit-user-select: text; }
-        .hidden { display: none !important; }
-        .icon { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+        .icon { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
         .btn-reset { background: none; border: none; cursor: pointer; color: inherit; font: inherit; }
+        .hidden { display: none !important; }
 
-        /* --- LIQUID GLASS UTILS --- */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .liquid-btn {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.02), 0 5px 15px rgba(0,0,0,0.5);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px 24px; border-radius: 50px; /* Fully Rounded */
-            font-size: 0.8rem;
-            text-decoration: none;
-        }
-        .liquid-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--gemini-cyan); color: var(--gemini-cyan);
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.15); transform: translateY(-2px);
-        }
-        .liquid-btn.danger { border-color: rgba(239, 68, 68, 0.5); color: var(--gemini-red); }
-        .liquid-btn.danger:hover {
-            border-color: var(--gemini-red); color: var(--gemini-red);
-            box-shadow: 0 0 20px rgba(244, 63, 94, 0.2);
-        }
-
-        /* LOADER */
         #loader {
-            position: fixed; inset: 0; background: #000000; z-index: 20000;
+            position: fixed; inset: 0; background: #02040a; z-index: 10000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 0.4s ease;
         }
-        .loader-circle {
+        .gemini-spinner {
             width: 50px; height: 50px; border-radius: 50%;
             border: 3px solid rgba(34, 211, 238, 0.1); border-top-color: var(--gemini-cyan);
             animation: spin 0.8s linear infinite; margin-bottom: 20px;
-            box-shadow: 0 0 30px rgba(34, 211, 238, 0.2);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
         }
-        .loader-text { font-size: 0.8rem; letter-spacing: 4px; color: var(--gemini-blue); font-weight: 700; animation: pulse 1.5s infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        /* LOGIN SCREEN */
-        #login-screen {
-            position: fixed; inset: 0; background: #000000; z-index: 9000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 20px; overflow-y: auto; padding-bottom: 100px;
+        /* HEADER */
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 30px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+            border-bottom: var(--border-glass); position: sticky; top: 0; z-index: 100;
+            height: 70px;
         }
-        .login-card { width: 100%; max-width: 360px; text-align: center; margin: auto; }
         
-        .brand-title {
-            font-size: 4rem; font-weight: 800; letter-spacing: -2px; margin: 0;
-            background: linear-gradient(135deg, #fff 0%, var(--gemini-cyan) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 50px rgba(34, 211, 238, 0.3);
-        }
-        .brand-sub { font-size: 0.8rem; color: var(--gemini-blue); letter-spacing: 4px; text-transform: uppercase; font-weight: 700; margin-top: 5px; margin-bottom: 40px; }
+        .logo-section { display: flex; align-items: center; gap: 20px; }
+        .logo-text { font-size: 1.2rem; font-weight: 800; color: white; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+        .logo-text span { color: var(--gemini-cyan); }
 
-        .login-tabs { display: flex; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 16px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); }
-        .tab-btn {
-            flex: 1; padding: 12px; border-radius: 12px; border: none; background: transparent;
-            color: var(--text-mute); font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: 0.3s;
-        }
-        .tab-btn.active { background: rgba(255,255,255,0.1); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
+        .controls-group { display: flex; align-items: center; gap: 15px; }
 
-        .login-input {
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); color: white;
-            padding: 16px 20px; border-radius: 16px; font-size: 1rem; letter-spacing: 1px;
-            text-align: center; width: 100%; transition: 0.3s; margin-bottom: 15px;
+        .st-select {
+            background: rgba(255,255,255,0.05); border: var(--border-glass); color: white;
+            padding: 0 15px; border-radius: 8px; font-family: inherit; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s; height: 36px;
         }
-        .login-input:focus { border-color: var(--gemini-cyan); box-shadow: 0 0 20px rgba(34, 211, 238, 0.1); background: rgba(255,255,255,0.05); outline: none; }
-        select.login-input { appearance: none; cursor: pointer; }
-        select.login-input option { background: #000; color: white; }
+        .st-select:hover { border-color: var(--gemini-cyan); background: rgba(34, 211, 238, 0.05); }
+        .st-select option { background-color: #0f172a; color: white; }
 
-        .main-action-btn {
-            width: 100%; padding: 16px; border-radius: 50px; font-size: 1rem; margin-top: 20px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(34, 211, 238, 0.2));
-            border: 1px solid rgba(34, 211, 238, 0.3);
+        .btn-admin {
+            background: rgba(251, 191, 36, 0.05); border: 1px solid rgba(251, 191, 36, 0.3); 
+            color: var(--gemini-gold); font-weight: 700; display: flex; align-items: center; gap: 8px;
+            padding: 0 15px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; height: 36px;
         }
-        .main-action-btn:hover { background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(34, 211, 238, 0.4)); box-shadow: 0 0 40px rgba(34, 211, 238, 0.3); }
+        .btn-admin:hover { background: rgba(251, 191, 36, 0.15); border-color: var(--gemini-gold); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+        .btn-admin.logged-in { background: rgba(239, 68, 68, 0.1); border-color: var(--gemini-red); color: var(--gemini-red); }
+        .btn-admin.logged-in:hover { background: var(--gemini-red); color: white; }
 
-        .switch-link {
-            margin-top: 25px; font-size: 0.85rem; color: var(--text-mute); cursor: pointer; 
-            text-decoration: underline; transition: 0.2s; display: block;
+        .btn-back {
+            background: transparent; border: 1px solid var(--gemini-red); color: var(--gemini-red);
+            padding: 0 20px; border-radius: 20px; font-weight: 600; cursor: pointer; text-decoration: none;
+            font-size: 0.8rem; transition: 0.2s; display: flex; align-items: center; gap: 8px; height: 36px;
         }
-        .switch-link:hover { color: white; text-shadow: 0 0 10px white; }
+        .btn-back:hover { background: var(--gemini-red); color: white; }
 
-        .top-back-btn {
-            position: absolute; top: 30px; left: 30px; 
-            display: flex; align-items: center; gap: 8px;
-            color: var(--text-mute); text-decoration: none; font-weight: 700; font-size: 0.9rem;
-            transition: 0.3s;
+        /* CALENDAR SECTION */
+        .calendar-section { 
+            flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative;
         }
-        .top-back-btn:hover { color: white; transform: translateX(-5px); }
-
-        /* DASHBOARD */
-        #dashboard { display: none; padding: 30px; padding-top: calc(20px + var(--safe-top)); padding-bottom: calc(100px + var(--safe-bottom)); max-width: 1400px; margin: 0 auto; width: 100%; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: var(--border-glass); }
-        .profile { display: flex; align-items: center; gap: 20px; }
-        .avatar-lg { width: 64px; height: 64px; border-radius: 20px; background: rgba(34, 211, 238, 0.1); border: 1px solid var(--gemini-cyan); color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; box-shadow: 0 0 30px rgba(34, 211, 238, 0.15); }
-        .user-info h1 { margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .group-tag { background: rgba(59, 130, 246, 0.15); padding: 5px 12px; border-radius: 8px; color: var(--gemini-cyan); font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.3); }
         
-        .nav-actions { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
-        .nav-btn { flex: 1; padding: 14px; border-radius: 16px; font-size: 0.9rem; text-decoration: none;}
+        .cal-title-row {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            margin-bottom: 25px;
+        }
+        .month-label { font-size: 1.2rem; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 2px; }
+        
+        /* WEEK LABEL NEXT TO MONTH */
+        .title-group { display: flex; align-items: baseline; gap: 10px; }
+        .week-label { font-size: 0.9rem; color: var(--gemini-cyan); font-weight: 700; background: rgba(34, 211, 238, 0.1); padding: 2px 10px; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
+        .editable-month { cursor: pointer; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.2); }
+
+        /* SLIDER CONTAINER */
+        .slider-container {
+            display: flex; align-items: flex-start; gap: 15px; width: 100%; max-width: 1500px;
+        }
+
+        .nav-arrow {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-mute); width: 50px; height: 500px; 
+            border-radius: 12px; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; font-weight: 300;
+        }
+        .nav-arrow:hover { background: rgba(255,255,255,0.05); color: var(--gemini-cyan); border-color: var(--gemini-cyan); box-shadow: 0 0 20px rgba(34, 211, 238, 0.1); }
+        .nav-arrow:disabled { opacity: 0.2; cursor: not-allowed; border-color: transparent; }
 
         /* GRID */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
-        .card { border-radius: 24px; padding: 30px; display: flex; flex-direction: column; min-height: 320px; }
-        
-        .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .card-title { font-size: 0.9rem; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
-        
-        .gpa-display { font-size: 4rem; font-weight: 800; color: white; letter-spacing: -3px; text-shadow: 0 0 40px rgba(255,255,255,0.1); }
-        
-        .grade-list, .hw-list, .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 200px; padding-right: 5px; }
-        
-        .item-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: 12px;
-            font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
+        .cal-wrapper {
+            display: grid; grid-template-columns: 60px repeat(5, 1fr); gap: 10px;
+            flex: 1; 
         }
-        .item-row:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); transform: translateX(3px); }
-        .val-hl { font-weight: 800; color: var(--gemini-purple); font-size: 1.1rem; }
-        
-        .del-btn { color: var(--gemini-red); cursor: pointer; opacity: 0.5; transition: 0.2s; padding: 5px; font-size: 1.2rem; }
-        .ok-btn { color: var(--gemini-green); cursor: pointer; opacity: 0.5; transition: 0.2s; padding: 5px; font-size: 1.2rem; }
-        .del-btn:hover, .ok-btn:hover { opacity: 1; transform: scale(1.2); text-shadow: 0 0 10px currentColor; }
-
-        .att-alert { background: rgba(244, 63, 94, 0.1); border: 1px solid var(--gemini-red); color: var(--gemini-red); padding: 12px; border-radius: 12px; font-weight: 800; text-align: center; margin-bottom: 20px; font-size: 0.8rem; display: none; box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); animation: pulse 2s infinite; }
-        .att-stats { display: flex; justify-content: space-between; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
-        .stat-item { text-align: center; flex: 1; position: relative; }
-        .stat-item:not(:last-child)::after { content:''; position: absolute; right: 0; top: 10%; height: 80%; width: 1px; background: rgba(255,255,255,0.1); }
-        .stat-val { font-size: 1.4rem; font-weight: 800; display: block; margin-bottom: 4px; }
-        .stat-lbl { font-size: 0.6rem; color: var(--text-mute); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-        .c-red { color: var(--gemini-red); } .c-gold { color: var(--gemini-gold); } .c-green { color: var(--gemini-green); }
-
-        .hw-item { background: rgba(255,255,255,0.02); padding: 14px; border-radius: 12px; display: flex; align-items: flex-start; gap: 12px; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
-        .hw-check { min-width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--text-mute); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 2px; transition: 0.2s; }
-        .hw-check:hover { border-color: white; }
-        .hw-check.done { background: var(--gemini-cyan); border-color: var(--gemini-cyan); box-shadow: 0 0 10px rgba(34, 211, 238, 0.3); }
-        .hw-check svg { width: 14px; color: black; display: none; }
-        .hw-check.done svg { display: block; }
-        .hw-text { font-size: 0.95rem; color: #e2e8f0; flex: 1; line-height: 1.5; }
-        .hw-item.done .hw-text { text-decoration: line-through; color: rgba(255,255,255,0.3); }
-
-        .add-row, .admin-controls { display: none; gap: 10px; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
-        .admin-controls { flex-direction: column; }
-        .admin-visible { display: flex !important; }
-        .st-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 12px; width: 100%; transition: 0.2s; }
-        .st-input:focus { background: rgba(255,255,255,0.1); border-color: var(--gemini-cyan); outline: none; }
-        .admin-tag { font-size: 0.65rem; color: var(--gemini-gold); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
-        
-        /* ADMIN REGISTRY */
-        #admin-registry { display: none; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .registry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: var(--border-glass); }
-        .reg-title h1 { margin: 0; font-size: 2rem; font-weight: 700; color: white; }
-        .registry-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
-        #adminSearch { width: 100%; max-width: 300px; padding: 14px 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; margin-bottom: 30px; font-size: 1rem; backdrop-filter: blur(10px); }
-        .student-card { border-radius: 20px; padding: 25px; cursor: pointer; position: relative; overflow: hidden; height: 200px; display: flex; flex-direction: column; justify-content: space-between; }
-        .student-card:hover { border-color: var(--gemini-cyan); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(34, 211, 238, 0.05); transform: translateY(-5px); }
-        .st-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .st-avatar { width: 60px; height: 60px; border-radius: 18px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(34, 211, 238, 0.2)); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem; box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
-        .st-grp-badge { background: rgba(255,255,255,0.05); padding: 6px 14px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; color: var(--text-mute); border: 1px solid rgba(255,255,255,0.05); }
-        .st-name { font-size: 1.3rem; font-weight: 700; color: white; margin: 0; }
-        .st-id { font-size: 0.9rem; color: var(--text-mute); font-family: monospace; letter-spacing: 1px; margin-top: 5px; }
-
-        /* FOOTER LEGAL (Persistent) */
-        .footer-legal {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px);
-            border-top: var(--border-glass);
-            display: flex; justify-content: center; gap: 20px;
-            padding: 15px; 
-            z-index: 9500; /* Floating above login */
-            padding-bottom: calc(15px + var(--safe-bottom));
+        .cal-header {
+            text-align: center; color: var(--text-mute); padding-bottom: 10px;
+            display: flex; flex-direction: column; gap: 4px; border-radius: 8px; padding: 5px; border: 1px solid transparent; user-select: none;
         }
-        .foot-btn {
-            padding: 8px 16px; border-radius: 20px;
-            color: var(--text-mute); font-size: 0.75rem; font-weight: 700; 
-            text-transform: uppercase; letter-spacing: 1px;
+        
+        /* INTELLIGENT HIGHLIGHT - TODAY */
+        .cal-header.today { 
+            background: rgba(34, 211, 238, 0.15); /* Distinct Cyan Background */
+            border: 1px solid var(--gemini-cyan);
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
         }
-        .foot-btn:hover { color: white; background: rgba(255,255,255,0.05); }
-        .foot-btn.support { color: var(--gemini-gold); border: 1px solid rgba(251, 191, 36, 0.2); background: rgba(251, 191, 36, 0.05); }
-        .foot-btn.support:hover { background: rgba(251, 191, 36, 0.15); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); color: white; }
+        .cal-header.today .day-name { color: var(--gemini-cyan); }
+        .day-col.today { 
+            background: rgba(34, 211, 238, 0.02); 
+            border-radius: 12px;
+            border: 1px solid rgba(34, 211, 238, 0.05);
+        }
+
+        .day-name { font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        .day-date { 
+            font-size: 0.75rem; color: white; font-weight: 600; background: rgba(255,255,255,0.05); 
+            padding: 2px 8px; border-radius: 12px; align-self: center; cursor: default; transition: 0.2s;
+        }
+        .day-date.editable:hover { background: var(--gemini-cyan); color: black; cursor: pointer; }
+
+        .time-labels { display: grid; grid-template-rows: 1fr 1fr 20px 1fr 1fr; gap: 15px; text-align: right; padding-right: 15px; }
+        .time-label { display: flex; flex-direction: column; justify-content: center; font-size: 0.75rem; color: var(--text-mute); font-weight: 600; }
+        .time-label span { display: block; font-size: 0.65rem; opacity: 0.7; }
+        .lunch-break-label { font-size: 0.7rem; color: var(--gemini-purple); display: flex; align-items: center; justify-content: flex-end; opacity: 0.8; }
+
+        .day-col { display: grid; grid-template-rows: 1fr 1fr 20px 1fr 1fr; gap: 15px; position: relative; }
+        .slot {
+            background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1);
+            border-radius: 12px; position: relative; transition: 0.2s; min-height: 120px;
+        }
+        .slot.admin-mode:hover { background: rgba(34, 211, 238, 0.05); border-color: var(--gemini-cyan); cursor: pointer; }
+        .slot.admin-mode:hover::after {
+            content: '+'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: var(--gemini-cyan); opacity: 0.5;
+        }
+        .lunch-break { height: 20px; display: flex; align-items: center; justify-content: center; }
+        .lunch-line { width: 100%; height: 1px; background: rgba(255,255,255,0.05); }
+
+        /* DAY VACATION BANNER */
+        .day-vacay-overlay {
+            position: absolute; inset: 0; 
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(217, 70, 239, 0.1));
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 5; backdrop-filter: blur(5px);
+        }
+        .day-vacay-text {
+            font-size: 1.5rem; font-weight: 800; letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            transform: rotate(-90deg); white-space: nowrap;
+        }
+
+        .event-card {
+            position: absolute; inset: 0; border-radius: 12px; padding: 12px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            border-left: 4px solid; backdrop-filter: blur(10px); z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.2s; cursor: pointer;
+            overflow: hidden; 
+        }
+        .event-card:hover { transform: scale(1.02); z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+
+        .type-CM { background: rgba(59, 130, 246, 0.15); border-color: var(--gemini-blue); }
+        .type-TD { background: rgba(16, 185, 129, 0.15); border-color: var(--gemini-green); }
+        .type-TP { background: rgba(249, 115, 22, 0.15); border-color: var(--gemini-orange); }
+        .type-SAE { background: rgba(168, 85, 247, 0.15); border-color: var(--gemini-purple); }
+
+        /* EXAM BADGE */
+        .exam-badge {
+            position: absolute; top: 0; right: 0;
+            background: #f43f5e; color: white;
+            font-size: 0.6rem; font-weight: 800; text-transform: uppercase;
+            padding: 3px 8px; border-bottom-left-radius: 8px;
+            z-index: 5; box-shadow: -2px 2px 10px rgba(244, 63, 94, 0.3);
+        }
+
+        .evt-top { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 10px; }
+        .evt-group-badge { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.3); }
+        .badge-promo { color: var(--gemini-gold); border: 1px solid rgba(251, 191, 36, 0.3); }
+        .badge-grp { color: var(--gemini-cyan); border: 1px solid rgba(34, 211, 238, 0.2); }
+
+        .evt-type { font-size: 0.65rem; font-weight: 800; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; }
+        .evt-title { font-weight: 700; font-size: 0.95rem; color: white; line-height: 1.2; margin-top: 5px; }
+        .evt-bot { display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.75rem; color: var(--text-mute); }
+        .evt-room { font-weight: 600; color: var(--gemini-cyan); display: flex; align-items: center; gap: 4px; }
+
+        /* GLOBAL VACATION OVERLAY */
+        #vacationBanner {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            height: 100%; width: 100%; text-align: center; animation: float 3s ease-in-out infinite;
+            position: absolute; top: 0; left: 0; z-index: 50; background: var(--bg-deep);
+        }
+        #vacationBanner h1 { font-size: 3rem; margin: 0; background: linear-gradient(135deg, #22d3ee, #d946ef); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        #vacationBanner p { font-size: 1.2rem; color: var(--text-mute); margin-top: 10px; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
 
         /* MODALS */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 20000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
-        .modal-box { padding: 40px; border-radius: 24px; width: 90%; max-width: 600px; box-shadow: 0 0 100px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); }
-        .scroll-text { max-height: 50vh; overflow-y: auto; background: rgba(255,255,255,0.02); padding: 25px; border-radius: 16px; font-size: 0.95rem; color: #ccc; line-height: 1.7; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); text-align: left; }
-        .scroll-text h4 { color: var(--gemini-cyan); margin-top: 25px; margin-bottom: 10px; font-size: 1.1rem; }
-        .scroll-text h3 { color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; font-size: 1.5rem; }
-        .privacy-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
+        .modal-box { background: #0f1218; border: var(--border-glass); padding: 30px; border-radius: 20px; width: 95%; max-width: 450px; box-shadow: 0 0 60px rgba(0,0,0,0.8); }
+        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .m-title { font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 5px; }
+        .m-sub { color: var(--gemini-cyan); font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
+        .m-row { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .m-val { font-size: 1rem; color: white; font-weight: 500; }
+        .m-val.email { color: var(--gemini-blue); text-decoration: underline; cursor: pointer; transition:0.2s; }
+        .m-val.email:hover { color: white; }
 
-        @media (max-width: 768px) {
+        .st-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-family: inherit; }
+        .st-input:focus { border-color: var(--gemini-cyan); outline: none; }
+        .st-input option { background-color: #0f172a; color: white; }
+        .btn-action { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition:0.2s; margin-top: 10px; }
+        .btn-primary { background: var(--gemini-cyan); color: black; }
+        .btn-primary:hover { box-shadow: 0 5px 20px rgba(34, 211, 238, 0.3); transform: translateY(-2px); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--gemini-red); border: 1px solid var(--gemini-red); }
+        .btn-danger:hover { background: var(--gemini-red); color: white; }
+        .login-title { text-align: center; font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; }
+
+        @media screen and (max-width: 768px) {
             body { font-size: 14px; }
-            #dashboard, #admin-registry { padding: 15px; width: 100%; padding-top: var(--safe-top); padding-bottom: 80px; }
-            .header { flex-direction: column; align-items: flex-start; gap: 15px; }
-            .profile { width: 100%; }
-            .header > div:last-child { width: 100%; justify-content: flex-end; gap: 10px; }
-            .nav-actions { flex-direction: column; gap: 10px; }
-            .nav-btn { width: 100%; justify-content: center; padding: 15px; font-size: 1rem; }
-            .grid { grid-template-columns: 1fr; }
-            .login-card { width: 90%; max-width: none; }
-            .brand-title { font-size: 3rem; }
-            .registry-header { flex-direction: column; gap: 15px; align-items: flex-start; }
-            .registry-header > div { width: 100%; flex-direction: column; gap: 10px; }
-            .registry-grid { grid-template-columns: 1fr; }
-            .modal-box { width: 95%; padding: 25px 20px; }
-            .footer-legal { flex-wrap: wrap; gap: 10px; }
+            .calendar-section { justify-content: flex-start; -webkit-overflow-scrolling: touch; }
+            .cal-wrapper { min-width: 800px; margin-bottom: 20px; }
+            .top-bar { height: auto; padding: 20px; align-items: flex-start; flex-direction: column; }
+            .left-group { width: 100%; justify-content: space-between; }
+            .controls-group { width: 100%; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+            .st-select { flex: 1; text-align: center; }
+            .modal-box { width: 95%; max-height: 85vh; overflow-y: auto; }
+            .slider-container { gap: 5px; }
+            .nav-arrow { width: 40px; }
         }
     </style>
 </head>
 <body>
 
     <div id="loader">
-        <div class="loader-circle"></div>
-        <div class="loader-text">CONNEXION...</div>
+        <div class="gemini-spinner"></div>
     </div>
 
-    <div id="login-screen">
-        <a href="index.html" class="top-back-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            Retour au Menu
-        </a>
-
-        <div class="login-card">
-            <h1 class="brand-title">SmartST</h1>
-            <div class="brand-sub">Student Operating System</div>
-            
-            <div class="login-tabs">
-                <button class="tab-btn active" id="tabStudent" onclick="switchTab('student')">ÉTUDIANT</button>
-                <button class="tab-btn" id="tabAdmin" onclick="switchTab('admin')">ADMIN</button>
-            </div>
-
-            <div id="studentLogin">
-                <div id="stLoginMode">
-                    <input type="email" id="stEmail" class="login-input" placeholder="EMAIL ÉTUDIANT">
-                    <input type="password" id="stPwd" class="login-input" placeholder="MOT DE PASSE">
-                    <button class="liquid-btn main-action-btn" onclick="handleStudentAuth('login')">ENTRER</button>
-                    <div class="switch-link" onclick="toggleStMode()">Pas de compte ? Créer un compte</div>
-                </div>
-
-                <div id="stSignupMode" class="hidden">
-                    <input type="email" id="suEmail" class="login-input" placeholder="EMAIL (ex: prenom.nom@etu...)">
-                    <input type="password" id="suPwd" class="login-input" placeholder="MOT DE PASSE">
-                    <input type="text" id="suPrenom" class="login-input" placeholder="PRÉNOM">
-                    <input type="text" id="suNom" class="login-input" placeholder="NOM">
-                    <select id="suGroup" class="login-input">
-                        <option value="" disabled selected>CHOISIR GROUPE</option>
-                        <option value="C1">Groupe C1</option>
-                        <option value="C2">Groupe C2</option>
-                    </select>
-                    <button class="liquid-btn main-action-btn" onclick="handleStudentAuth('signup')">S'INSCRIRE</button>
-                    <div class="switch-link" onclick="toggleStMode()">J'ai déjà un compte</div>
-                </div>
-            </div>
-            
-            <div id="adminLogin" class="hidden">
-                <input type="text" id="adminUser" class="login-input" placeholder="EMAIL ADMIN" style="margin-bottom:10px;">
-                <input type="password" id="adminPwd" class="login-input" style="margin-top:0;" placeholder="MOT DE PASSE">
-                <button class="liquid-btn main-action-btn" onclick="attemptAdminLogin()">CONNEXION ADMIN</button>
-            </div>
-            
-            <div id="errorMsg" style="color:var(--gemini-red); margin-top:20px; font-size:0.85rem; opacity:0; transition:0.3s; text-align:center;">Erreur</div>
-        </div>
-    </div>
-
-    <div id="dashboard">
-        <div class="header">
-            <div class="profile">
-                <div class="avatar-lg" id="dashAvatar">--</div>
-                <div class="user-info">
-                    <h1 id="greeting">Bienvenue</h1>
-                    <p><span class="group-tag" id="dashGroup">--</span> BUT InfoCom</p>
-                </div>
-            </div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn-privacy liquid-btn" onclick="openModal('privacyModal')" style="width:40px; height:40px; padding:0;"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></button>
-                <button class="liquid-btn btn-logout admin-back" id="adminBackBtn" style="display:none;" onclick="exitAdmin()">Retour</button>
-                <button class="liquid-btn btn-logout" onclick="logout()">Déconnexion</button>
+    <div class="top-bar">
+        <div class="left-group">
+            <div class="logo-text">
+                <svg class="icon" viewBox="0 0 24 24" style="color:var(--gemini-cyan); width:24px; height:24px; margin-right:10px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                MCalC+ <span>Calendar</span>
             </div>
         </div>
 
-        <div class="nav-actions">
-            <a href="index.html" class="liquid-btn nav-btn">Accueil</a>
-            <a href="calendar-cloud-access.html" class="liquid-btn nav-btn">Emploi du temps</a>
-            <a href="pomodoro.html" class="liquid-btn nav-btn" style="border-color:var(--gemini-purple); color:var(--gemini-purple);">
-                Focus Mode
+        <div class="controls-group">
+            <select id="groupSelect" class="st-select" onchange="renderCalendar()">
+                <option value="C1">Groupe C1</option>
+                <option value="C2">Groupe C2</option>
+            </select>
+            
+            <button id="adminBtn" class="st-select btn-admin" onclick="handleAdminClick()">
+                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span id="adminBtnText">Admin</span>
+            </button>
+
+            <a href="smartst-cloud-access.html" class="btn-back">
+                <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Retour OS
             </a>
-            <a href="attendance.html" id="navAppel" class="liquid-btn nav-btn" style="display:none;">Appel (Admin)</a>
+        </div>
+    </div>
+
+    <div class="calendar-section">
+        <div id="vacationBanner">
+            <h1>IT'S VACAAYYYY TIME! 🌴</h1>
+            <p>Profitez bien de vos vacances.</p>
+            <div id="returnDateDisplay" style="margin-top:15px; font-size:1.1rem; color:var(--gemini-cyan); font-weight:700; text-transform:uppercase; letter-spacing:1px;"></div>
         </div>
 
-        <div class="grid">
-            <div class="card glass-panel">
-                <div class="card-head"><div class="card-title">Notes</div></div>
-                <div style="text-align:center; margin-bottom:20px;"><div class="gpa-display" id="gpaVal">--</div><span>Moyenne</span></div>
-                <div class="grade-list" id="gradeList"></div>
-                <div class="add-row">
-                    <input type="text" id="grName" class="st-input" placeholder="Matière" style="flex:2">
-                    <input type="number" id="grVal" class="st-input" placeholder="/20" style="flex:1">
-                    <button class="liquid-btn st-btn" onclick="addGrade()">+</button>
+        <div class="cal-title-row">
+            <div class="title-group">
+                <div id="currentWeekLabel" class="week-label" onclick="editWeekMapping()">Semaine ...</div>
+                <div class="month-label">
+                    <span id="monthDisplay" class="editable-month" onclick="editMonthName()">...</span>
                 </div>
             </div>
+        </div>
 
-            <div class="card glass-panel">
-                <div class="card-head"><div class="card-title">Assiduité</div></div>
-                <div id="warnLevel1" class="att-alert">⚠️ AVERTISSEMENT (5+ Pts)</div>
-                <div class="att-stats">
-                    <div class="stat-item"><span class="stat-val c-red" id="countAbs">0</span><span class="stat-lbl">Abs</span></div>
-                    <div class="stat-item"><span class="stat-val c-green" id="countJus">0</span><span class="stat-lbl">Jus</span></div>
-                    <div class="stat-item"><span class="stat-val c-gold" id="countLate">0</span><span class="stat-lbl">Ret</span></div>
+        <div class="slider-container" id="calContainer">
+            <button class="nav-arrow" id="btnPrev" onclick="changeSlot(-1)">&lt;</button>
+
+            <div class="cal-wrapper">
+                <div class="cal-header"></div>
+                <div class="cal-header" id="head-0" oncontextmenu="toggleDayHoliday(0); return false;"><span class="day-name">Lundi</span><span class="day-date" id="date-0" ondblclick="pickDate(0)">...</span></div>
+                <div class="cal-header" id="head-1" oncontextmenu="toggleDayHoliday(1); return false;"><span class="day-name">Mardi</span><span class="day-date" id="date-1" ondblclick="pickDate(1)">...</span></div>
+                <div class="cal-header" id="head-2" oncontextmenu="toggleDayHoliday(2); return false;"><span class="day-name">Mercredi</span><span class="day-date" id="date-2" ondblclick="pickDate(2)">...</span></div>
+                <div class="cal-header" id="head-3" oncontextmenu="toggleDayHoliday(3); return false;"><span class="day-name">Jeudi</span><span class="day-date" id="date-3" ondblclick="pickDate(3)">...</span></div>
+                <div class="cal-header" id="head-4" oncontextmenu="toggleDayHoliday(4); return false;"><span class="day-name">Vendredi</span><span class="day-date" id="date-4" ondblclick="pickDate(4)">...</span></div>
+
+                <div class="time-labels">
+                    <div class="time-label"><span>09h00</span>10h45</div>
+                    <div class="time-label"><span>11h00</span>12h45</div>
+                    <div class="lunch-break-label">PAUSE</div>
+                    <div class="time-label"><span>14h15</span>16h00</div>
+                    <div class="time-label"><span>16h15</span>18h00</div>
                 </div>
-                <div class="history-list" id="absList"></div>
-                <div class="admin-controls" id="adminAbsBox">
-                    <span class="admin-tag">Admin: Ajouter Absence</span>
-                    <div style="display:flex; gap:5px;">
-                        <select id="adAbsType" class="st-input" style="flex:1"><option value="absent">Absence</option><option value="late">Retard</option></select>
-                        <input type="text" id="adAbsReason" class="st-input" placeholder="Motif" style="flex:2">
-                        <button class="liquid-btn st-btn" style="border-color:var(--gemini-red); color:var(--gemini-red)" onclick="addAbsence()">OK</button>
-                    </div>
-                </div>
+
+                <div class="day-col" id="day-0"></div>
+                <div class="day-col" id="day-1"></div>
+                <div class="day-col" id="day-2"></div>
+                <div class="day-col" id="day-3"></div>
+                <div class="day-col" id="day-4"></div>
             </div>
 
-            <div class="card glass-panel">
-                <div class="card-head"><div class="card-title">Devoirs</div></div>
-                <div class="hw-list" id="hwList"></div>
-                 <div class="admin-controls" id="adminHwBox">
-                    <div style="display:flex; gap:5px;">
-                        <input type="text" id="adHwTxt" class="st-input" placeholder="Titre..." style="flex:2">
-                        <select id="adHwTgt" class="st-input" style="flex:1"><option value="ALL">Tous</option></select>
-                        <button class="liquid-btn st-btn" style="border-color:var(--gemini-gold); color:var(--gemini-gold);" onclick="addHomework()">+</button>
-                    </div>
+            <button class="nav-arrow" id="btnNext" onclick="changeSlot(1)">&gt;</button>
+        </div>
+    </div>
+
+    <input type="date" id="hiddenDatePicker" style="display:none; position:absolute; z-index:1000;">
+
+    <div class="modal-overlay" id="adminLoginModal">
+        <div class="modal-box">
+            <div class="login-title">Accès Administrateur</div>
+            <input type="text" id="loginUser" class="st-input" placeholder="Identifiant">
+            <input type="password" id="loginPass" class="st-input" placeholder="Mot de passe">
+            <button class="btn-action btn-primary" onclick="verifyAdmin()">Connexion</button>
+            <button class="btn-action btn-danger" style="background:transparent; border:none; color:#666;" onclick="closeModal('adminLoginModal')">Annuler</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="adminToolsModal" onclick="closeModal('adminToolsModal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <h3 style="color:white; margin-top:0;">Outils Admin</h3>
+            <div style="margin:20px 0;">
+                <label style="color:white; display:flex; align-items:center; gap:10px; cursor:pointer; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
+                    <input type="checkbox" id="vacationToggle" onchange="toggleGlobalVacation()" style="width:20px; height:20px;">
+                    <span style="font-size:1rem; font-weight:700;">Global Vacation Mode 🌴</span>
+                </label>
+                <div style="font-size:0.8rem; color:#888; padding:10px;">
+                    <strong>Astuce :</strong> Clic-droit sur un jour (ex: Lundi) pour le mettre en vacances individuellement.
                 </div>
+            </div>
+            <button class="btn-action" style="background:transparent; border:1px solid #666; color:#aaa;" onclick="closeModal('adminToolsModal')">Fermer</button>
+            <button class="btn-action btn-danger" style="margin-top:10px;" onclick="if(confirm('Se déconnecter?')) signOut(auth).then(()=>location.reload());">Déconnexion</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="classModal" onclick="closeModal('classModal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div id="viewMode">
+                <div class="m-header">
+                    <div><div class="m-title" id="mName">...</div><div class="m-sub" id="mType">...</div></div>
+                    <button class="btn-reset" onclick="closeModal('classModal')" style="font-size:1.5rem; color:#666;">&times;</button>
+                </div>
+                <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><div class="m-val" id="mTimeLoc">...</div></div>
+                <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><div class="m-val" id="mProf">...</div></div>
+                <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg><div class="m-val email" style="color:var(--gemini-blue); cursor:pointer; text-decoration:underline;" id="mEmail" onclick="copyEmail()">...</div></div>
+                <div id="mExamBox" style="display:none; margin-top:20px; padding:15px; background:rgba(244, 63, 94, 0.1); border:1px solid var(--gemini-red); border-radius:10px;"><div style="color:var(--gemini-red); font-weight:800; font-size:0.8rem; margin-bottom:5px;">⚠️ EXAMEN PRÉVU</div><div class="m-val" id="mExamText" style="font-size:0.9rem;"></div></div>
+                <button id="btnEdit" class="btn-action btn-primary" style="margin-top:25px; background:var(--gemini-gold); color:black; display:none;" onclick="toEditMode()">MODIFIER (ADMIN)</button>
+            </div>
+
+            <div id="editMode" class="hidden">
+                <h3 style="color:white; margin-top:0;">Éditer le Cours</h3>
+                <select id="eGroup" class="st-input" style="border:1px solid var(--gemini-gold);">
+                    <option value="C1">C1 Uniquement</option>
+                    <option value="C2">C2 Uniquement</option>
+                    <option value="C_FULL">Groupe C Complet (C1 + C2)</option>
+                    <option value="ALL">PROMO (Toute la promo)</option>
+                </select>
+                <input type="text" id="eName" class="st-input" placeholder="Matière">
+                <select id="eType" class="st-input">
+                    <option value="CM">CM</option><option value="TD">TD</option><option value="TP">TP</option><option value="SAE">SAE</option>
+                </select>
+                <div style="display:flex; gap:10px;">
+                    <input type="number" id="eStart" class="st-input" placeholder="Début">
+                    <input type="number" id="eDur" class="st-input" placeholder="Durée">
+                </div>
+                <input type="text" id="eRoom" class="st-input" placeholder="Salle">
+                <input type="text" id="eProf" class="st-input" placeholder="Professeur">
+                <input type="text" id="eEmail" class="st-input" placeholder="Email">
+                <input type="text" id="eExam" class="st-input" placeholder="Info Examen">
+                <button class="btn-action btn-primary" onclick="saveClass()">ENREGISTRER</button>
+                <button class="btn-action btn-danger" onclick="confirmDelete()">SUPPRIMER</button>
             </div>
         </div>
     </div>
 
-    <div id="admin-registry">
-        <div class="registry-header">
-            <h1>Registre Admin</h1>
-            <div style="display:flex; gap:10px;">
-                <button class="liquid-btn" onclick="window.location.href='attendance.html'" style="color:var(--gemini-green); border-color:var(--gemini-green);">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-                    Faire l'Appel
-                </button>
-                <button class="liquid-btn btn-logout" onclick="window.location.href='setup_students.html'" style="color:var(--gemini-cyan); border-color:var(--gemini-cyan);">Database</button>
-                <button class="liquid-btn btn-logout" onclick="logout()">Déconnexion</button>
-            </div>
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box" style="text-align:center;">
+            <h3 style="color:white;">Confirmer la suppression ?</h3>
+            <button class="btn-action btn-danger" onclick="executeDelete()">OUI, SUPPRIMER</button>
+            <button class="btn-action" style="background:transparent; border:1px solid #666; color:#aaa; margin-top:10px;" onclick="closeModal('deleteModal')">ANNULER</button>
         </div>
-        <input type="text" id="adminSearch" placeholder="Rechercher..." onkeyup="filterStudents()">
-        <div class="registry-grid" id="studentGrid"></div>
-    </div>
-
-    <div class="footer-legal">
-        <button class="foot-btn liquid-btn" onclick="openModal('tosModal')">CGU</button>
-        <button class="foot-btn liquid-btn" onclick="openModal('gdprModal')">Confidentialité</button>
-        <button class="foot-btn support liquid-btn" onclick="window.location.href='supdocs.html'">Support</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, orderBy, deleteDoc, addDoc, updateDoc, writeBatch, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, deleteUser, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, doc, query, onSnapshot, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -429,384 +436,415 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        const ADMIN_UID = "WA5k4NI4mWWsmzdLgRS9tGRRfVz2"; 
 
-        let currentUser = null;
-        let isAdmin = false; 
-        let isLoginAdmin = false; 
-        let isSignupMode = false;
-        let localData = { grades: [], attendance: [], homework: [], scheduleMap: {} };
-        let allStudents = []; 
-
-        const SESSION_KEY = 'smartst_session';
-        const TIMEOUT_MS = 30 * 60 * 1000;
-
-        // UI Logic
-        window.switchTab = (mode) => {
-            isLoginAdmin = (mode === 'admin');
-            document.getElementById('tabStudent').className = isLoginAdmin ? 'tab-btn' : 'tab-btn active';
-            document.getElementById('tabAdmin').className = isLoginAdmin ? 'tab-btn active' : 'tab-btn';
-            
-            if(isLoginAdmin) {
-                document.getElementById('studentLogin').classList.add('hidden');
-                document.getElementById('adminLogin').classList.remove('hidden');
-            } else {
-                document.getElementById('studentLogin').classList.remove('hidden');
-                document.getElementById('adminLogin').classList.add('hidden');
-            }
-        };
-
-        window.toggleStMode = () => {
-            isSignupMode = !isSignupMode;
-            if(isSignupMode) {
-                document.getElementById('stLoginMode').classList.add('hidden');
-                document.getElementById('stSignupMode').classList.remove('hidden');
-            } else {
-                document.getElementById('stLoginMode').classList.remove('hidden');
-                document.getElementById('stSignupMode').classList.add('hidden');
-            }
-        };
-
-        window.onload = function() { 
-            if (!checkSession()) {
-                document.getElementById('loader').style.display='none'; 
-            }
-        };
-
-        function checkSession() {
-            const stored = localStorage.getItem(SESSION_KEY);
-            if (!stored) return false;
-            const session = JSON.parse(stored);
-            if (Date.now() - session.timestamp > TIMEOUT_MS) {
-                localStorage.removeItem(SESSION_KEY);
-                return false;
-            } else {
-                session.timestamp = Date.now();
-                localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-                loadDashboard(session.user, session.isAdmin);
-                return true;
-            }
-        }
-
-        function saveSession(user, adminStatus) {
-            localStorage.setItem(SESSION_KEY, JSON.stringify({ user, isAdmin: adminStatus, timestamp: Date.now() }));
-        }
-
-        // --- AUTH LOGIC (Existing) ---
-        window.handleStudentAuth = async function(action) {
-            const loader = document.getElementById('loader');
-            loader.style.display = 'flex';
-
-            if (action === 'signup') {
-                const email = document.getElementById('suEmail').value;
-                const pwd = document.getElementById('suPwd').value;
-                const nom = document.getElementById('suNom').value;
-                const prenom = document.getElementById('suPrenom').value;
-                const grp = document.getElementById('suGroup').value;
-
-                if(!email || !pwd || !nom || !prenom || !grp) {
-                    loader.style.display='none';
-                    return alert("Remplissez tous les champs.");
-                }
-
-                createUserWithEmailAndPassword(auth, email, pwd)
-                    .then(async (cred) => {
-                        const shortId = 'U' + Math.floor(1000 + Math.random() * 9000);
-                        const newUser = { id: cred.user.uid, shortId, email, nom, prenom, grp, xp: 0, level: 1 };
-                        await setDoc(doc(db, "students", cred.user.uid), newUser);
-                        saveSession(newUser, false);
-                        loadDashboard(newUser, false);
-                    })
-                    .catch((error) => {
-                        loader.style.display='none';
-                        alert("Erreur Inscription: " + error.message);
-                    });
-
-            } else {
-                const email = document.getElementById('stEmail').value;
-                const pwd = document.getElementById('stPwd').value;
-
-                signInWithEmailAndPassword(auth, email, pwd)
-                    .then(async (cred) => {
-                        const docRef = doc(db, "students", cred.user.uid);
-                        const docSnap = await getDoc(docRef);
-                        if(docSnap.exists()) {
-                            const user = { id: docSnap.id, ...docSnap.data() };
-                            saveSession(user, false);
-                            loadDashboard(user, false);
-                        } else {
-                            loader.style.display='none';
-                            alert("Compte existant mais aucune donnée étudiante trouvée.");
-                        }
-                    })
-                    .catch((error) => {
-                        loader.style.display='none';
-                        alert("Erreur Connexion: " + error.message);
-                    });
-            }
-        };
-
-        window.attemptAdminLogin = async function() {
-            const u = document.getElementById('adminUser').value;
-            const p = document.getElementById('adminPwd').value;
-            document.getElementById('loader').style.display = 'flex'; 
-
-            signInWithEmailAndPassword(auth, u, p)
-                .then(async (userCredential) => {
-                    const email = userCredential.user.email;
-                    const q = query(collection(db, "admins"), where("email", "==", email));
-                    const snapshot = await getDocs(q);
-
-                    // Master override or DB check
-                    if (snapshot.empty && userCredential.user.uid !== "WA5k4NI4mWWsmzdLgRS9tGRRfVz2" && userCredential.user.uid !== "hWVtA8MsXYWusnBeEOAVQghIWbb2") {
-                        await signOut(auth);
-                        document.getElementById('loader').style.display = 'none';
-                        alert("ACCÈS REFUSÉ: Vous n'êtes pas sur la liste des administrateurs.");
-                        return;
-                    }
-
-                    const adminUser = { id: userCredential.user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
-                    saveSession(adminUser, true);
-                    loadDashboard(adminUser, true);
-                })
-                .catch((error) => {
-                    document.getElementById('loader').style.display = 'none';
-                    alert("Erreur: " + error.message);
-                });
-        }
-
-        // --- DASHBOARD LOADER ---
-        window.loadDashboard = async function(user, adminMode, forceView = false) {
-            currentUser = user;
-            isAdmin = adminMode;
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('loader').style.display = 'none';
-
-            if(isAdmin && !forceView) {
-                document.getElementById('admin-registry').style.display = 'block';
-                document.getElementById('dashboard').style.display = 'none';
-                loadAdminRegistry();
-            } else {
-                document.getElementById('dashboard').style.display = 'block';
-                document.getElementById('admin-registry').style.display = 'none';
-                document.getElementById('greeting').innerText = `Hello, ${user.prenom}`;
-                document.getElementById('dashGroup').innerText = user.grp;
-                document.getElementById('dashAvatar').innerText = user.prenom.charAt(0) + user.nom.charAt(0);
-                
-                if(isAdmin) {
-                    document.getElementById('adminBackBtn').style.display = 'flex';
-                    document.getElementById('adminHwBox').classList.add('admin-visible');
-                    document.getElementById('adminAbsBox').classList.add('admin-visible');
-                    document.querySelectorAll('.add-row').forEach(e => e.classList.add('admin-visible'));
-                }
-                
-                await syncData();
-            }
-        }
-
-        async function addXP(amount) {
-            if(!currentUser || isAdmin) return; 
-            const userRef = doc(db, "students", currentUser.id);
-            try {
-                // Background update only
-                await updateDoc(userRef, { xp: increment(amount) });
-                console.log(`+${amount} XP Saved!`);
-            } catch(e) { console.error("XP Error:", e); }
-        }
-
-        // --- DATA SYNC ---
-        async function syncData() {
-            localData = { grades: [], attendance: [], homework: [], scheduleMap: {} };
-            
-            const schSnap = await getDocs(collection(db, "schedule"));
-            schSnap.forEach(d => localData.scheduleMap[d.id] = d.data());
-
-            // SYNC PROFILE AGAIN TO GET XP UPDATES
-            if(currentUser && currentUser.id) {
-                const userSnap = await getDoc(doc(db, "students", currentUser.id));
-                if(userSnap.exists()) {
-                    currentUser = { id: userSnap.id, ...userSnap.data() };
-                }
-            }
-
-            const grQ = query(collection(db, "grades"), where("userId", "==", currentUser.id));
-            const grS = await getDocs(grQ);
-            grS.forEach(d => localData.grades.push({ ...d.data(), id: d.id }));
-
-            const atQ = query(collection(db, "attendance"), where("studentId", "==", currentUser.id));
-            const atS = await getDocs(atQ);
-            atS.forEach(d => localData.attendance.push({ ...d.data(), id: d.id }));
-
-            const hwSnap = await getDocs(collection(db, "homework"));
-            hwSnap.forEach(d => localData.homework.push({ ...d.data(), id: d.id }));
-
-            renderAll();
-        }
-
-        function renderAll() {
-            const gList = document.getElementById('gradeList');
-            gList.innerHTML = '';
-            let gSum = 0;
-            localData.grades.forEach(g => {
-                gSum += parseFloat(g.val);
-                gList.innerHTML += `<div class="item-row"><span>${g.name}</span><div style="display:flex;align-items:center;"><span class="val-hl">${g.val}</span>${isAdmin?`<div class="del-btn" onclick="window.deleteGrade('${g.id}')">&times;</div>`:''}</div></div>`;
-            });
-            document.getElementById('gpaVal').innerText = localData.grades.length ? (gSum/localData.grades.length).toFixed(2) : '--';
-
-            const aList = document.getElementById('absList');
-            aList.innerHTML = '';
-            let abs=0, lat=0, jus=0;
-            localData.attendance.forEach(a => {
-                let statusClass = 'c-red';
-                let statusText = 'ABS';
-                if(a.status === 'absent') { abs++; }
-                else if(a.status === 'late') { lat++; statusClass = 'c-gold'; statusText = 'RET'; }
-                else if(a.status === 'justified') { jus++; statusClass = 'c-green'; statusText = 'JUS'; }
-
-                let actions = '';
-                if(isAdmin) {
-                    actions += `<div class="del-btn" onclick="window.deleteAbsence('${a.id}')">&times;</div>`;
-                    if(a.status === 'absent') actions += `<div class="ok-btn" onclick="window.justifyAbsence('${a.id}')">✓</div>`;
-                }
-
-                aList.innerHTML += `<div class="item-row"><div><strong>${a.date}</strong><br><small>${a.reason || 'Aucun motif'}</small></div><div style="display:flex; align-items:center;"><span class="${statusClass}" style="font-weight:700;">${statusText}</span>${actions}</div></div>`;
-            });
-            document.getElementById('countAbs').innerText = abs;
-            document.getElementById('countLate').innerText = lat;
-            document.getElementById('countJus').innerText = jus;
-            document.getElementById('warnLevel1').style.display = (abs+lat) > 5 ? 'block' : 'none';
-
-            const hList = document.getElementById('hwList');
-            hList.innerHTML = '';
-            localData.homework.forEach(h => {
-                const done = h.doneBy && h.doneBy.includes(currentUser.id);
-                hList.innerHTML += `<div class="hw-item ${done?'done':''}"><div class="hw-check ${done?'done':''}" onclick="window.toggleTask('${h.id}', ${done})"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="hw-text">${h.text}</div>${isAdmin?`<div class="del-btn" onclick="window.deleteTask('${h.id}')">&times;</div>`:''}</div>`;
-            });
-        }
-
-        // --- ACTION FUNCTIONS ---
-        window.toggleTask = async function(id, isDone) {
-            const task = localData.homework.find(h=>h.id===id);
-            let doneBy = task.doneBy || [];
-            if(isDone) doneBy = doneBy.filter(i=>i!==currentUser.id); 
-            else { 
-                doneBy.push(currentUser.id); 
-                addXP(10); // Reward for completing homework
-            }
-            await updateDoc(doc(db, "homework", id), { doneBy });
-            await syncData();
-        }
-
-        window.addGrade = async function() {
-            const n = document.getElementById('grName').value;
-            const v = document.getElementById('grVal').value;
-            if(n && v) { 
-                await addDoc(collection(db, "grades"), { userId: currentUser.id, name: n, val: v }); 
-                addXP(20); // Reward for adding a grade
-                document.getElementById('grName').value=''; document.getElementById('grVal').value=''; await syncData(); 
-            }
-        }
-
-        window.addHomework = async function() {
-            const t = document.getElementById('adHwTxt').value;
-            const tgt = document.getElementById('adHwTgt').value;
-            if(t) { await addDoc(collection(db, "homework"), { text: t, targetType: tgt, targetVal: tgt==='ALL'?'ALL':currentUser.grp }); document.getElementById('adHwTxt').value=''; await syncData(); }
-        }
-
-        window.addAbsence = async function() {
-            const t = document.getElementById('adAbsType').value;
-            const r = document.getElementById('adAbsReason').value;
-            const now = new Date();
-            await addDoc(collection(db, "attendance"), { studentId: currentUser.id, date: now.toISOString().split('T')[0], status: t, reason: r, timestamp: now, classId: 'MANUAL' });
-            document.getElementById('adAbsReason').value=''; await syncData();
-        }
-
-        window.justifyAbsence = async function(id) { if(confirm("Justifier cette absence ?")) { await updateDoc(doc(db, "attendance", id), { status: 'justified' }); await syncData(); } }
-        window.deleteAbsence = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "attendance", id)); await syncData(); } }
-        window.deleteGrade = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "grades", id)); await syncData(); } }
-        window.deleteTask = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "homework", id)); await syncData(); } }
-
-        window.loadAdminRegistry = async function() {
-            document.getElementById('login-screen').style.display='none';
-            document.getElementById('dashboard').style.display='none';
-            document.getElementById('admin-registry').style.display='block';
-            const q = query(collection(db, "students"), orderBy("nom"));
-            const snap = await getDocs(q);
-            const grid = document.getElementById('studentGrid');
-            grid.innerHTML = '';
-            allStudents = [];
-            snap.forEach(d => {
-                const s = d.data();
-                allStudents.push({id:d.id, ...s});
-                const displayId = s.shortId || s.id;
-                const el = document.createElement('div');
-                el.className = 'student-card glass-panel';
-                el.innerHTML = `<div class="st-card-top"><div class="st-avatar">${s.prenom[0]}</div><div class="st-grp-badge">${s.grp}</div></div><div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${displayId}</div></div>`;
-                el.onclick = () => loadDashboard({id:d.id, ...s}, true, true);
-                grid.appendChild(el);
-            });
-        }
-
-        window.filterStudents = function() {
-            const term = document.getElementById('adminSearch').value.toLowerCase();
-            const filtered = allStudents.filter(s => s.nom.toLowerCase().includes(term) || (s.shortId || s.id).toLowerCase().includes(term));
-            const grid = document.getElementById('studentGrid');
-            grid.innerHTML = '';
-            filtered.forEach(s => {
-                const displayId = s.shortId || s.id;
-                const el = document.createElement('div');
-                el.className = 'student-card glass-panel';
-                el.innerHTML = `<div class="st-card-top"><div class="st-avatar">${s.prenom[0]}</div><div class="st-grp-badge">${s.grp}</div></div><div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${displayId}</div></div>`;
-                el.onclick = () => loadDashboard(s, true, true);
-                grid.appendChild(el);
-            });
-        }
-
-        window.exitAdmin = () => loadAdminRegistry();
-        window.logout = () => { signOut(auth).then(() => { localStorage.removeItem(SESSION_KEY); location.reload(); }); }
-        window.openModal = (id) => document.getElementById(id).style.display='flex';
-        window.closeModal = () => document.querySelectorAll('.modal-overlay').forEach(e=>e.style.display='none');
+        let scheduleData = [];
+        let dateData = {}; 
+        let settingsData = { monthName: "...", vacationMode: false, holidays: {}, weekMap: [6, 7, 8, 9] };
+        let isAdmin = false;
+        let currentEvent = null;
+        let currentSlot = null;
         
-        window.downloadData = () => {
-            if(!currentUser) return alert("Veuillez vous connecter pour télécharger vos données.");
-            const exportData = { userProfile: currentUser, academicData: localData, exportDate: new Date().toISOString(), platform: "SmartST Student OS" };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "smartst_data_export.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
+        // VIEW STATE: Only 4 Slots (0, 1, 2, 3)
+        let currentViewIndex = 0; 
+        const SLOTS = [{start:9.00, duration:1.75}, {start:11.00, duration:1.75}, {start:14.25, duration:1.75}, {start:16.25, duration:1.75}];
+
+        window.onload = function() {
+            if(!localStorage.getItem('smartst_session')) {
+                window.location.href = 'smartst-cloud-access.html'; 
+            }
+        };
+
+        // --- AUTH & DATA ---
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.uid === ADMIN_UID) {
+                isAdmin = true;
+                updateAdminBtnUI(true);
+            } else {
+                isAdmin = false;
+                updateAdminBtnUI(false);
+            }
+            initData();
+            setTimeout(() => { document.getElementById('loader').style.display='none'; }, 500);
+        });
+
+        function initData() {
+            onSnapshot(query(collection(db, "schedule")), (snapshot) => {
+                scheduleData = [];
+                snapshot.forEach(doc => scheduleData.push({ ...doc.data(), id: doc.id }));
+                renderCalendar();
+            });
+
+            onSnapshot(doc(db, "meta", "calendarDates"), (doc) => {
+                if(doc.exists()) dateData = doc.data();
+                renderCalendar();
+            });
+
+            onSnapshot(doc(db, "meta", "calendarSettings"), (doc) => {
+                if(doc.exists()) {
+                    const d = doc.data();
+                    // Merge with defaults
+                    settingsData = { ...settingsData, ...d };
+                    // Default weekMap if missing
+                    if(!settingsData.weekMap || settingsData.weekMap.length !== 4) settingsData.weekMap = [1,2,3,4];
+                    
+                    document.getElementById('monthDisplay').innerText = settingsData.monthName || "MOIS";
+                    
+                    if(settingsData.vacationMode) {
+                        document.getElementById('calContainer').style.display = 'none';
+                        document.getElementById('vacationBanner').style.display = 'flex';
+                        // Show Return Date
+                        const msg = settingsData.vacationReturnDate ? `ON SE VOIT DE RETOUR LE ${settingsData.vacationReturnDate}` : "";
+                        document.getElementById('returnDateDisplay').innerText = msg;
+                    } else {
+                        document.getElementById('calContainer').style.display = 'flex';
+                        document.getElementById('vacationBanner').style.display = 'none';
+                    }
+                    if(isAdmin) document.getElementById('vacationToggle').checked = settingsData.vacationMode;
+                    renderCalendar(); 
+                }
+            });
         }
 
-        window.deleteAccount = async () => {
-            if(!confirm("ATTENTION: Cette action est irréversible. Toutes vos données seront effacées.")) return;
-            const loader = document.getElementById('loader');
-            loader.style.display = 'flex';
-            try {
-                const uid = currentUser.id;
-                const batch = writeBatch(db);
-                const gradesQ = query(collection(db, "grades"), where("userId", "==", uid));
-                const gradesSnap = await getDocs(gradesQ);
-                gradesSnap.forEach(doc => batch.delete(doc.ref));
-                const attQ = query(collection(db, "attendance"), where("studentId", "==", uid));
-                const attSnap = await getDocs(attQ);
-                attSnap.forEach(doc => batch.delete(doc.ref));
-                const tickQ = query(collection(db, "support_tickets"), where("userId", "==", uid));
-                const tickSnap = await getDocs(tickQ);
-                tickSnap.forEach(doc => batch.delete(doc.ref));
-                const studentRef = doc(db, "students", uid);
-                batch.delete(studentRef);
-                await batch.commit();
-                const user = auth.currentUser;
-                if(user) await deleteUser(user);
-                localStorage.clear();
-                alert("Compte supprimé avec succès.");
-                location.reload();
-            } catch (error) {
-                console.error(error);
-                loader.style.display = 'none';
-                alert("Erreur: Une reconnexion récente est nécessaire pour supprimer le compte.");
+        // --- NAVIGATION (LOCKED TO 4 SLOTS) ---
+        window.changeSlot = (dir) => {
+            currentViewIndex += dir;
+            // HARD LIMIT 0 to 3
+            if(currentViewIndex < 0) currentViewIndex = 0; 
+            if(currentViewIndex > 3) currentViewIndex = 3;
+            renderCalendar();
+        }
+
+        window.editWeekMapping = async () => {
+            if(!isAdmin) return;
+            const currentMapped = settingsData.weekMap[currentViewIndex];
+            const newVal = prompt(`Semaine ${currentMapped}. Entrer le N° réel pour ce créneau :`, currentMapped);
+            
+            if(newVal && !isNaN(newVal)) {
+                let val = parseInt(newVal);
+                // Update local & DB
+                settingsData.weekMap[currentViewIndex] = val;
+                await setDoc(doc(db, "meta", "calendarSettings"), { weekMap: settingsData.weekMap }, { merge: true });
+                renderCalendar();
             }
+        }
+
+        // --- RENDER ---
+        function renderSlots(dayIdx, isHoliday) {
+            const col = document.getElementById(`day-${dayIdx}`);
+            col.innerHTML = '';
+            
+            if (isHoliday) {
+                col.innerHTML = `
+                    <div class="day-vacay-overlay" ${isAdmin ? `onclick="toggleDayHoliday(${dayIdx})"` : ''}>
+                        <div class="day-vacay-text">VACANCES / FÉRIÉ</div>
+                    </div>
+                `;
+            } else {
+                col.innerHTML += `<div class="slot" onclick="clickSlot(${dayIdx}, 0)"></div>`;
+                col.innerHTML += `<div class="slot" onclick="clickSlot(${dayIdx}, 1)"></div>`;
+                col.innerHTML += `<div class="lunch-break"><div class="lunch-line"></div></div>`;
+                col.innerHTML += `<div class="slot" onclick="clickSlot(${dayIdx}, 2)"></div>`;
+                col.innerHTML += `<div class="slot" onclick="clickSlot(${dayIdx}, 3)"></div>`;
+            }
+            updateAdminStyles();
+        }
+
+        window.renderCalendar = function() {
+            // Update Buttons State
+            document.getElementById('btnPrev').disabled = (currentViewIndex === 0);
+            document.getElementById('btnNext').disabled = (currentViewIndex === 3);
+
+            // Get Real Week ID from Map
+            const realWeekID = settingsData.weekMap[currentViewIndex];
+            document.getElementById('currentWeekLabel').innerText = `Semaine ${realWeekID}`;
+
+            const group = document.getElementById('groupSelect').value;
+            const dates = dateData[realWeekID] || ["...", "...", "...", "...", "..."];
+            
+            // SMART HIGHLIGHT
+            const now = new Date();
+            // Format: DD/MM (Adjust to match your DB inputs)
+            const todayStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }); 
+
+            const weekHolidays = settingsData.holidays ? (settingsData.holidays[realWeekID] || {}) : {};
+
+            for(let i=0; i<5; i++) {
+                const el = document.getElementById(`date-${i}`);
+                const dbDate = dates[i] || "";
+                el.innerText = dbDate;
+                if(isAdmin) el.classList.add('editable'); else el.classList.remove('editable');
+                
+                const head = document.getElementById(`head-${i}`);
+                const col = document.getElementById(`day-${i}`);
+                
+                if (dbDate === todayStr) {
+                    head.classList.add('today');
+                    col.classList.add('today');
+                } else {
+                    head.classList.remove('today');
+                    col.classList.remove('today');
+                }
+
+                const isHoliday = weekHolidays[i] === true;
+                renderSlots(i, isHoliday);
+            }
+
+            // Query using REAL ID
+            const events = scheduleData.filter(e => 
+                e.weeks && e.weeks.includes(realWeekID) && 
+                (e.groups.includes(group) || e.groups.includes("ALL"))
+            );
+
+            events.forEach(evt => {
+                let slotIdx = -1;
+                if (Math.abs(evt.start - 9.00) < 0.5) slotIdx = 0;
+                else if (Math.abs(evt.start - 11.00) < 0.5) slotIdx = 1;
+                else if (Math.abs(evt.start - 14.25) < 0.5) slotIdx = 2;
+                else if (Math.abs(evt.start - 16.25) < 0.5) slotIdx = 3;
+
+                if (slotIdx > -1) {
+                    const col = document.getElementById(`day-${evt.day}`);
+                    if(col.children.length > 2) { 
+                        const targetChildIndex = slotIdx < 2 ? slotIdx : slotIdx + 1;
+                        const slotDiv = col.children[targetChildIndex];
+
+                        if(slotDiv) {
+                            const card = document.createElement('div');
+                            card.className = `event-card type-${evt.type}`;
+                            
+                            let badgeHtml = '';
+                            if(evt.groups.includes('ALL')) badgeHtml = '<span class="evt-group-badge badge-promo">PROMO</span>';
+                            else if(evt.groups.length > 1) badgeHtml = '<span class="evt-group-badge badge-grp">C1 + C2</span>';
+                            else if(evt.groups.includes('C1')) badgeHtml = '<span class="evt-group-badge badge-grp">C1</span>';
+                            else if(evt.groups.includes('C2')) badgeHtml = '<span class="evt-group-badge badge-grp">C2</span>';
+
+                            const examBadge = evt.examInfo ? `<div class="exam-badge">PARTIEL PRÉVU</div>` : '';
+
+                            card.innerHTML = `
+                                ${examBadge}
+                                <div class="evt-top">
+                                    <div style="display:flex; gap:5px; align-items:center;">
+                                        <span class="evt-type">${evt.type}</span>
+                                        ${badgeHtml}
+                                    </div>
+                                </div>
+                                <div class="evt-title">${evt.name}</div>
+                                <div class="evt-bot"><span class="evt-room">${evt.room}</span><span>${evt.prof}</span></div>
+                            `;
+                            card.onclick = (e) => { e.stopPropagation(); openDetails(evt); };
+                            slotDiv.appendChild(card);
+                        }
+                    }
+                }
+            });
+            updateAdminStyles();
+        }
+
+        function updateAdminStyles() {
+            document.querySelectorAll('.slot').forEach(s => {
+                if(isAdmin) s.classList.add('admin-mode'); else s.classList.remove('admin-mode');
+            });
+        }
+
+        // --- DATE PICKER LOGIC ---
+        window.pickDate = function(dayIdx) {
+            if(!isAdmin) return;
+            const picker = document.getElementById('hiddenDatePicker');
+            picker.showPicker();
+            picker.onchange = async (e) => {
+                const dateObj = new Date(e.target.value);
+                const formatted = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+                
+                const realWeekID = settingsData.weekMap[currentViewIndex];
+                if(!dateData[realWeekID]) dateData[realWeekID] = ["...", "...", "...", "...", "..."];
+                
+                dateData[realWeekID][dayIdx] = formatted;
+                await setDoc(doc(db, "meta", "calendarDates"), dateData);
+                renderCalendar();
+                picker.value = "";
+            };
+        }
+
+        // --- HOLIDAY LOGIC ---
+        window.toggleDayHoliday = async function(dayIdx) {
+            if(!isAdmin) return;
+            if(!confirm(`Basculer le jour ${dayIdx+1} en mode Vacances/Férié ?`)) return;
+
+            const realWeekID = settingsData.weekMap[currentViewIndex];
+            let holidays = settingsData.holidays || {};
+            if(!holidays[realWeekID]) holidays[realWeekID] = {};
+            
+            const currentVal = holidays[realWeekID][dayIdx];
+            holidays[realWeekID][dayIdx] = !currentVal;
+
+            await setDoc(doc(db, "meta", "calendarSettings"), { holidays: holidays }, { merge: true });
+        }
+
+        // --- ADMIN FEATURES ---
+        window.handleAdminClick = function() {
+            if(isAdmin) openModal('adminToolsModal'); 
+            else openModal('adminLoginModal');
+        }
+
+        window.editMonthName = async function() {
+            if(!isAdmin) return;
+            const newName = prompt("Nom du mois :", settingsData.monthName);
+            if(newName) await setDoc(doc(db, "meta", "calendarSettings"), { monthName: newName }, { merge: true });
+        }
+
+        window.toggleGlobalVacation = async function() {
+            if(!isAdmin) return;
+            const checkbox = document.getElementById('vacationToggle');
+            const newState = checkbox.checked;
+            
+            let returnDate = settingsData.vacationReturnDate || "";
+            
+            if (newState) {
+                const input = prompt("Date de retour (ex: Lundi 12 Mars) :", returnDate);
+                if (input === null) {
+                    checkbox.checked = !newState; // Cancel toggle
+                    return;
+                }
+                returnDate = input;
+            }
+            
+            await setDoc(doc(db, "meta", "calendarSettings"), { 
+                vacationMode: newState, 
+                vacationReturnDate: returnDate 
+            }, { merge: true });
+        }
+
+        // --- EDITOR LOGIC ---
+        window.clickSlot = function(day, idx) {
+            if(!isAdmin) return;
+            currentEvent = null;
+            const def = SLOTS[idx];
+            document.getElementById('eName').value = "";
+            document.getElementById('eType').value = "CM";
+            document.getElementById('eStart').value = def.start;
+            document.getElementById('eDur').value = def.duration;
+            document.getElementById('eRoom').value = "";
+            document.getElementById('eProf').value = "";
+            document.getElementById('eEmail').value = "";
+            document.getElementById('eExam').value = "";
+            const cf = document.getElementById('groupSelect').value;
+            document.getElementById('eGroup').value = cf; 
+            
+            const realWeekID = settingsData.weekMap[currentViewIndex];
+            currentSlot = { day: day, wk: realWeekID, grp: cf };
+            openModal('classModal');
+            window.toEditMode();
+        }
+
+        window.openDetails = function(evt) {
+            currentEvent = evt;
+            document.getElementById('mName').innerText = evt.name;
+            document.getElementById('mType').innerText = evt.type;
+            document.getElementById('mTimeLoc').innerText = `${formatTime(evt.start)} - ${formatTime(evt.start+evt.duration)} • ${evt.room}`;
+            document.getElementById('mProf').innerText = evt.prof;
+            document.getElementById('mEmail').innerText = evt.profEmail || "Non renseigné";
+            if(evt.examInfo) {
+                document.getElementById('mExamBox').style.display = 'block';
+                document.getElementById('mExamText').innerText = evt.examInfo;
+            } else document.getElementById('mExamBox').style.display = 'none';
+
+            document.getElementById('viewMode').style.display = 'block';
+            document.getElementById('editMode').style.display = 'none';
+            document.getElementById('btnEdit').style.display = isAdmin ? 'block' : 'none';
+            openModal('classModal');
+        }
+
+        window.toEditMode = function() {
+            document.getElementById('viewMode').style.display = 'none';
+            document.getElementById('editMode').classList.remove('hidden');
+            document.getElementById('editMode').style.display = 'block';
+            if(currentEvent) {
+                document.getElementById('eName').value = currentEvent.name;
+                document.getElementById('eType').value = currentEvent.type;
+                document.getElementById('eStart').value = currentEvent.start;
+                document.getElementById('eDur').value = currentEvent.duration;
+                document.getElementById('eRoom').value = currentEvent.room;
+                document.getElementById('eProf').value = currentEvent.prof;
+                document.getElementById('eEmail').value = currentEvent.profEmail;
+                document.getElementById('eExam').value = currentEvent.examInfo;
+                let gVal = 'C1'; 
+                if(currentEvent.groups.includes('ALL')) gVal = 'ALL';
+                else if(currentEvent.groups.includes('C1') && currentEvent.groups.includes('C2')) gVal = 'C_FULL';
+                else if(currentEvent.groups.includes('C1')) gVal = 'C1';
+                else if(currentEvent.groups.includes('C2')) gVal = 'C2';
+                document.getElementById('eGroup').value = gVal;
+            }
+        }
+
+        window.saveClass = async function() {
+            const tGroup = document.getElementById('eGroup').value;
+            let groupsArr = [tGroup];
+            if(tGroup === 'ALL') groupsArr = ['ALL'];
+            if(tGroup === 'C_FULL') groupsArr = ['C1', 'C2'];
+
+            const data = {
+                name: document.getElementById('eName').value,
+                type: document.getElementById('eType').value,
+                start: parseFloat(document.getElementById('eStart').value),
+                duration: parseFloat(document.getElementById('eDur').value),
+                room: document.getElementById('eRoom').value,
+                prof: document.getElementById('eProf').value,
+                profEmail: document.getElementById('eEmail').value,
+                examInfo: document.getElementById('eExam').value,
+                groups: groupsArr
+            };
+
+            try {
+                if(currentEvent) await updateDoc(doc(db, "schedule", currentEvent.id), data);
+                else {
+                    data.day = currentSlot.day;
+                    data.weeks = [currentSlot.wk];
+                    await addDoc(collection(db, "schedule"), data);
+                }
+                closeModal('classModal');
+            } catch(e) { alert("Erreur Admin"); }
+        }
+
+        window.confirmDelete = function() { openModal('deleteModal'); }
+        window.executeDelete = async function() {
+            if(currentEvent) {
+                await deleteDoc(doc(db, "schedule", currentEvent.id));
+                closeModal('deleteModal'); closeModal('classModal');
+            }
+        }
+
+        // --- AUTH & HELPERS ---
+        window.verifyAdmin = async function() {
+            const u = document.getElementById('loginUser').value;
+            const p = document.getElementById('loginPass').value;
+            try { await signInWithEmailAndPassword(auth, u, p); closeModal('adminLoginModal'); }
+            catch(error) { alert("Erreur: " + error.message); }
+        }
+
+        function updateAdminBtnUI(active) {
+            const btn = document.getElementById('adminBtn');
+            const txt = document.getElementById('adminBtnText');
+            if(active) {
+                btn.classList.add('logged-in');
+                txt.innerText = "Outils"; 
+            } else {
+                btn.classList.remove('logged-in');
+                txt.innerText = "Admin";
+            }
+        }
+
+        window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; }
+        window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
+        
+        window.formatTime = function(dec) {
+            const h = Math.floor(dec);
+            const m = Math.round((dec - h) * 60);
+            return `${h}h${m<10?'0'+m:m}`;
+        }
+        window.copyEmail = function() {
+            const mail = document.getElementById('mEmail').innerText;
+            if(mail && mail !== "Non renseigné") { navigator.clipboard.writeText(mail); alert("Adresse copiée !"); }
         }
     </script>
 </body>
