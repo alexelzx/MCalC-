@@ -55,7 +55,6 @@ The project has shifted to a **Serverless JAMstack** architecture.
 **No installation required.** The platform is a Progressive Web App (PWA).
 
 🔗 **Official Deployment:** [https://alexelzx.github.io/MCalC-/index.html](https://alexelzx.github.io/MCalC-/index.html)  
-*(Note: SmartST features require an Alpha Key).*
 
 ## Quick Preview
 https://github.com/user-attachments/assets/8b20eb6f-cf21-4703-9275-07213d6f4498
