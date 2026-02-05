@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>MCalC+ | Emploi du Temps</title>
+    <title>MCalC+ | Calendar</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -63,19 +63,18 @@
             height: 70px;
         }
         
-        /* LEFT SIDE: Logo + Weather */
-        .left-group { display: flex; align-items: center; gap: 25px; }
+        .logo-section { display: flex; align-items: center; gap: 20px; }
         .logo-text { font-size: 1.2rem; font-weight: 800; color: white; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
         .logo-text span { color: var(--gemini-cyan); }
 
         .info-widget {
             display: flex; align-items: center; gap: 10px; font-size: 0.8rem; color: var(--text-mute);
             background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+            margin-right: 15px;
         }
         .weather-box { display: flex; align-items: center; gap: 5px; color: var(--gemini-gold); font-weight: 700; }
         .date-box { color: white; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* RIGHT SIDE: Controls */
         .controls-group { display: flex; align-items: center; gap: 15px; }
 
         .st-select {
@@ -102,51 +101,48 @@
         }
         .btn-back:hover { background: var(--gemini-red); color: white; }
 
-        /* CALENDAR LAYOUT WITH SLIDERS */
+        /* CALENDAR SECTION */
         .calendar-section { 
             flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative;
         }
         
         .cal-title-row {
-            display: flex; justify-content: center; align-items: center; gap: 15px;
-            margin-bottom: 20px;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            margin-bottom: 25px;
         }
-        .month-label { font-size: 1.5rem; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 2px; }
-        .week-label { font-size: 1rem; color: var(--gemini-cyan); font-weight: 700; background: rgba(34, 211, 238, 0.1); padding: 4px 12px; border-radius: 12px; }
+        .month-label { font-size: 1.2rem; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 2px; }
+        .week-label { font-size: 0.9rem; color: var(--gemini-cyan); font-weight: 700; background: rgba(34, 211, 238, 0.1); padding: 4px 12px; border-radius: 12px; margin-bottom: 5px; }
         .editable-month { cursor: pointer; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.2); }
 
+        /* SLIDER CONTAINER */
         .slider-container {
             display: flex; align-items: flex-start; gap: 15px; width: 100%; max-width: 1500px;
         }
 
-        /* NAVIGATION ARROWS (LARGE) */
+        /* NAVIGATION ARROWS */
         .nav-arrow {
             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-mute); width: 50px; height: 500px; /* Tall clickable area */
+            color: var(--text-mute); width: 50px; height: 500px; 
             border-radius: 12px; cursor: pointer; transition: 0.2s;
             display: flex; align-items: center; justify-content: center;
             font-size: 2rem; font-weight: 300;
         }
         .nav-arrow:hover { background: rgba(255,255,255,0.05); color: var(--gemini-cyan); border-color: var(--gemini-cyan); box-shadow: 0 0 20px rgba(34, 211, 238, 0.1); }
 
+        /* GRID */
         .cal-wrapper {
             display: grid; grid-template-columns: 60px repeat(5, 1fr); gap: 10px;
-            flex: 1; /* Take remaining width */
+            flex: 1; 
         }
         .cal-header {
             text-align: center; color: var(--text-mute); padding-bottom: 10px;
-            display: flex; flex-direction: column; gap: 4px; border-radius: 8px; padding: 5px;
+            display: flex; flex-direction: column; gap: 4px; border-radius: 8px; padding: 5px; border: 1px solid transparent;
         }
         
-        /* TODAY HIGHLIGHT */
-        .cal-header.today { background: rgba(34, 211, 238, 0.1); border: 1px solid rgba(34, 211, 238, 0.3); }
+        /* INTELLIGENT HIGHLIGHT */
+        .cal-header.today { background: rgba(34, 211, 238, 0.1); border-color: rgba(34, 211, 238, 0.5); box-shadow: 0 0 15px rgba(34, 211, 238, 0.1); }
         .cal-header.today .day-name { color: var(--gemini-cyan); }
-        .day-col.today { background: rgba(34, 211, 238, 0.02); border-radius: 12px; }
-
-        /* EXAM DAY */
-        .cal-header.has-exam { background: rgba(244, 63, 94, 0.15); border: 1px solid var(--gemini-red); }
-        .cal-header.has-exam .day-name { color: var(--gemini-red); display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .cal-header.has-exam .day-name::after { content: '⚠️'; font-size: 0.8rem; }
+        .day-col.today { background: rgba(34, 211, 238, 0.03); border-radius: 12px; border: 1px solid rgba(34, 211, 238, 0.1); }
 
         .day-name { font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
         .day-date { 
@@ -173,6 +169,7 @@
         .lunch-break { height: 20px; display: flex; align-items: center; justify-content: center; }
         .lunch-line { width: 100%; height: 1px; background: rgba(255,255,255,0.05); }
 
+        /* CARDS */
         .event-card {
             position: absolute; inset: 0; border-radius: 12px; padding: 12px;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -186,6 +183,25 @@
         .type-TD { background: rgba(16, 185, 129, 0.15); border-color: var(--gemini-green); }
         .type-TP { background: rgba(249, 115, 22, 0.15); border-color: var(--gemini-orange); }
         .type-SAE { background: rgba(168, 85, 247, 0.15); border-color: var(--gemini-purple); }
+
+        /* EXAM BADGE */
+        .exam-badge {
+            position: absolute; top: 0; right: 0;
+            background: #f43f5e; color: white;
+            font-size: 0.6rem; font-weight: 800; text-transform: uppercase;
+            padding: 3px 8px; border-bottom-left-radius: 8px;
+            z-index: 5; box-shadow: -2px 2px 10px rgba(244, 63, 94, 0.3);
+        }
+
+        .evt-top { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 10px; }
+        .evt-group-badge { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.3); }
+        .badge-promo { color: var(--gemini-gold); border: 1px solid rgba(251, 191, 36, 0.3); }
+        .badge-grp { color: var(--gemini-cyan); border: 1px solid rgba(34, 211, 238, 0.2); }
+
+        .evt-type { font-size: 0.65rem; font-weight: 800; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; }
+        .evt-title { font-weight: 700; font-size: 0.95rem; color: white; line-height: 1.2; margin-top: 5px; }
+        .evt-bot { display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.75rem; color: var(--text-mute); }
+        .evt-room { font-weight: 600; color: var(--gemini-cyan); display: flex; align-items: center; gap: 4px; }
 
         /* VACATION OVERLAY */
         #vacationBanner {
@@ -218,14 +234,14 @@
         .btn-danger:hover { background: var(--gemini-red); color: white; }
         .login-title { text-align: center; font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; }
 
-        @media screen and (max-width: 768px) {
+        @media screen and (max-width: 900px) {
             body { font-size: 14px; }
             .calendar-section { justify-content: flex-start; -webkit-overflow-scrolling: touch; }
             .cal-wrapper { min-width: 800px; margin-bottom: 20px; }
             .top-bar { height: auto; padding: 20px; align-items: flex-start; flex-direction: column; }
             .left-group { width: 100%; justify-content: space-between; }
             .controls-group { width: 100%; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
-            .info-widget { display: none; } /* Hide weather on small mobile to save space */
+            .info-widget { display: none; } 
             .st-select { flex: 1; text-align: center; }
             .modal-box { width: 95%; max-height: 85vh; overflow-y: auto; }
             .slider-container { gap: 5px; }
@@ -281,10 +297,10 @@
         </div>
 
         <div class="cal-title-row">
+            <div id="currentWeekLabel" class="week-label">Semaine 1</div>
             <div class="month-label">
                 <span id="monthDisplay" class="editable-month" onclick="editMonthName()">...</span>
             </div>
-            <div id="currentWeekLabel" class="week-label">Semaine 6</div>
         </div>
 
         <div class="slider-container" id="calContainer">
@@ -292,11 +308,11 @@
 
             <div class="cal-wrapper">
                 <div class="cal-header"></div>
-                <div class="cal-header" id="head-0"><span class="day-name">Lundi</span><span class="day-date" id="date-0" onclick="editDate(0)">...</span></div>
-                <div class="cal-header" id="head-1"><span class="day-name">Mardi</span><span class="day-date" id="date-1" onclick="editDate(1)">...</span></div>
-                <div class="cal-header" id="head-2"><span class="day-name">Mercredi</span><span class="day-date" id="date-2" onclick="editDate(2)">...</span></div>
-                <div class="cal-header" id="head-3"><span class="day-name">Jeudi</span><span class="day-date" id="date-3" onclick="editDate(3)">...</span></div>
-                <div class="cal-header" id="head-4"><span class="day-name">Vendredi</span><span class="day-date" id="date-4" onclick="editDate(4)">...</span></div>
+                <div class="cal-header" id="head-0"><span class="day-name">Lundi</span><span class="day-date" id="date-0" ondblclick="pickDate(0)">...</span></div>
+                <div class="cal-header" id="head-1"><span class="day-name">Mardi</span><span class="day-date" id="date-1" ondblclick="pickDate(1)">...</span></div>
+                <div class="cal-header" id="head-2"><span class="day-name">Mercredi</span><span class="day-date" id="date-2" ondblclick="pickDate(2)">...</span></div>
+                <div class="cal-header" id="head-3"><span class="day-name">Jeudi</span><span class="day-date" id="date-3" ondblclick="pickDate(3)">...</span></div>
+                <div class="cal-header" id="head-4"><span class="day-name">Vendredi</span><span class="day-date" id="date-4" ondblclick="pickDate(4)">...</span></div>
 
                 <div class="time-labels">
                     <div class="time-label"><span>09h00</span>10h45</div>
@@ -317,6 +333,8 @@
         </div>
     </div>
 
+    <input type="date" id="hiddenDatePicker" style="display:none; position:absolute; z-index:1000;">
+
     <div class="modal-overlay" id="adminLoginModal">
         <div class="modal-box">
             <div class="login-title">Accès Administrateur</div>
@@ -331,11 +349,14 @@
         <div class="modal-box" onclick="event.stopPropagation()">
             <h3 style="color:white; margin-top:0;">Outils Admin</h3>
             <div style="margin:20px 0;">
-                <label style="color:white; display:flex; align-items:center; gap:10px; cursor:pointer; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.1);">
+                <label style="color:white; display:flex; align-items:center; gap:10px; cursor:pointer; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
                     <input type="checkbox" id="vacationToggle" onchange="toggleVacationMode()" style="width:20px; height:20px;">
                     <span style="font-size:1rem; font-weight:700;">Activer "Mode Vacances" 🌴</span>
                 </label>
-                <p style="color:#666; font-size:0.8rem; margin-top:10px; line-height:1.4;">Cochez cette case pour masquer l'emploi du temps et afficher le message de vacances à tous les étudiants.</p>
+                <label style="color:white; display:flex; align-items:center; gap:10px; cursor:pointer; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px;">
+                    <input type="checkbox" id="forceHighlightToggle" onchange="renderCalendar()" style="width:20px; height:20px;">
+                    <span style="font-size:1rem; font-weight:700;">Test: Force Highlight (Today)</span>
+                </label>
             </div>
             <button class="btn-action" style="background:transparent; border:1px solid #666; color:#aaa;" onclick="closeModal('adminToolsModal')">Fermer</button>
             <button class="btn-action btn-danger" style="margin-top:10px;" onclick="if(confirm('Se déconnecter?')) signOut(auth).then(()=>location.reload());">Déconnexion</button>
@@ -344,7 +365,6 @@
 
     <div class="modal-overlay" id="classModal" onclick="closeModal('classModal')">
         <div class="modal-box" onclick="event.stopPropagation()">
-            
             <div id="viewMode">
                 <div class="m-header">
                     <div><div class="m-title" id="mName">...</div><div class="m-sub" id="mType">...</div></div>
@@ -352,7 +372,7 @@
                 </div>
                 <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><div class="m-val" id="mTimeLoc">...</div></div>
                 <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><div class="m-val" id="mProf">...</div></div>
-                <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg><div class="m-val email" id="mEmail" onclick="copyEmail()">...</div></div>
+                <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg><div class="m-val email" style="color:var(--gemini-blue); cursor:pointer; text-decoration:underline;" id="mEmail" onclick="copyEmail()">...</div></div>
                 <div id="mExamBox" style="display:none; margin-top:20px; padding:15px; background:rgba(244, 63, 94, 0.1); border:1px solid var(--gemini-red); border-radius:10px;"><div style="color:var(--gemini-red); font-weight:800; font-size:0.8rem; margin-bottom:5px;">⚠️ EXAMEN PRÉVU</div><div class="m-val" id="mExamText" style="font-size:0.9rem;"></div></div>
                 <button id="btnEdit" class="btn-action btn-primary" style="margin-top:25px; background:var(--gemini-gold); color:black; display:none;" onclick="toEditMode()">MODIFIER (ADMIN)</button>
             </div>
@@ -408,8 +428,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-
-        // YOUR ADMIN UID
         const ADMIN_UID = "WA5k4NI4mWWsmzdLgRS9tGRRfVz2"; 
 
         let scheduleData = [];
@@ -419,7 +437,7 @@
         let currentEvent = null;
         let currentSlot = null;
         
-        let currentWeekIndex = 1; // Default
+        let currentWeekIndex = 1;
         const SLOTS = [{start:9.00, duration:1.75}, {start:11.00, duration:1.75}, {start:14.25, duration:1.75}, {start:16.25, duration:1.75}];
 
         window.onload = function() {
@@ -427,7 +445,7 @@
                 window.location.href = 'smartst-cloud-access.html'; 
             }
             updateLiveInfo();
-            fetchWeather(); // Get Real Weather
+            fetchWeather(); 
             setInterval(updateLiveInfo, 60000); 
         };
 
@@ -457,7 +475,6 @@
                 document.getElementById('weatherIcon').innerText = icon;
                 document.getElementById('weatherTemp').innerText = `${temp}°C`;
             } catch(e) {
-                console.error("Weather Error", e);
                 document.getElementById('weatherIcon').innerText = "📡";
             }
         }
@@ -476,26 +493,22 @@
         });
 
         function initData() {
-            // Schedule Data
             onSnapshot(query(collection(db, "schedule")), (snapshot) => {
                 scheduleData = [];
                 snapshot.forEach(doc => scheduleData.push({ ...doc.data(), id: doc.id }));
                 renderCalendar();
             });
 
-            // Meta Data (Dates)
             onSnapshot(doc(db, "meta", "calendarDates"), (doc) => {
                 if(doc.exists()) dateData = doc.data();
                 renderCalendar();
             });
 
-            // Meta Data (Settings)
             onSnapshot(doc(db, "meta", "calendarSettings"), (doc) => {
                 if(doc.exists()) {
                     settingsData = { ...settingsData, ...doc.data() };
                     document.getElementById('monthDisplay').innerText = settingsData.monthName || "MOIS";
                     
-                    // Vacation Mode Logic
                     if(settingsData.vacationMode) {
                         document.getElementById('calContainer').style.display = 'none';
                         document.getElementById('vacationBanner').style.display = 'flex';
@@ -503,7 +516,6 @@
                         document.getElementById('calContainer').style.display = 'flex';
                         document.getElementById('vacationBanner').style.display = 'none';
                     }
-                    
                     if(isAdmin) document.getElementById('vacationToggle').checked = settingsData.vacationMode;
                 }
             });
@@ -512,7 +524,6 @@
         // --- SLIDE NAVIGATION ---
         window.changeWeek = (dir) => {
             currentWeekIndex += dir;
-            // Limit to 4 weeks only
             if(currentWeekIndex < 1) currentWeekIndex = 1; 
             if(currentWeekIndex > 4) currentWeekIndex = 4;
             document.getElementById('currentWeekLabel').innerText = `Semaine ${currentWeekIndex}`;
@@ -538,33 +549,33 @@
             const group = document.getElementById('groupSelect').value;
             const dates = dateData[currentWeekIndex] || ["...", "...", "...", "...", "..."];
             
-            // Calculate Today index (0=Mon...4=Fri)
-            const today = new Date();
-            const dayIdx = today.getDay() - 1; 
+            // Intelligent Date Matching
+            const now = new Date();
+            // Format: "26 Février 2026" - Adjust format to match what you type in DB
+            // Assuming DB stores "26/02" or similar short format. 
+            // We compare substrings for safety.
+            const todayStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }); // "26/02"
 
             for(let i=0; i<5; i++) {
-                // Dates
                 const el = document.getElementById(`date-${i}`);
-                el.innerText = dates[i];
+                const dbDate = dates[i] || "";
+                el.innerText = dbDate;
                 if(isAdmin) el.classList.add('editable'); else el.classList.remove('editable');
                 
-                // Highlight Today
                 const head = document.getElementById(`head-${i}`);
                 const col = document.getElementById(`day-${i}`);
                 
-                // Simple highlight logic (assuming current usage)
-                if (i === dayIdx) {
+                // Highlight Logic: Match DB date with Today OR Admin Force Toggle
+                const isRealToday = dbDate.includes(todayStr) || dbDate === todayStr;
+                const force = document.getElementById('forceHighlightToggle')?.checked && i === 3; // Debug on Thursday
+
+                if (isRealToday || force) {
                     head.classList.add('today');
                     col.classList.add('today');
                 } else {
                     head.classList.remove('today');
                     col.classList.remove('today');
                 }
-
-                // Check Exam
-                const hasExam = checkForExam(i);
-                if(hasExam) head.classList.add('has-exam');
-                else head.classList.remove('has-exam');
             }
 
             const events = scheduleData.filter(e => 
@@ -594,13 +605,16 @@
                         else if(evt.groups.includes('C1')) badgeHtml = '<span class="evt-group-badge badge-grp">C1</span>';
                         else if(evt.groups.includes('C2')) badgeHtml = '<span class="evt-group-badge badge-grp">C2</span>';
 
+                        // Exam Badge
+                        const examBadge = evt.examInfo ? `<div class="exam-badge">PARTIEL PRÉVU</div>` : '';
+
                         card.innerHTML = `
+                            ${examBadge}
                             <div class="evt-top">
                                 <div style="display:flex; gap:5px; align-items:center;">
                                     <span class="evt-type">${evt.type}</span>
                                     ${badgeHtml}
                                 </div>
-                                ${evt.examInfo ? '<div class="exam-dot"></div>' : ''}
                             </div>
                             <div class="evt-title">${evt.name}</div>
                             <div class="evt-bot"><span class="evt-room">${evt.room}</span><span>${evt.prof}</span></div>
@@ -613,20 +627,31 @@
             updateAdminStyles();
         }
 
-        function checkForExam(dayIdx) {
-            const group = document.getElementById('groupSelect').value;
-            return scheduleData.some(e => 
-                e.weeks.includes(currentWeekIndex) && 
-                e.day === dayIdx && 
-                (e.groups.includes(group) || e.groups.includes("ALL")) && 
-                e.examInfo && e.examInfo.trim() !== ""
-            );
-        }
-
         function updateAdminStyles() {
             document.querySelectorAll('.slot').forEach(s => {
                 if(isAdmin) s.classList.add('admin-mode'); else s.classList.remove('admin-mode');
             });
+        }
+
+        // --- DATE PICKER LOGIC (New) ---
+        window.pickDate = function(dayIdx) {
+            if(!isAdmin) return;
+            const picker = document.getElementById('hiddenDatePicker');
+            picker.showPicker(); // Opens native calendar
+            
+            // When user picks a date
+            picker.onchange = async (e) => {
+                const dateObj = new Date(e.target.value);
+                // Format: DD/MM (Standard French format)
+                const formatted = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+                
+                if(!dateData[currentWeekIndex]) dateData[currentWeekIndex] = ["...", "...", "...", "...", "..."];
+                dateData[currentWeekIndex][dayIdx] = formatted;
+                
+                await setDoc(doc(db, "meta", "calendarDates"), dateData);
+                renderCalendar();
+                picker.value = ""; // Reset
+            };
         }
 
         // --- ADMIN FEATURES ---
@@ -667,17 +692,6 @@
             currentSlot = { day: day, wk: currentWeekIndex, grp: cf };
             openModal('classModal');
             window.toEditMode();
-        }
-
-        window.editDate = async function(dayIdx) {
-            if(!isAdmin) return;
-            const week = currentWeekIndex;
-            const newDate = prompt("Date (jj/mm) :", dateData[week]?.[dayIdx] || "");
-            if(newDate) {
-                if(!dateData[week]) dateData[week] = ["...", "...", "...", "...", "..."];
-                dateData[week][dayIdx] = newDate;
-                await setDoc(doc(db, "meta", "calendarDates"), dateData);
-            }
         }
 
         window.openDetails = function(evt) {
