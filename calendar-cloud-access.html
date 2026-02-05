@@ -67,13 +67,6 @@
         .logo-text { font-size: 1.2rem; font-weight: 800; color: white; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
         .logo-text span { color: var(--gemini-cyan); }
 
-        .info-widget {
-            display: flex; align-items: center; gap: 10px; font-size: 0.8rem; color: var(--text-mute);
-            background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
-            margin-right: 15px;
-        }
-        .date-box { color: white; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-
         .controls-group { display: flex; align-items: center; gap: 15px; }
 
         .st-select {
@@ -110,8 +103,7 @@
             margin-bottom: 25px;
         }
         .month-label { font-size: 1.2rem; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 2px; }
-        .week-label { font-size: 0.9rem; color: var(--gemini-cyan); font-weight: 700; background: rgba(34, 211, 238, 0.1); padding: 4px 12px; border-radius: 12px; margin-bottom: 5px; cursor:pointer; transition:0.2s; }
-        .week-label:hover { background: rgba(34, 211, 238, 0.2); }
+        .week-label { font-size: 0.9rem; color: var(--gemini-cyan); font-weight: 700; background: rgba(34, 211, 238, 0.1); padding: 4px 12px; border-radius: 12px; margin-bottom: 5px; cursor: pointer; }
         .editable-month { cursor: pointer; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.2); }
 
         /* SLIDER CONTAINER */
@@ -138,6 +130,7 @@
             display: flex; flex-direction: column; gap: 4px; border-radius: 8px; padding: 5px; border: 1px solid transparent; user-select: none;
         }
         
+        /* INTELLIGENT HIGHLIGHT */
         .cal-header.today { background: rgba(34, 211, 238, 0.1); border-color: rgba(34, 211, 238, 0.5); box-shadow: 0 0 15px rgba(34, 211, 238, 0.1); }
         .cal-header.today .day-name { color: var(--gemini-cyan); }
         .day-col.today { background: rgba(34, 211, 238, 0.03); border-radius: 12px; border: 1px solid rgba(34, 211, 238, 0.1); }
@@ -271,10 +264,6 @@
                 <svg class="icon" viewBox="0 0 24 24" style="color:var(--gemini-cyan); width:24px; height:24px; margin-right:10px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 MCalC+ <span>Calendar</span>
             </div>
-            
-            <div class="info-widget">
-                <div id="liveDate" class="date-box">...</div>
-            </div>
         </div>
 
         <div class="controls-group">
@@ -302,7 +291,7 @@
         </div>
 
         <div class="cal-title-row">
-            <div id="currentWeekLabel" class="week-label" onclick="editWeekNumber()">Semaine 6</div>
+            <div id="currentWeekLabel" class="week-label" onclick="editWeekNumber()">Semaine 1</div>
             <div class="month-label">
                 <span id="monthDisplay" class="editable-month" onclick="editMonthName()">...</span>
             </div>
@@ -359,8 +348,7 @@
                     <span style="font-size:1rem; font-weight:700;">Global Vacation Mode 🌴</span>
                 </label>
                 <div style="font-size:0.8rem; color:#888; padding:10px;">
-                    <strong>Tip:</strong> Double-click dates to change them.<br>
-                    <strong>Tip:</strong> Right-click Day Header (Lundi, etc.) to toggle single day holiday.
+                    <strong>Astuce :</strong> Clic-droit sur un jour (ex: Lundi) pour le mettre en vacances individuellement.
                 </div>
             </div>
             <button class="btn-action" style="background:transparent; border:1px solid #666; color:#aaa;" onclick="closeModal('adminToolsModal')">Fermer</button>
@@ -442,22 +430,14 @@
         let currentEvent = null;
         let currentSlot = null;
         
-        let currentWeekIndex = 6; // DEFAULT START WEEK (MATCHING YOUR FIREBASE)
+        let currentWeekIndex = 1; // Default
         const SLOTS = [{start:9.00, duration:1.75}, {start:11.00, duration:1.75}, {start:14.25, duration:1.75}, {start:16.25, duration:1.75}];
 
         window.onload = function() {
             if(!localStorage.getItem('smartst_session')) {
                 window.location.href = 'smartst-cloud-access.html'; 
             }
-            updateLiveInfo();
-            setInterval(updateLiveInfo, 60000); 
         };
-
-        function updateLiveInfo() {
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-            document.getElementById('liveDate').innerText = dateStr;
-        }
 
         // --- AUTH & DATA ---
         onAuthStateChanged(auth, (user) => {
@@ -489,7 +469,6 @@
                     settingsData = { ...settingsData, ...doc.data() };
                     document.getElementById('monthDisplay').innerText = settingsData.monthName || "MOIS";
                     
-                    // Global Vacation Mode
                     if(settingsData.vacationMode) {
                         document.getElementById('calContainer').style.display = 'none';
                         document.getElementById('vacationBanner').style.display = 'flex';
@@ -498,8 +477,7 @@
                         document.getElementById('vacationBanner').style.display = 'none';
                     }
                     if(isAdmin) document.getElementById('vacationToggle').checked = settingsData.vacationMode;
-                    
-                    renderCalendar(); // Re-render to show/hide day vacays
+                    renderCalendar(); // Refresh for holidays
                 }
             });
         }
@@ -507,18 +485,21 @@
         // --- NAVIGATION ---
         window.changeWeek = (dir) => {
             currentWeekIndex += dir;
-            // No strict limit now, allowing navigation through the year
+            // HARD LIMIT: 1 to 4
             if(currentWeekIndex < 1) currentWeekIndex = 1; 
-            if(currentWeekIndex > 52) currentWeekIndex = 52;
+            if(currentWeekIndex > 4) currentWeekIndex = 4;
             document.getElementById('currentWeekLabel').innerText = `Semaine ${currentWeekIndex}`;
             renderCalendar();
         }
 
         window.editWeekNumber = () => {
             if(!isAdmin) return;
-            const newVal = prompt("Aller à la semaine :", currentWeekIndex);
+            const newVal = prompt("Aller à la semaine (1-4) :", currentWeekIndex);
             if(newVal && !isNaN(newVal)) {
-                currentWeekIndex = parseInt(newVal);
+                let val = parseInt(newVal);
+                if(val < 1) val = 1;
+                if(val > 4) val = 4;
+                currentWeekIndex = val;
                 document.getElementById('currentWeekLabel').innerText = `Semaine ${currentWeekIndex}`;
                 renderCalendar();
             }
@@ -530,7 +511,6 @@
             col.innerHTML = '';
             
             if (isHoliday) {
-                // Render Holiday Overlay instead of slots
                 col.innerHTML = `
                     <div class="day-vacay-overlay" ${isAdmin ? `onclick="toggleDayHoliday(${dayIdx})"` : ''}>
                         <div class="day-vacay-text">VACANCES / FÉRIÉ</div>
@@ -550,10 +530,10 @@
             const group = document.getElementById('groupSelect').value;
             const dates = dateData[currentWeekIndex] || ["...", "...", "...", "...", "..."];
             
+            // SMART HIGHLIGHT
             const now = new Date();
-            const todayStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }); 
+            const todayStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }); // "05/02"
 
-            // Check if this week has any specific day holidays
             const weekHolidays = settingsData.holidays ? (settingsData.holidays[currentWeekIndex] || {}) : {};
 
             for(let i=0; i<5; i++) {
@@ -565,9 +545,8 @@
                 const head = document.getElementById(`head-${i}`);
                 const col = document.getElementById(`day-${i}`);
                 
-                // Highlight Logic
-                const isRealToday = dbDate === todayStr;
-                if (isRealToday) {
+                // Compare system date with column date string
+                if (dbDate === todayStr) {
                     head.classList.add('today');
                     col.classList.add('today');
                 } else {
@@ -594,7 +573,6 @@
 
                 if (slotIdx > -1) {
                     const col = document.getElementById(`day-${evt.day}`);
-                    // Only append if it's not a holiday (col has slots)
                     if(col.children.length > 2) { 
                         const targetChildIndex = slotIdx < 2 ? slotIdx : slotIdx + 1;
                         const slotDiv = col.children[targetChildIndex];
