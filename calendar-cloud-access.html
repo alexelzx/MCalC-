@@ -55,80 +55,104 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* HEADER */
-        .top-bar {
+        /* --- INFO BAR (Date/Time/Weather) --- */
+        .info-bar {
             display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 30px; background: rgba(0,0,0,0.4); border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.8rem; color: var(--text-mute);
+        }
+        .live-clock { font-family: monospace; font-weight: 700; color: var(--gemini-cyan); font-size: 0.9rem; }
+        .month-display { font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; }
+        .month-display:hover { color: var(--gemini-gold); }
+
+        /* --- TOP HEADER --- */
+        .top-bar {
+            display: flex; flex-direction: column; gap: 15px;
             padding: 15px 30px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px);
             border-bottom: var(--border-glass); position: sticky; top: 0; z-index: 100;
         }
+        
+        .nav-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        
         .logo-text { font-size: 1.2rem; font-weight: 800; color: white; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
         .logo-text span { color: var(--gemini-cyan); }
-        .controls { display: flex; gap: 15px; align-items: center; }
         
+        /* CONTROLS & SLIDER */
+        .controls-area { display: flex; gap: 10px; align-items: center; width: 100%; justify-content: space-between; }
+        
+        .week-slider { 
+            display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.05); 
+            padding: 5px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); 
+        }
+        .slide-btn { background: transparent; border: none; color: white; cursor: pointer; font-weight: 800; font-size: 1.2rem; display: flex; align-items: center; }
+        .slide-btn:hover { color: var(--gemini-cyan); transform: scale(1.2); }
+        .current-week-lbl { font-size: 0.9rem; font-weight: 700; color: white; min-width: 80px; text-align: center; }
+
+        .view-toggles { display: flex; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 3px; border: 1px solid rgba(255,255,255,0.1); }
+        .v-btn { padding: 6px 12px; border: none; background: transparent; color: var(--text-mute); font-size: 0.75rem; font-weight: 700; cursor: pointer; border-radius: 8px; transition: 0.2s; }
+        .v-btn.active { background: rgba(255,255,255,0.1); color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+
         .st-select {
             background: rgba(255,255,255,0.05); border: var(--border-glass); color: white;
-            padding: 8px 15px; border-radius: 8px; font-family: inherit; font-size: 0.85rem; font-weight: 600;
+            padding: 8px 15px; border-radius: 8px; font-family: inherit; font-size: 0.8rem; font-weight: 600;
             cursor: pointer; transition: 0.2s;
         }
-        .st-select:hover { border-color: var(--gemini-cyan); background: rgba(34, 211, 238, 0.05); }
         .st-select option { background-color: #0f172a; color: white; }
 
-        .btn-admin {
-            background: rgba(251, 191, 36, 0.05); border: 1px solid rgba(251, 191, 36, 0.3); 
-            color: var(--gemini-gold); font-weight: 700; display: flex; align-items: center; gap: 8px;
-        }
-        .btn-admin:hover { background: rgba(251, 191, 36, 0.15); border-color: var(--gemini-gold); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+        .btn-admin { background: rgba(251, 191, 36, 0.05); border: 1px solid rgba(251, 191, 36, 0.3); color: var(--gemini-gold); display: flex; align-items: center; gap: 5px; padding: 8px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem; }
         .btn-admin.logged-in { background: rgba(239, 68, 68, 0.1); border-color: var(--gemini-red); color: var(--gemini-red); }
-        .btn-admin.logged-in:hover { background: var(--gemini-red); color: white; }
 
-        .btn-back {
-            background: transparent; border: 1px solid var(--gemini-red); color: var(--gemini-red);
-            padding: 8px 20px; border-radius: 20px; font-weight: 600; cursor: pointer; text-decoration: none;
-            font-size: 0.8rem; transition: 0.2s; display: flex; align-items: center; gap: 8px;
-        }
-        .btn-back:hover { background: var(--gemini-red); color: white; }
-
-        /* CALENDAR */
+        /* CALENDAR GRID */
         .calendar-container { padding: 20px; flex: 1; overflow-y: auto; display: flex; justify-content: center; }
+        
         .cal-wrapper {
-            display: grid; grid-template-columns: 80px repeat(5, 1fr); gap: 10px;
-            max-width: 1400px; width: 100%; min-width: 900px;
+            display: grid; grid-template-columns: 60px repeat(5, 1fr); gap: 10px;
+            max-width: 1400px; width: 100%; min-width: 900px; transition: transform 0.3s ease;
         }
+        
+        /* Day & View Specifics */
+        .cal-wrapper.day-view { display: flex; flex-direction: column; min-width: 0; width: 100%; max-width: 600px; }
+        .cal-wrapper.month-view { display: flex; flex-direction: column; gap: 30px; min-width: 0; width: 100%; }
+
         .cal-header {
-            text-align: center; color: var(--text-mute); padding-bottom: 10px;
-            display: flex; flex-direction: column; gap: 4px;
+            text-align: center; color: var(--text-mute); padding: 10px; border-radius: 12px;
+            display: flex; flex-direction: column; gap: 4px; border: 1px solid transparent; transition: 0.3s;
         }
-        .day-name { font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
-        .day-date { 
-            font-size: 0.75rem; color: white; font-weight: 600; background: rgba(255,255,255,0.05); 
-            padding: 2px 8px; border-radius: 12px; align-self: center; cursor: default; transition: 0.2s;
-        }
-        .day-date.editable:hover { background: var(--gemini-cyan); color: black; cursor: pointer; }
+        
+        /* TODAY HIGHLIGHT */
+        .cal-header.is-today { background: rgba(34, 211, 238, 0.05); border-color: var(--gemini-cyan); box-shadow: 0 0 20px rgba(34, 211, 238, 0.1); }
+        .cal-header.is-today .day-name { color: var(--gemini-cyan); }
+        
+        /* EXAM DAY HIGHLIGHT */
+        .cal-header.has-exam { background: rgba(244, 63, 94, 0.1); border-color: var(--gemini-red); }
+        .cal-header.has-exam .day-name { color: var(--gemini-red); display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .cal-header.has-exam .day-name::before { content: '⚠️'; font-size: 0.8rem; }
+
+        .day-name { font-weight: 800; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
+        .day-meta { display: flex; justify-content: center; gap: 8px; align-items: center; }
+        .day-date { font-size: 0.75rem; color: white; font-weight: 600; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 8px; cursor: default; }
+        .weather-icon { font-size: 1rem; }
 
         .time-labels { display: grid; grid-template-rows: 1fr 1fr 20px 1fr 1fr; gap: 15px; text-align: right; padding-right: 15px; }
-        .time-label { display: flex; flex-direction: column; justify-content: center; font-size: 0.75rem; color: var(--text-mute); font-weight: 600; }
-        .time-label span { display: block; font-size: 0.65rem; opacity: 0.7; }
-        .lunch-break-label { font-size: 0.7rem; color: var(--gemini-purple); display: flex; align-items: center; justify-content: flex-end; opacity: 0.8; }
+        .time-label { display: flex; flex-direction: column; justify-content: center; font-size: 0.7rem; color: var(--text-mute); font-weight: 600; }
+        .lunch-break-label { font-size: 0.65rem; color: var(--gemini-purple); display: flex; align-items: center; justify-content: flex-end; opacity: 0.8; font-weight: 700; letter-spacing: 1px; }
 
         .day-col { display: grid; grid-template-rows: 1fr 1fr 20px 1fr 1fr; gap: 15px; }
         .slot {
             background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1);
-            border-radius: 12px; position: relative; transition: 0.2s; min-height: 120px;
+            border-radius: 12px; position: relative; transition: 0.2s; min-height: 110px;
         }
         .slot.admin-mode:hover { background: rgba(34, 211, 238, 0.05); border-color: var(--gemini-cyan); cursor: pointer; }
-        .slot.admin-mode:hover::after {
-            content: '+'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-            font-size: 2rem; color: var(--gemini-cyan); opacity: 0.5;
-        }
+        .slot.admin-mode:hover::after { content: '+'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--gemini-cyan); opacity: 0.5; }
+        
         .lunch-break { height: 20px; display: flex; align-items: center; justify-content: center; }
         .lunch-line { width: 100%; height: 1px; background: rgba(255,255,255,0.05); }
 
         .event-card {
-            position: absolute; inset: 0; border-radius: 12px; padding: 12px;
+            position: absolute; inset: 0; border-radius: 12px; padding: 10px;
             display: flex; flex-direction: column; justify-content: space-between;
-            border-left: 4px solid; backdrop-filter: blur(10px); z-index: 10;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.2s; cursor: pointer;
-            overflow: hidden; 
+            border-left: 3px solid; backdrop-filter: blur(10px); z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: 0.2s; cursor: pointer; overflow: hidden; 
         }
         .event-card:hover { transform: scale(1.02); z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
@@ -137,134 +161,98 @@
         .type-TP { background: rgba(249, 115, 22, 0.15); border-color: var(--gemini-orange); }
         .type-SAE { background: rgba(168, 85, 247, 0.15); border-color: var(--gemini-purple); }
 
-        /* STATUS STYLES */
-        .status-cancelled { 
-            background: repeating-linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(239, 68, 68, 0.05) 10px, rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.2) 20px) !important;
-            border-color: #333 !important; 
-        }
-        .status-postponed { 
-            background: repeating-linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.05) 10px, rgba(0, 0, 0, 0.2) 10px, rgba(0, 0, 0, 0.2) 20px) !important;
-            border-color: #333 !important; 
-        }
-        .status-cancelled .evt-top, .status-cancelled .evt-title, .status-cancelled .evt-bot,
-        .status-postponed .evt-top, .status-postponed .evt-title, .status-postponed .evt-bot {
-            opacity: 0.2; filter: grayscale(100%);
-        }
-        
-        .status-text-overlay {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;
-            z-index: 15; pointer-events: none; border: 2px solid currentColor;
-            padding: 8px 16px; border-radius: 4px; background: #000; white-space: nowrap;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-        }
-        .st-cancelled-text { color: #f43f5e; border-color: #f43f5e; }
-        .st-postponed-text { color: #3b82f6; border-color: #3b82f6; }
+        /* STATUS */
+        .status-cancelled { background: repeating-linear-gradient(135deg, rgba(239,68,68,0.05), rgba(239,68,68,0.05) 10px, rgba(0,0,0,0.2) 10px, rgba(0,0,0,0.2) 20px) !important; border-color: #333 !important; }
+        .status-postponed { background: repeating-linear-gradient(135deg, rgba(59,130,246,0.05), rgba(59,130,246,0.05) 10px, rgba(0,0,0,0.2) 10px, rgba(0,0,0,0.2) 20px) !important; border-color: #333 !important; }
+        .status-cancelled > *, .status-postponed > * { opacity: 0.3; filter: grayscale(100%); }
+        .status-badge { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 2px solid currentColor; padding: 4px 8px; border-radius: 4px; background: #000; font-weight: 800; font-size: 0.8rem; z-index: 50; opacity: 1 !important; filter: none !important; }
+        .st-cancelled { color: #f43f5e; border-color: #f43f5e; } .st-postponed { color: #3b82f6; border-color: #3b82f6; }
 
-        .evt-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .evt-group-badge { font-size: 0.6rem; font-weight: 800; letter-spacing: 0.5px; padding: 2px 6px; border-radius: 4px; background: rgba(0,0,0,0.3); }
-        .badge-promo { color: var(--gemini-gold); border: 1px solid rgba(251, 191, 36, 0.3); }
-        .badge-grp { color: var(--gemini-cyan); border: 1px solid rgba(34, 211, 238, 0.2); }
+        .evt-top { display: flex; justify-content: space-between; }
+        .evt-title { font-weight: 700; font-size: 0.85rem; color: white; margin-top: 4px; line-height: 1.2; }
+        .evt-bot { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-mute); }
+        .evt-room { font-weight: 600; color: var(--gemini-cyan); }
+        .exam-indicator { width: 8px; height: 8px; background: var(--gemini-red); border-radius: 50%; box-shadow: 0 0 8px var(--gemini-red); }
 
-        .evt-type { font-size: 0.65rem; font-weight: 800; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; }
-        .evt-title { font-weight: 700; font-size: 0.95rem; color: white; line-height: 1.2; margin-top: 5px; }
-        .evt-bot { display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.75rem; color: var(--text-mute); }
-        .evt-room { font-weight: 600; color: var(--gemini-cyan); display: flex; align-items: center; gap: 4px; }
-        .exam-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gemini-red); box-shadow: 0 0 10px var(--gemini-red); margin-left: 5px; }
+        /* Month View Specifics */
+        .month-week-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .month-week-label { width: 60px; font-size: 0.7rem; color: var(--gemini-cyan); writing-mode: vertical-rl; transform: rotate(180deg); text-align: center; font-weight: 700; border-right: 1px solid rgba(255,255,255,0.1); }
+        .month-days-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; flex: 1; }
+        .month-day-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; min-height: 80px; }
+        .month-day-head { font-size: 0.7rem; color: var(--text-mute); margin-bottom: 5px; display: flex; justify-content: space-between; }
+        .mini-event { height: 4px; width: 100%; margin-bottom: 2px; border-radius: 2px; }
 
         /* MODALS */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
-        .modal-box { background: #0f1218; border: var(--border-glass); padding: 30px; border-radius: 20px; width: 95%; max-width: 450px; box-shadow: 0 0 60px rgba(0,0,0,0.8); }
-        .m-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .m-title { font-size: 1.5rem; font-weight: 700; color: white; margin-bottom: 5px; }
-        .m-sub { color: var(--gemini-cyan); font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
-        .m-row { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-        .m-val { font-size: 1rem; color: white; font-weight: 500; }
-        .m-val.email { color: var(--gemini-blue); text-decoration: underline; cursor: pointer; transition:0.2s; }
-        .m-val.email:hover { color: white; }
-
-        .st-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-family: inherit; }
-        .st-input:focus { border-color: var(--gemini-cyan); outline: none; }
-        .st-input option { background-color: #0f172a; color: white; }
-        .btn-action { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition:0.2s; margin-top: 10px; }
+        .modal-box { background: #0f1218; border: var(--border-glass); padding: 30px; border-radius: 20px; width: 95%; max-width: 450px; }
+        .st-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+        .btn-action { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; margin-top: 10px; }
         .btn-primary { background: var(--gemini-cyan); color: black; }
-        .btn-primary:hover { box-shadow: 0 5px 20px rgba(34, 211, 238, 0.3); transform: translateY(-2px); }
         .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--gemini-red); border: 1px solid var(--gemini-red); }
-        .btn-danger:hover { background: var(--gemini-red); color: white; }
-        .login-title { text-align: center; font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; }
 
         @media screen and (max-width: 768px) {
             body { font-size: 14px; }
-            .calendar-container { justify-content: flex-start; -webkit-overflow-scrolling: touch; }
             .cal-wrapper { min-width: 800px; margin-bottom: 20px; }
-            .top-bar { flex-direction: column; gap: 15px; align-items: flex-start; }
-            .controls { flex-wrap: wrap; width: 100%; justify-content: space-between; }
-            .st-select { flex: 1; text-align: center; }
-            .modal-box { width: 95%; max-height: 85vh; overflow-y: auto; }
+            .top-bar { padding: 15px; }
+            .controls-area { flex-direction: column; align-items: stretch; gap: 15px; }
+            .week-slider { justify-content: space-between; }
+            .view-toggles { justify-content: center; width: 100%; }
+            .v-btn { flex: 1; text-align: center; }
+            .month-view .cal-wrapper { min-width: 0; } 
         }
     </style>
 </head>
 <body>
 
-    <div id="loader">
-        <div class="gemini-spinner"></div>
+    <div id="loader"><div class="gemini-spinner"></div></div>
+
+    <div class="info-bar">
+        <div id="liveClock" class="live-clock">--:--</div>
+        <div id="editableMonth" class="month-display" onclick="editMonthName()">CALENDRIER</div>
+        <div id="liveDate" style="font-size:0.75rem; text-transform:uppercase;">...</div>
     </div>
 
     <div class="top-bar">
-        <div class="logo-area">
+        <div class="nav-row">
             <div class="logo-text">
                 <svg class="icon" viewBox="0 0 24 24" style="color:var(--gemini-cyan); width:24px; height:24px; margin-right:10px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 MCalC+ <span>Calendar</span>
             </div>
+            <a href="smartst-cloud-access.html" style="color:var(--text-mute); text-decoration:none; font-weight:600; font-size:0.8rem;">Retour OS</a>
         </div>
-        <div class="controls">
-            <select id="weekSelect" class="st-select" onchange="renderCalendar()">
-                </select>
+
+        <div class="controls-area">
+            <div class="view-toggles">
+                <button class="v-btn" onclick="setView('day')" id="btnViewDay">JOUR</button>
+                <button class="v-btn active" onclick="setView('week')" id="btnViewWeek">SEMAINE</button>
+                <button class="v-btn" onclick="setView('month')" id="btnViewMonth">MOIS</button>
+            </div>
+
+            <div class="week-slider">
+                <button class="slide-btn" onclick="changeWeek(-1)">&lt;</button>
+                <span id="currentWeekLabel" class="current-week-lbl">Semaine 6</span>
+                <button class="slide-btn" onclick="changeWeek(1)">&gt;</button>
+            </div>
+
             <select id="groupSelect" class="st-select" onchange="renderCalendar()">
                 <option value="C1">Groupe C1</option>
                 <option value="C2">Groupe C2</option>
             </select>
             
-            <button id="adminBtn" class="st-select btn-admin" onclick="handleAdminClick()">
+            <button id="adminBtn" class="btn-admin" onclick="handleAdminClick()">
                 <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                <span id="adminBtnText">Admin</span>
+                Admin
             </button>
-
-            <a href="smartst-cloud-access.html" class="btn-back">
-                <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                Retour OS
-            </a>
         </div>
     </div>
 
     <div class="calendar-container">
-        <div class="cal-wrapper">
-            <div class="cal-header"></div>
-            <div class="cal-header"><span class="day-name">Lundi</span><span class="day-date" id="date-0" onclick="editDate(0)">...</span></div>
-            <div class="cal-header"><span class="day-name">Mardi</span><span class="day-date" id="date-1" onclick="editDate(1)">...</span></div>
-            <div class="cal-header"><span class="day-name">Mercredi</span><span class="day-date" id="date-2" onclick="editDate(2)">...</span></div>
-            <div class="cal-header"><span class="day-name">Jeudi</span><span class="day-date" id="date-3" onclick="editDate(3)">...</span></div>
-            <div class="cal-header"><span class="day-name">Vendredi</span><span class="day-date" id="date-4" onclick="editDate(4)">...</span></div>
-
-            <div class="time-labels">
-                <div class="time-label"><span>09h00</span>10h45</div>
-                <div class="time-label"><span>11h00</span>12h45</div>
-                <div class="lunch-break-label">PAUSE</div>
-                <div class="time-label"><span>14h15</span>16h00</div>
-                <div class="time-label"><span>16h15</span>18h00</div>
-            </div>
-
-            <div class="day-col" id="day-0"></div>
-            <div class="day-col" id="day-1"></div>
-            <div class="day-col" id="day-2"></div>
-            <div class="day-col" id="day-3"></div>
-            <div class="day-col" id="day-4"></div>
-        </div>
+        <div id="calendarGrid" class="cal-wrapper"></div>
     </div>
 
     <div class="modal-overlay" id="adminLoginModal">
         <div class="modal-box">
-            <div class="login-title">Accès Administrateur</div>
+            <h3 style="color:white; text-align:center;">Accès Administrateur</h3>
             <input type="text" id="loginUser" class="st-input" placeholder="Identifiant">
             <input type="password" id="loginPass" class="st-input" placeholder="Mot de passe">
             <button class="btn-action btn-primary" onclick="verifyAdmin()">Connexion</button>
@@ -274,44 +262,29 @@
 
     <div class="modal-overlay" id="classModal" onclick="closeModal('classModal')">
         <div class="modal-box" onclick="event.stopPropagation()">
-            
             <div id="viewMode">
                 <div class="m-header">
                     <div><div class="m-title" id="mName">...</div><div class="m-sub" id="mType">...</div></div>
                     <button class="btn-reset" onclick="closeModal('classModal')" style="font-size:1.5rem; color:#666;">&times;</button>
                 </div>
-                <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><div class="m-val" id="mTimeLoc">...</div></div>
-                <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><div class="m-val" id="mProf">...</div></div>
-                <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg><div class="m-val email" id="mEmail" onclick="copyEmail()">...</div></div>
+                <div class="m-row"><svg class="icon" style="color:#666" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><div class="m-val" id="mTimeLoc">...</div></div>
+                <div class="m-row"><svg class="icon" style="color:#666" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><div class="m-val" id="mProf">...</div></div>
+                <div class="m-row"><svg class="icon" style="color:#666" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg><div class="m-val email" style="color:var(--gemini-blue); cursor:pointer; text-decoration:underline;" id="mEmail" onclick="copyEmail()">...</div></div>
                 <div id="mExamBox" style="display:none; margin-top:20px; padding:15px; background:rgba(244, 63, 94, 0.1); border:1px solid var(--gemini-red); border-radius:10px;"><div style="color:var(--gemini-red); font-weight:800; font-size:0.8rem; margin-bottom:5px;">⚠️ EXAMEN PRÉVU</div><div class="m-val" id="mExamText" style="font-size:0.9rem;"></div></div>
                 <button id="btnEdit" class="btn-action btn-primary" style="margin-top:25px; background:var(--gemini-gold); color:black; display:none;" onclick="toEditMode()">MODIFIER (ADMIN)</button>
             </div>
 
             <div id="editMode" class="hidden">
                 <h3 style="color:white; margin-top:0;">Éditer le Cours</h3>
-                <select id="eGroup" class="st-input" style="border:1px solid var(--gemini-gold);">
-                    <option value="C1">C1 Uniquement</option>
-                    <option value="C2">C2 Uniquement</option>
-                    <option value="C_FULL">Groupe C Complet (C1 + C2)</option>
-                    <option value="ALL">PROMO (Toute la promo)</option>
-                </select>
+                <select id="eGroup" class="st-input" style="border:1px solid var(--gemini-gold);"><option value="C1">C1</option><option value="C2">C2</option><option value="C_FULL">C1 + C2</option><option value="ALL">PROMO</option></select>
                 <input type="text" id="eName" class="st-input" placeholder="Matière">
-                <select id="eType" class="st-input">
-                    <option value="CM">CM</option><option value="TD">TD</option><option value="TP">TP</option><option value="SAE">SAE</option>
-                </select>
-                <div style="display:flex; gap:10px;">
-                    <input type="number" id="eStart" class="st-input" placeholder="Début">
-                    <input type="number" id="eDur" class="st-input" placeholder="Durée">
-                </div>
+                <select id="eType" class="st-input"><option value="CM">CM</option><option value="TD">TD</option><option value="TP">TP</option><option value="SAE">SAE</option></select>
+                <div style="display:flex; gap:10px;"><input type="number" id="eStart" class="st-input" placeholder="Début"><input type="number" id="eDur" class="st-input" placeholder="Durée"></div>
                 <input type="text" id="eRoom" class="st-input" placeholder="Salle">
                 <input type="text" id="eProf" class="st-input" placeholder="Professeur">
                 <input type="text" id="eEmail" class="st-input" placeholder="Email">
                 <input type="text" id="eExam" class="st-input" placeholder="Info Examen">
-                <select id="eStatus" class="st-input">
-                    <option value="active">Actif</option>
-                    <option value="cancelled">Annulé</option>
-                    <option value="postponed">Reporté</option>
-                </select>
+                <select id="eStatus" class="st-input"><option value="active">Actif</option><option value="cancelled">Annulé</option><option value="postponed">Reporté</option></select>
                 <button class="btn-action btn-primary" onclick="saveClass()">ENREGISTRER</button>
                 <button class="btn-action btn-danger" onclick="confirmDelete()">SUPPRIMER</button>
             </div>
@@ -328,138 +301,248 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, doc, query, onSnapshot, addDoc, updateDoc, deleteDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, query, onSnapshot, addDoc, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
-            authDomain: "smartst-os.firebaseapp.com",
-            projectId: "smartst-os",
-            storageBucket: "smartst-os.firebasestorage.app",
-            messagingSenderId: "866980185011",
-            appId: "1:866980185011:web:03006fe6a81634d5dec1c6"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8", authDomain: "smartst-os.firebaseapp.com", projectId: "smartst-os", storageBucket: "smartst-os.firebasestorage.app", messagingSenderId: "866980185011", appId: "1:866980185011:web:03006fe6a81634d5dec1c6" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-
-        // YOUR ADMIN UID (Must match Firestore Rule)
         const ADMIN_UID = "WA5k4NI4mWWsmzdLgRS9tGRRfVz2"; 
 
         let scheduleData = [];
         let dateData = {}; 
+        let monthName = "Février";
         let isAdmin = false;
         let currentEvent = null;
         let currentSlot = null;
-
-        const SLOTS = [
-            { start: 9.00, duration: 1.75 }, 
-            { start: 11.00, duration: 1.75 }, 
-            { start: 14.25, duration: 1.75 }, 
-            { start: 16.25, duration: 1.75 }
-        ];
+        
+        // VIEW STATE
+        let currentView = 'week'; // 'day', 'week', 'month'
+        let currentWeekIndex = 6; // Start at Week 6
+        const DAYS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
+        const SLOTS = [{start:9.00, duration:1.75}, {start:11.00, duration:1.75}, {start:14.25, duration:1.75}, {start:16.25, duration:1.75}];
 
         window.onload = function() {
-            // Basic UI session check (to prevent random access without main login)
-            if(!localStorage.getItem('smartst_session')) {
-                window.location.href = 'smartst-cloud-access.html'; 
-            }
-            // Initialize 4-week selection
-            generateWeekOptions();
+            if(!localStorage.getItem('smartst_session')) window.location.href = 'smartst-cloud-access.html'; 
+            startClock();
         };
 
-        // --- NEW: Generate 4 Weeks (1 Month) of Options ---
-        function generateWeekOptions() {
-            const selector = document.getElementById('weekSelect');
-            selector.innerHTML = ''; // Clear existing
-            
-            // Configuration: Start Week. Change this to match current academic week.
-            // Currently set to 6 based on your previous "Sem A" = 6
-            const startWeek = 6; 
-            
-            for (let i = 0; i < 4; i++) {
-                const weekNum = startWeek + i;
-                const option = document.createElement('option');
-                option.value = weekNum;
-                option.innerText = `Semaine ${weekNum}`;
-                selector.appendChild(option);
-            }
+        // --- CLOCK & WEATHER ---
+        function startClock() {
+            const update = () => {
+                const now = new Date();
+                document.getElementById('liveClock').innerText = now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+                document.getElementById('liveDate').innerText = now.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
+            };
+            update();
+            setInterval(update, 1000);
         }
 
-        // --- REAL AUTH LISTENER ---
+        // --- AUTH & DATA ---
         onAuthStateChanged(auth, (user) => {
-            if (user && user.uid === ADMIN_UID) {
-                console.log("Admin privileges active.");
-                isAdmin = true;
-                updateAdminBtnUI(true);
-            } else {
-                console.log("Standard user access.");
-                isAdmin = false;
-                updateAdminBtnUI(false);
-            }
-
-            // Start Data Sync
+            if (user && user.uid === ADMIN_UID) { isAdmin = true; updateAdminBtnUI(true); } 
+            else { isAdmin = false; updateAdminBtnUI(false); }
             initRealTimeSync();
-            
-            // Remove Loader
-            setTimeout(() => {
-                const l = document.getElementById('loader');
-                if(l) { l.style.opacity = '0'; setTimeout(()=>l.style.display='none', 400); }
-            }, 500);
+            setTimeout(() => { const l = document.getElementById('loader'); if(l) l.style.display='none'; }, 500);
         });
 
         function initRealTimeSync() {
-            const q = query(collection(db, "schedule"));
-            onSnapshot(q, (snapshot) => {
+            onSnapshot(query(collection(db, "schedule")), (snapshot) => {
                 scheduleData = [];
-                snapshot.forEach(doc => {
-                    scheduleData.push({ ...doc.data(), id: doc.id });
-                });
+                snapshot.forEach(doc => scheduleData.push({ ...doc.data(), id: doc.id }));
                 renderCalendar();
-            }, (error) => {
-                console.error("Sync Error:", error);
             });
-
-            onSnapshot(doc(db, "meta", "calendarDates"), (doc) => {
-                if(doc.exists()) {
-                    dateData = doc.data();
-                    renderCalendar();
+            onSnapshot(doc(db, "meta", "calendarSettings"), (docSnap) => {
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    dateData = data.dates || {};
+                    if(data.monthName) { monthName = data.monthName; document.getElementById('editableMonth').innerText = monthName; }
                 }
+                renderCalendar();
             });
         }
 
-        function renderSlots() {
-            for(let d=0; d<5; d++) {
-                const col = document.getElementById(`day-${d}`);
-                col.innerHTML = '';
-                col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 0)"></div>`;
-                col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 1)"></div>`;
-                col.innerHTML += `<div class="lunch-break"><div class="lunch-line"></div></div>`;
-                col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 2)"></div>`;
-                col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 3)"></div>`;
-            }
-            updateAdminStyles();
+        // --- VIEW CONTROLLERS ---
+        window.setView = (view) => {
+            currentView = view;
+            document.querySelectorAll('.v-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btnView${view.charAt(0).toUpperCase() + view.slice(1)}`).classList.add('active');
+            renderCalendar();
         }
 
-        window.renderCalendar = function() {
-            // Re-render empty slots first
-            renderSlots();
-            
-            const week = document.getElementById('weekSelect').value;
-            const group = document.getElementById('groupSelect').value;
+        window.changeWeek = (dir) => {
+            currentWeekIndex += dir;
+            if(currentWeekIndex < 1) currentWeekIndex = 1; 
+            if(currentWeekIndex > 52) currentWeekIndex = 52;
+            document.getElementById('currentWeekLabel').innerText = `Semaine ${currentWeekIndex}`;
+            renderCalendar();
+        }
 
-            // Handle date display for currently selected week
-            // Note: DB needs keys like "6", "7", "8", "9" for full functionality
-            const weekDates = dateData[week] || ["...", "...", "...", "...", "..."];
+        window.editMonthName = async () => {
+            if(!isAdmin) return;
+            const newName = prompt("Nom du mois :", monthName);
+            if(newName) {
+                try {
+                    await setDoc(doc(db, "meta", "calendarSettings"), { monthName: newName }, { merge: true });
+                } catch(e) { alert("Erreur: Droits insuffisants"); }
+            }
+        }
+
+        // --- RENDERING CORE ---
+        window.renderCalendar = function() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            grid.className = `cal-wrapper ${currentView}-view`;
+
+            if(currentView === 'week') renderWeekView(grid);
+            else if(currentView === 'day') renderDayView(grid);
+            else if(currentView === 'month') renderMonthView(grid);
+        }
+
+        function renderWeekView(container) {
+            // Header Row
+            container.innerHTML += `<div class="cal-header"></div>`; // Time col spacer
+            const todayIndex = (new Date().getDay()) - 1; // 0=Mon, 4=Fri
+            
+            const weekDates = dateData[currentWeekIndex] || ["...", "...", "...", "...", "..."];
+            
+            // Render Headers
             for(let i=0; i<5; i++) {
-                const el = document.getElementById(`date-${i}`);
-                el.innerText = weekDates[i];
-                if(isAdmin) el.classList.add('editable'); else el.classList.remove('editable');
+                const hasExam = checkForExam(i);
+                const isToday = (i === todayIndex && checkIsCurrentWeek());
+                const classes = `cal-header ${isToday?'is-today':''} ${hasExam?'has-exam':''}`;
+                
+                container.innerHTML += `
+                    <div class="${classes}">
+                        <span class="day-name">${DAYS[i]}</span>
+                        <div class="day-meta">
+                            <span class="day-date" id="date-${i}" ${isAdmin ? `onclick="editDate(${i})"` : ''}>${weekDates[i]}</span>
+                            <span class="weather-icon">${getWeatherIcon(i)}</span>
+                        </div>
+                    </div>`;
             }
 
+            // Time Labels
+            container.innerHTML += `
+                <div class="time-labels">
+                    <div class="time-label"><span>09h00</span>10h45</div>
+                    <div class="time-label"><span>11h00</span>12h45</div>
+                    <div class="lunch-break-label">PAUSE</div>
+                    <div class="time-label"><span>14h15</span>16h00</div>
+                    <div class="time-label"><span>16h15</span>18h00</div>
+                </div>`;
+
+            // Columns
+            for(let i=0; i<5; i++) {
+                const col = document.createElement('div');
+                col.className = 'day-col';
+                col.id = `day-${i}`;
+                // Slots
+                col.innerHTML = `
+                    <div class="slot ${isAdmin?'admin-mode':''}" onclick="clickSlot(${i}, 0)"></div>
+                    <div class="slot ${isAdmin?'admin-mode':''}" onclick="clickSlot(${i}, 1)"></div>
+                    <div class="lunch-break"><div class="lunch-line"></div></div>
+                    <div class="slot ${isAdmin?'admin-mode':''}" onclick="clickSlot(${i}, 2)"></div>
+                    <div class="slot ${isAdmin?'admin-mode':''}" onclick="clickSlot(${i}, 3)"></div>
+                `;
+                container.appendChild(col);
+            }
+
+            populateEvents(container);
+        }
+
+        function renderDayView(container) {
+            const todayIndex = (new Date().getDay()) - 1; 
+            const targetDay = (todayIndex >= 0 && todayIndex <= 4) ? todayIndex : 0; // Default to Mon if weekend
+            
+            const weekDates = dateData[currentWeekIndex] || ["...", "...", "...", "...", "..."];
+            
+            // Only 1 column layout
+            container.style.gridTemplateColumns = "60px 1fr"; 
+            
+            // Header
+            const hasExam = checkForExam(targetDay);
+            container.innerHTML = `
+                <div class="cal-header"></div>
+                <div class="cal-header is-today ${hasExam?'has-exam':''}">
+                    <span class="day-name">${DAYS[targetDay]} (AUJOURD'HUI)</span>
+                    <div class="day-meta">
+                        <span class="day-date">${weekDates[targetDay]}</span>
+                        <span class="weather-icon">${getWeatherIcon(targetDay)}</span>
+                    </div>
+                </div>
+            `;
+
+            // Time Labels (Same)
+            container.innerHTML += `
+                <div class="time-labels">
+                    <div class="time-label"><span>09h00</span>10h45</div>
+                    <div class="time-label"><span>11h00</span>12h45</div>
+                    <div class="lunch-break-label">PAUSE</div>
+                    <div class="time-label"><span>14h15</span>16h00</div>
+                    <div class="time-label"><span>16h15</span>18h00</div>
+                </div>`;
+
+            // Single Col
+            const col = document.createElement('div');
+            col.className = 'day-col';
+            col.id = `day-${targetDay}`; // Keep ID for populateEvents logic
+            col.innerHTML = `
+                <div class="slot" onclick="clickSlot(${targetDay}, 0)"></div>
+                <div class="slot" onclick="clickSlot(${targetDay}, 1)"></div>
+                <div class="lunch-break"><div class="lunch-line"></div></div>
+                <div class="slot" onclick="clickSlot(${targetDay}, 2)"></div>
+                <div class="slot" onclick="clickSlot(${targetDay}, 3)"></div>
+            `;
+            container.appendChild(col);
+            
+            populateEvents(container);
+        }
+
+        function renderMonthView(container) {
+            // Show 4 weeks stack
+            const startWk = currentWeekIndex;
+            
+            for(let w=0; w<4; w++) {
+                const wkNum = startWk + w;
+                const weekRow = document.createElement('div');
+                weekRow.className = 'month-week-row';
+                
+                let dayCards = '';
+                for(let d=0; d<5; d++) {
+                    const date = dateData[wkNum]?.[d] || "";
+                    // Count events for this day
+                    const evts = scheduleData.filter(e => e.weeks && e.weeks.includes(wkNum) && e.day === d && (e.groups.includes(document.getElementById('groupSelect').value) || e.groups.includes('ALL')));
+                    
+                    let indicators = '';
+                    evts.forEach(e => {
+                        let color = 'var(--gemini-blue)';
+                        if(e.type === 'TD') color = 'var(--gemini-green)';
+                        if(e.type === 'TP') color = 'var(--gemini-orange)';
+                        indicators += `<div class="mini-event" style="background:${color}"></div>`;
+                    });
+
+                    dayCards += `
+                        <div class="month-day-card">
+                            <div class="month-day-head"><span>${DAYS[d].substring(0,3)}</span><span>${date}</span></div>
+                            ${indicators}
+                        </div>
+                    `;
+                }
+
+                weekRow.innerHTML = `
+                    <div class="month-week-label">SEM ${wkNum}</div>
+                    <div class="month-days-grid">${dayCards}</div>
+                `;
+                container.appendChild(weekRow);
+            }
+        }
+
+        function populateEvents(container) {
+            const group = document.getElementById('groupSelect').value;
             const events = scheduleData.filter(e => 
-                e.weeks && e.weeks.includes(parseInt(week)) && 
+                e.weeks && e.weeks.includes(currentWeekIndex) && 
                 (e.groups.includes(group) || e.groups.includes("ALL"))
             );
 
@@ -472,178 +555,88 @@
 
                 if (slotIdx > -1) {
                     const col = document.getElementById(`day-${evt.day}`);
-                    const targetChildIndex = slotIdx < 2 ? slotIdx : slotIdx + 1;
-                    const slotDiv = col.children[targetChildIndex];
+                    // If day view, we only render the specific col, so check if it exists
+                    if(col) {
+                        const targetChildIndex = slotIdx < 2 ? slotIdx : slotIdx + 1;
+                        const slotDiv = col.children[targetChildIndex];
+                        if(slotDiv) {
+                            const card = document.createElement('div');
+                            card.className = `event-card type-${evt.type}`;
+                            if(evt.status === 'cancelled') card.classList.add('status-cancelled');
+                            if(evt.status === 'postponed') card.classList.add('status-postponed');
 
-                    if(slotDiv) {
-                        const card = document.createElement('div');
-                        card.className = `event-card type-${evt.type}`;
-                        if(evt.status === 'cancelled') card.classList.add('status-cancelled');
-                        if(evt.status === 'postponed') card.classList.add('status-postponed');
+                            let statusOverlay = '';
+                            if(evt.status === 'cancelled') statusOverlay = '<div class="status-badge st-cancelled">ANNULÉ</div>';
+                            else if(evt.status === 'postponed') statusOverlay = '<div class="status-badge st-postponed">REPORTÉ</div>';
 
-                        let badgeHtml = '';
-                        if(evt.groups.includes('ALL')) badgeHtml = '<span class="evt-group-badge badge-promo">PROMO</span>';
-                        else if(evt.groups.length > 1) badgeHtml = '<span class="evt-group-badge badge-grp">C1 + C2</span>';
-                        else if(evt.groups.includes('C1')) badgeHtml = '<span class="evt-group-badge badge-grp">C1</span>';
-                        else if(evt.groups.includes('C2')) badgeHtml = '<span class="evt-group-badge badge-grp">C2</span>';
-
-                        // --- INSERT STATUS TEXT ---
-                        let statusOverlay = '';
-                        if(evt.status === 'cancelled') {
-                            statusOverlay = '<div class="status-text-overlay st-cancelled-text">ANNULÉ</div>';
-                        } else if(evt.status === 'postponed') {
-                            statusOverlay = '<div class="status-text-overlay st-postponed-text">REPORTÉ</div>';
-                        }
-
-                        card.innerHTML = `
-                            ${statusOverlay}
-                            <div class="evt-top">
-                                <div style="display:flex; gap:5px; align-items:center;">
+                            card.innerHTML = `
+                                ${statusOverlay}
+                                <div class="evt-top">
                                     <span class="evt-type">${evt.type}</span>
-                                    ${badgeHtml}
+                                    ${evt.examInfo ? '<div class="exam-indicator"></div>' : ''}
                                 </div>
-                                ${evt.examInfo ? '<div class="exam-dot"></div>' : ''}
-                            </div>
-                            <div class="evt-title">${evt.name}</div>
-                            <div class="evt-bot"><span class="evt-room">${evt.room}</span><span>${evt.prof}</span></div>
-                        `;
-                        card.onclick = (e) => { e.stopPropagation(); openDetails(evt); };
-                        slotDiv.appendChild(card);
+                                <div class="evt-title">${evt.name}</div>
+                                <div class="evt-bot"><span class="evt-room">${evt.room}</span><span>${evt.prof}</span></div>
+                            `;
+                            card.onclick = (e) => { e.stopPropagation(); openDetails(evt); };
+                            slotDiv.appendChild(card);
+                        }
                     }
                 }
             });
-            updateAdminStyles();
         }
 
-        function updateAdminStyles() {
-            document.querySelectorAll('.slot').forEach(s => {
-                if(isAdmin) s.classList.add('admin-mode'); else s.classList.remove('admin-mode');
-            });
+        // --- HELPERS ---
+        function checkForExam(dayIdx) {
+            const group = document.getElementById('groupSelect').value;
+            // Check if any event in this day/week has examInfo
+            return scheduleData.some(e => 
+                e.weeks.includes(currentWeekIndex) && 
+                e.day === dayIdx && 
+                (e.groups.includes(group) || e.groups.includes("ALL")) && 
+                e.examInfo && e.examInfo.trim() !== ""
+            );
         }
 
-        window.handleAdminClick = function() {
-            if(isAdmin) {
-                if(confirm("Se déconnecter du mode Admin ?")) {
-                    signOut(auth).then(() => {
-                        window.location.reload(); 
-                    });
-                }
-            } else {
-                openModal('adminLoginModal');
-            }
+        function checkIsCurrentWeek() {
+            // Simple mockup: assume week 6 is current for demo. 
+            // In real app, calculate week number from date.
+            return currentWeekIndex === 6; 
         }
 
-        // --- AUTHENTICATION ---
-        window.verifyAdmin = async function() {
-            const u = document.getElementById('loginUser').value;
-            const p = document.getElementById('loginPass').value;
-            
-            try {
-                // This swaps the current Auth user to the Admin user.
-                await signInWithEmailAndPassword(auth, u, p);
-                closeModal('adminLoginModal');
-            } catch (error) {
-                console.error(error);
-                alert("Erreur de connexion : " + error.message);
-            }
+        function getWeatherIcon(dayIdx) {
+            // Deterministic mockup weather based on day index + week
+            const icons = ['☀️', '⛅', '🌧️', '⛈️', '🌥️'];
+            const i = (dayIdx + currentWeekIndex) % icons.length;
+            return icons[i];
         }
 
-        function updateAdminBtnUI(active) {
-            const btn = document.getElementById('adminBtn');
-            if(active) {
-                btn.classList.add('logged-in');
-                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg> Quit Admin`;
-            } else {
-                btn.classList.remove('logged-in');
-                btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Admin`;
-            }
-        }
-
-        // --- EDITOR LOGIC ---
-        window.clickSlot = function(day, idx) {
+        // --- ADMIN FUNCTIONS ---
+        window.clickSlot = (day, idx) => {
             if(!isAdmin) return;
             currentEvent = null;
             const def = SLOTS[idx];
-            
-            document.getElementById('eName').value = "";
-            document.getElementById('eType').value = "CM";
-            document.getElementById('eStart').value = def.start;
-            document.getElementById('eDur').value = def.duration;
-            document.getElementById('eRoom').value = "";
-            document.getElementById('eProf').value = "";
-            document.getElementById('eEmail').value = "";
-            document.getElementById('eExam').value = "";
+            document.getElementById('eName').value = ""; document.getElementById('eType').value = "CM";
+            document.getElementById('eStart').value = def.start; document.getElementById('eDur').value = def.duration;
+            document.getElementById('eRoom').value = ""; document.getElementById('eProf').value = "";
+            document.getElementById('eEmail').value = ""; document.getElementById('eExam').value = "";
             document.getElementById('eStatus').value = "active";
-            
-            const cf = document.getElementById('groupSelect').value;
-            document.getElementById('eGroup').value = cf; 
-
-            currentSlot = { day: day, wk: parseInt(document.getElementById('weekSelect').value), grp: cf };
-            openModal('classModal');
-            window.toEditMode();
+            document.getElementById('eGroup').value = document.getElementById('groupSelect').value;
+            currentSlot = { day, wk: currentWeekIndex };
+            openModal('classModal'); toEditMode();
         }
 
-        window.editDate = async function(dayIdx) {
+        window.editDate = async (dayIdx) => {
             if(!isAdmin) return;
-            const week = document.getElementById('weekSelect').value;
-            const newDate = prompt("Modifier la date (ex: 02/02) :", dateData[week]?.[dayIdx] || "");
+            const newDate = prompt("Date (jj/mm):", dateData[currentWeekIndex]?.[dayIdx] || "");
             if(newDate) {
-                if(!dateData[week]) dateData[week] = ["...", "...", "...", "...", "..."];
-                dateData[week][dayIdx] = newDate;
-                try {
-                    await setDoc(doc(db, "meta", "calendarDates"), dateData);
-                } catch(e) {
-                    alert("Erreur: Impossible de modifier (Droits insuffisants)");
-                }
+                if(!dateData[currentWeekIndex]) dateData[currentWeekIndex] = ["...","...","...","...","..."];
+                dateData[currentWeekIndex][dayIdx] = newDate;
+                await setDoc(doc(db, "meta", "calendarSettings"), { dates: dateData }, { merge: true });
             }
         }
 
-        window.openDetails = function(evt) {
-            currentEvent = evt;
-            document.getElementById('mName').innerText = evt.name;
-            document.getElementById('mType').innerText = evt.type;
-            document.getElementById('mTimeLoc').innerText = `${formatTime(evt.start)} - ${formatTime(evt.start+evt.duration)} • ${evt.room}`;
-            document.getElementById('mProf').innerText = evt.prof;
-            document.getElementById('mEmail').innerText = evt.profEmail || "Non renseigné";
-            
-            if(evt.examInfo) {
-                document.getElementById('mExamBox').style.display = 'block';
-                document.getElementById('mExamText').innerText = evt.examInfo;
-            } else document.getElementById('mExamBox').style.display = 'none';
-
-            document.getElementById('viewMode').style.display = 'block';
-            document.getElementById('editMode').style.display = 'none';
-            document.getElementById('btnEdit').style.display = isAdmin ? 'block' : 'none';
-            
-            openModal('classModal');
-        }
-
-        window.toEditMode = function() {
-            document.getElementById('viewMode').style.display = 'none';
-            document.getElementById('editMode').classList.remove('hidden');
-            document.getElementById('editMode').style.display = 'block';
-            
-            if(currentEvent) {
-                document.getElementById('eName').value = currentEvent.name;
-                document.getElementById('eType').value = currentEvent.type;
-                document.getElementById('eStart').value = currentEvent.start;
-                document.getElementById('eDur').value = currentEvent.duration;
-                document.getElementById('eRoom').value = currentEvent.room;
-                document.getElementById('eProf').value = currentEvent.prof;
-                document.getElementById('eEmail').value = currentEvent.profEmail;
-                document.getElementById('eExam').value = currentEvent.examInfo;
-                document.getElementById('eStatus').value = currentEvent.status;
-                
-                let gVal = 'C1'; 
-                if(currentEvent.groups.includes('ALL')) gVal = 'ALL';
-                else if(currentEvent.groups.includes('C1') && currentEvent.groups.includes('C2')) gVal = 'C_FULL';
-                else if(currentEvent.groups.includes('C1')) gVal = 'C1';
-                else if(currentEvent.groups.includes('C2')) gVal = 'C2';
-                document.getElementById('eGroup').value = gVal;
-            }
-        }
-
-        window.saveClass = async function() {
+        window.saveClass = async () => {
             const tGroup = document.getElementById('eGroup').value;
             let groupsArr = [tGroup];
             if(tGroup === 'ALL') groupsArr = ['ALL'];
@@ -663,45 +656,82 @@
             };
 
             try {
-                if(currentEvent) {
-                    await updateDoc(doc(db, "schedule", currentEvent.id), data);
-                } else {
+                if(currentEvent) await updateDoc(doc(db, "schedule", currentEvent.id), data);
+                else {
                     data.day = currentSlot.day;
                     data.weeks = [currentSlot.wk];
                     await addDoc(collection(db, "schedule"), data);
                 }
                 closeModal('classModal');
-            } catch(e) {
-                console.error(e);
-                alert("Erreur de sauvegarde: Permissions refusées. Vérifiez que vous êtes connecté avec le compte Admin.");
-            }
+            } catch(e) { alert("Erreur Admin"); }
         }
 
-        window.confirmDelete = function() { openModal('deleteModal'); }
-        window.executeDelete = async function() {
+        window.executeDelete = async () => {
             if(currentEvent) {
-                try {
-                    await deleteDoc(doc(db, "schedule", currentEvent.id));
-                    closeModal('deleteModal');
-                    closeModal('classModal');
-                } catch(e) {
-                    alert("Erreur: Impossible de supprimer (Permissions refusées).");
-                }
+                await deleteDoc(doc(db, "schedule", currentEvent.id));
+                closeModal('deleteModal'); closeModal('classModal');
             }
         }
 
-        window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; }
-        window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; }
-        
-        window.formatTime = function(dec) {
-            const h = Math.floor(dec);
-            const m = Math.round((dec - h) * 60);
-            return `${h}h${m<10?'0'+m:m}`;
+        // --- AUTH ---
+        window.handleAdminClick = () => {
+            if(isAdmin) { if(confirm("Quit Admin?")) signOut(auth).then(()=>location.reload()); }
+            else openModal('adminLoginModal');
         }
-        window.copyEmail = function() {
-            const mail = document.getElementById('mEmail').innerText;
-            if(mail && mail !== "Non renseigné") { navigator.clipboard.writeText(mail); alert("Adresse copiée !"); }
+        window.verifyAdmin = async () => {
+            const u = document.getElementById('loginUser').value;
+            const p = document.getElementById('loginPass').value;
+            try { await signInWithEmailAndPassword(auth, u, p); closeModal('adminLoginModal'); }
+            catch(e) { alert("Erreur Login"); }
         }
+        function updateAdminBtnUI(active) {
+            const btn = document.getElementById('adminBtn');
+            if(active) { btn.classList.add('logged-in'); btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"></path></svg> Quit`; }
+            else { btn.classList.remove('logged-in'); btn.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> Admin`; }
+        }
+
+        // --- UTILS ---
+        window.openDetails = (evt) => {
+            currentEvent = evt;
+            document.getElementById('mName').innerText = evt.name;
+            document.getElementById('mType').innerText = evt.type;
+            document.getElementById('mTimeLoc').innerText = `${formatTime(evt.start)} - ${formatTime(evt.start+evt.duration)} • ${evt.room}`;
+            document.getElementById('mProf').innerText = evt.prof;
+            document.getElementById('mEmail').innerText = evt.profEmail || "Non renseigné";
+            document.getElementById('mExamBox').style.display = evt.examInfo ? 'block' : 'none';
+            if(evt.examInfo) document.getElementById('mExamText').innerText = evt.examInfo;
+            
+            document.getElementById('viewMode').style.display='block';
+            document.getElementById('editMode').style.display='none';
+            document.getElementById('btnEdit').style.display = isAdmin ? 'block' : 'none';
+            openModal('classModal');
+        }
+        window.toEditMode = () => {
+            document.getElementById('viewMode').style.display='none';
+            document.getElementById('editMode').classList.remove('hidden');
+            document.getElementById('editMode').style.display='block';
+            if(currentEvent) {
+                document.getElementById('eName').value = currentEvent.name;
+                document.getElementById('eType').value = currentEvent.type;
+                document.getElementById('eStart').value = currentEvent.start;
+                document.getElementById('eDur').value = currentEvent.duration;
+                document.getElementById('eRoom').value = currentEvent.room;
+                document.getElementById('eProf').value = currentEvent.prof;
+                document.getElementById('eEmail').value = currentEvent.profEmail;
+                document.getElementById('eExam').value = currentEvent.examInfo;
+                document.getElementById('eStatus').value = currentEvent.status;
+                let gVal = 'C1';
+                if(currentEvent.groups.includes('ALL')) gVal='ALL';
+                else if(currentEvent.groups.includes('C1') && currentEvent.groups.includes('C2')) gVal='C_FULL';
+                else if(currentEvent.groups.includes('C2')) gVal='C2';
+                document.getElementById('eGroup').value = gVal;
+            }
+        }
+        window.confirmDelete = () => openModal('deleteModal');
+        window.openModal = (id) => document.getElementById(id).style.display='flex';
+        window.closeModal = (id) => document.getElementById(id).style.display='none';
+        window.formatTime = (dec) => { const h=Math.floor(dec); const m=Math.round((dec-h)*60); return `${h}h${m<10?'0'+m:m}`; }
+        window.copyEmail = () => { const m = document.getElementById('mEmail').innerText; if(m && m!=="Non renseigné") navigator.clipboard.writeText(m); }
     </script>
 </body>
 </html>
