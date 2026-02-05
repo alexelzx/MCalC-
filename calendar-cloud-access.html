@@ -67,7 +67,13 @@
         .logo-text { font-size: 1.2rem; font-weight: 800; color: white; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
         .logo-text span { color: var(--gemini-cyan); }
 
-        /* CONTROLS GROUP (RIGHT SIDE) */
+        .info-widget {
+            display: flex; align-items: center; gap: 10px; font-size: 0.8rem; color: var(--text-mute);
+            background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+            margin-right: 15px;
+        }
+        .date-box { color: white; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
         .controls-group { display: flex; align-items: center; gap: 15px; }
 
         .st-select {
@@ -104,7 +110,8 @@
             margin-bottom: 25px;
         }
         .month-label { font-size: 1.2rem; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 2px; }
-        .week-label { font-size: 0.9rem; color: var(--gemini-cyan); font-weight: 700; background: rgba(34, 211, 238, 0.1); padding: 4px 12px; border-radius: 12px; margin-bottom: 5px; }
+        .week-label { font-size: 0.9rem; color: var(--gemini-cyan); font-weight: 700; background: rgba(34, 211, 238, 0.1); padding: 4px 12px; border-radius: 12px; margin-bottom: 5px; cursor:pointer; transition:0.2s; }
+        .week-label:hover { background: rgba(34, 211, 238, 0.2); }
         .editable-month { cursor: pointer; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.2); }
 
         /* SLIDER CONTAINER */
@@ -112,7 +119,6 @@
             display: flex; align-items: flex-start; gap: 15px; width: 100%; max-width: 1500px;
         }
 
-        /* NAVIGATION ARROWS */
         .nav-arrow {
             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1);
             color: var(--text-mute); width: 50px; height: 500px; 
@@ -129,10 +135,9 @@
         }
         .cal-header {
             text-align: center; color: var(--text-mute); padding-bottom: 10px;
-            display: flex; flex-direction: column; gap: 4px; border-radius: 8px; padding: 5px; border: 1px solid transparent;
+            display: flex; flex-direction: column; gap: 4px; border-radius: 8px; padding: 5px; border: 1px solid transparent; user-select: none;
         }
         
-        /* INTELLIGENT HIGHLIGHT */
         .cal-header.today { background: rgba(34, 211, 238, 0.1); border-color: rgba(34, 211, 238, 0.5); box-shadow: 0 0 15px rgba(34, 211, 238, 0.1); }
         .cal-header.today .day-name { color: var(--gemini-cyan); }
         .day-col.today { background: rgba(34, 211, 238, 0.03); border-radius: 12px; border: 1px solid rgba(34, 211, 238, 0.1); }
@@ -149,7 +154,7 @@
         .time-label span { display: block; font-size: 0.65rem; opacity: 0.7; }
         .lunch-break-label { font-size: 0.7rem; color: var(--gemini-purple); display: flex; align-items: center; justify-content: flex-end; opacity: 0.8; }
 
-        .day-col { display: grid; grid-template-rows: 1fr 1fr 20px 1fr 1fr; gap: 15px; }
+        .day-col { display: grid; grid-template-rows: 1fr 1fr 20px 1fr 1fr; gap: 15px; position: relative; }
         .slot {
             background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1);
             border-radius: 12px; position: relative; transition: 0.2s; min-height: 120px;
@@ -162,7 +167,20 @@
         .lunch-break { height: 20px; display: flex; align-items: center; justify-content: center; }
         .lunch-line { width: 100%; height: 1px; background: rgba(255,255,255,0.05); }
 
-        /* CARDS */
+        /* DAY VACATION BANNER */
+        .day-vacay-overlay {
+            position: absolute; inset: 0; 
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.1), rgba(217, 70, 239, 0.1));
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 5; backdrop-filter: blur(5px);
+        }
+        .day-vacay-text {
+            font-size: 1.5rem; font-weight: 800; letter-spacing: 2px;
+            background: linear-gradient(135deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            transform: rotate(-90deg); white-space: nowrap;
+        }
+
         .event-card {
             position: absolute; inset: 0; border-radius: 12px; padding: 12px;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -196,7 +214,7 @@
         .evt-bot { display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.75rem; color: var(--text-mute); }
         .evt-room { font-weight: 600; color: var(--gemini-cyan); display: flex; align-items: center; gap: 4px; }
 
-        /* VACATION OVERLAY */
+        /* GLOBAL VACATION OVERLAY */
         #vacationBanner {
             display: none; flex-direction: column; align-items: center; justify-content: center;
             height: 100%; width: 100%; text-align: center; animation: float 3s ease-in-out infinite;
@@ -227,7 +245,7 @@
         .btn-danger:hover { background: var(--gemini-red); color: white; }
         .login-title { text-align: center; font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; }
 
-        @media screen and (max-width: 900px) {
+        @media screen and (max-width: 768px) {
             body { font-size: 14px; }
             .calendar-section { justify-content: flex-start; -webkit-overflow-scrolling: touch; }
             .cal-wrapper { min-width: 800px; margin-bottom: 20px; }
@@ -252,6 +270,10 @@
             <div class="logo-text">
                 <svg class="icon" viewBox="0 0 24 24" style="color:var(--gemini-cyan); width:24px; height:24px; margin-right:10px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 MCalC+ <span>Calendar</span>
+            </div>
+            
+            <div class="info-widget">
+                <div id="liveDate" class="date-box">...</div>
             </div>
         </div>
 
@@ -280,7 +302,7 @@
         </div>
 
         <div class="cal-title-row">
-            <div id="currentWeekLabel" class="week-label">Semaine 1</div>
+            <div id="currentWeekLabel" class="week-label" onclick="editWeekNumber()">Semaine 6</div>
             <div class="month-label">
                 <span id="monthDisplay" class="editable-month" onclick="editMonthName()">...</span>
             </div>
@@ -291,11 +313,11 @@
 
             <div class="cal-wrapper">
                 <div class="cal-header"></div>
-                <div class="cal-header" id="head-0"><span class="day-name">Lundi</span><span class="day-date" id="date-0" ondblclick="pickDate(0)">...</span></div>
-                <div class="cal-header" id="head-1"><span class="day-name">Mardi</span><span class="day-date" id="date-1" ondblclick="pickDate(1)">...</span></div>
-                <div class="cal-header" id="head-2"><span class="day-name">Mercredi</span><span class="day-date" id="date-2" ondblclick="pickDate(2)">...</span></div>
-                <div class="cal-header" id="head-3"><span class="day-name">Jeudi</span><span class="day-date" id="date-3" ondblclick="pickDate(3)">...</span></div>
-                <div class="cal-header" id="head-4"><span class="day-name">Vendredi</span><span class="day-date" id="date-4" ondblclick="pickDate(4)">...</span></div>
+                <div class="cal-header" id="head-0" oncontextmenu="toggleDayHoliday(0); return false;"><span class="day-name">Lundi</span><span class="day-date" id="date-0" ondblclick="pickDate(0)">...</span></div>
+                <div class="cal-header" id="head-1" oncontextmenu="toggleDayHoliday(1); return false;"><span class="day-name">Mardi</span><span class="day-date" id="date-1" ondblclick="pickDate(1)">...</span></div>
+                <div class="cal-header" id="head-2" oncontextmenu="toggleDayHoliday(2); return false;"><span class="day-name">Mercredi</span><span class="day-date" id="date-2" ondblclick="pickDate(2)">...</span></div>
+                <div class="cal-header" id="head-3" oncontextmenu="toggleDayHoliday(3); return false;"><span class="day-name">Jeudi</span><span class="day-date" id="date-3" ondblclick="pickDate(3)">...</span></div>
+                <div class="cal-header" id="head-4" oncontextmenu="toggleDayHoliday(4); return false;"><span class="day-name">Vendredi</span><span class="day-date" id="date-4" ondblclick="pickDate(4)">...</span></div>
 
                 <div class="time-labels">
                     <div class="time-label"><span>09h00</span>10h45</div>
@@ -333,13 +355,13 @@
             <h3 style="color:white; margin-top:0;">Outils Admin</h3>
             <div style="margin:20px 0;">
                 <label style="color:white; display:flex; align-items:center; gap:10px; cursor:pointer; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-bottom:10px;">
-                    <input type="checkbox" id="vacationToggle" onchange="toggleVacationMode()" style="width:20px; height:20px;">
-                    <span style="font-size:1rem; font-weight:700;">Activer "Mode Vacances" 🌴</span>
+                    <input type="checkbox" id="vacationToggle" onchange="toggleGlobalVacation()" style="width:20px; height:20px;">
+                    <span style="font-size:1rem; font-weight:700;">Global Vacation Mode 🌴</span>
                 </label>
-                <label style="color:white; display:flex; align-items:center; gap:10px; cursor:pointer; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px;">
-                    <input type="checkbox" id="forceHighlightToggle" onchange="renderCalendar()" style="width:20px; height:20px;">
-                    <span style="font-size:1rem; font-weight:700;">Test: Highlight (Today Force)</span>
-                </label>
+                <div style="font-size:0.8rem; color:#888; padding:10px;">
+                    <strong>Tip:</strong> Double-click dates to change them.<br>
+                    <strong>Tip:</strong> Right-click Day Header (Lundi, etc.) to toggle single day holiday.
+                </div>
             </div>
             <button class="btn-action" style="background:transparent; border:1px solid #666; color:#aaa;" onclick="closeModal('adminToolsModal')">Fermer</button>
             <button class="btn-action btn-danger" style="margin-top:10px;" onclick="if(confirm('Se déconnecter?')) signOut(auth).then(()=>location.reload());">Déconnexion</button>
@@ -411,25 +433,31 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-
-        // YOUR ADMIN UID
         const ADMIN_UID = "WA5k4NI4mWWsmzdLgRS9tGRRfVz2"; 
 
         let scheduleData = [];
         let dateData = {}; 
-        let settingsData = { monthName: "...", vacationMode: false };
+        let settingsData = { monthName: "...", vacationMode: false, holidays: {} };
         let isAdmin = false;
         let currentEvent = null;
         let currentSlot = null;
         
-        let currentWeekIndex = 1; // Default
+        let currentWeekIndex = 6; // DEFAULT START WEEK (MATCHING YOUR FIREBASE)
         const SLOTS = [{start:9.00, duration:1.75}, {start:11.00, duration:1.75}, {start:14.25, duration:1.75}, {start:16.25, duration:1.75}];
 
         window.onload = function() {
             if(!localStorage.getItem('smartst_session')) {
                 window.location.href = 'smartst-cloud-access.html'; 
             }
+            updateLiveInfo();
+            setInterval(updateLiveInfo, 60000); 
         };
+
+        function updateLiveInfo() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+            document.getElementById('liveDate').innerText = dateStr;
+        }
 
         // --- AUTH & DATA ---
         onAuthStateChanged(auth, (user) => {
@@ -445,25 +473,23 @@
         });
 
         function initData() {
-            // Schedule Data
             onSnapshot(query(collection(db, "schedule")), (snapshot) => {
                 scheduleData = [];
                 snapshot.forEach(doc => scheduleData.push({ ...doc.data(), id: doc.id }));
                 renderCalendar();
             });
 
-            // Meta Data (Dates)
             onSnapshot(doc(db, "meta", "calendarDates"), (doc) => {
                 if(doc.exists()) dateData = doc.data();
                 renderCalendar();
             });
 
-            // Meta Data (Settings)
             onSnapshot(doc(db, "meta", "calendarSettings"), (doc) => {
                 if(doc.exists()) {
                     settingsData = { ...settingsData, ...doc.data() };
                     document.getElementById('monthDisplay').innerText = settingsData.monthName || "MOIS";
                     
+                    // Global Vacation Mode
                     if(settingsData.vacationMode) {
                         document.getElementById('calContainer').style.display = 'none';
                         document.getElementById('vacationBanner').style.display = 'flex';
@@ -472,43 +498,63 @@
                         document.getElementById('vacationBanner').style.display = 'none';
                     }
                     if(isAdmin) document.getElementById('vacationToggle').checked = settingsData.vacationMode;
+                    
+                    renderCalendar(); // Re-render to show/hide day vacays
                 }
             });
         }
 
-        // --- SLIDE NAVIGATION ---
+        // --- NAVIGATION ---
         window.changeWeek = (dir) => {
             currentWeekIndex += dir;
-            // Limit to 4 weeks only
+            // No strict limit now, allowing navigation through the year
             if(currentWeekIndex < 1) currentWeekIndex = 1; 
-            if(currentWeekIndex > 4) currentWeekIndex = 4;
+            if(currentWeekIndex > 52) currentWeekIndex = 52;
             document.getElementById('currentWeekLabel').innerText = `Semaine ${currentWeekIndex}`;
             renderCalendar();
         }
 
+        window.editWeekNumber = () => {
+            if(!isAdmin) return;
+            const newVal = prompt("Aller à la semaine :", currentWeekIndex);
+            if(newVal && !isNaN(newVal)) {
+                currentWeekIndex = parseInt(newVal);
+                document.getElementById('currentWeekLabel').innerText = `Semaine ${currentWeekIndex}`;
+                renderCalendar();
+            }
+        }
+
         // --- RENDER ---
-        function renderSlots() {
-            for(let d=0; d<5; d++) {
-                const col = document.getElementById(`day-${d}`);
-                col.innerHTML = '';
-                col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 0)"></div>`;
-                col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 1)"></div>`;
+        function renderSlots(dayIdx, isHoliday) {
+            const col = document.getElementById(`day-${dayIdx}`);
+            col.innerHTML = '';
+            
+            if (isHoliday) {
+                // Render Holiday Overlay instead of slots
+                col.innerHTML = `
+                    <div class="day-vacay-overlay" ${isAdmin ? `onclick="toggleDayHoliday(${dayIdx})"` : ''}>
+                        <div class="day-vacay-text">VACANCES / FÉRIÉ</div>
+                    </div>
+                `;
+            } else {
+                col.innerHTML += `<div class="slot" onclick="clickSlot(${dayIdx}, 0)"></div>`;
+                col.innerHTML += `<div class="slot" onclick="clickSlot(${dayIdx}, 1)"></div>`;
                 col.innerHTML += `<div class="lunch-break"><div class="lunch-line"></div></div>`;
-                col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 2)"></div>`;
-                col.innerHTML += `<div class="slot" onclick="clickSlot(${d}, 3)"></div>`;
+                col.innerHTML += `<div class="slot" onclick="clickSlot(${dayIdx}, 2)"></div>`;
+                col.innerHTML += `<div class="slot" onclick="clickSlot(${dayIdx}, 3)"></div>`;
             }
             updateAdminStyles();
         }
 
         window.renderCalendar = function() {
-            renderSlots();
             const group = document.getElementById('groupSelect').value;
             const dates = dateData[currentWeekIndex] || ["...", "...", "...", "...", "..."];
             
-            // Intelligent Date Matching
             const now = new Date();
-            // Format to match stored dates (DD/MM)
             const todayStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }); 
+
+            // Check if this week has any specific day holidays
+            const weekHolidays = settingsData.holidays ? (settingsData.holidays[currentWeekIndex] || {}) : {};
 
             for(let i=0; i<5; i++) {
                 const el = document.getElementById(`date-${i}`);
@@ -519,17 +565,19 @@
                 const head = document.getElementById(`head-${i}`);
                 const col = document.getElementById(`day-${i}`);
                 
-                // Highlight Logic: Match DB date with Today OR Admin Force Toggle
+                // Highlight Logic
                 const isRealToday = dbDate === todayStr;
-                const force = document.getElementById('forceHighlightToggle')?.checked && i === 3; // Debug on Thursday
-
-                if (isRealToday || force) {
+                if (isRealToday) {
                     head.classList.add('today');
                     col.classList.add('today');
                 } else {
                     head.classList.remove('today');
                     col.classList.remove('today');
                 }
+
+                // Render slots or holiday
+                const isHoliday = weekHolidays[i] === true;
+                renderSlots(i, isHoliday);
             }
 
             const events = scheduleData.filter(e => 
@@ -546,35 +594,37 @@
 
                 if (slotIdx > -1) {
                     const col = document.getElementById(`day-${evt.day}`);
-                    const targetChildIndex = slotIdx < 2 ? slotIdx : slotIdx + 1;
-                    const slotDiv = col.children[targetChildIndex];
+                    // Only append if it's not a holiday (col has slots)
+                    if(col.children.length > 2) { 
+                        const targetChildIndex = slotIdx < 2 ? slotIdx : slotIdx + 1;
+                        const slotDiv = col.children[targetChildIndex];
 
-                    if(slotDiv) {
-                        const card = document.createElement('div');
-                        card.className = `event-card type-${evt.type}`;
-                        
-                        let badgeHtml = '';
-                        if(evt.groups.includes('ALL')) badgeHtml = '<span class="evt-group-badge badge-promo">PROMO</span>';
-                        else if(evt.groups.length > 1) badgeHtml = '<span class="evt-group-badge badge-grp">C1 + C2</span>';
-                        else if(evt.groups.includes('C1')) badgeHtml = '<span class="evt-group-badge badge-grp">C1</span>';
-                        else if(evt.groups.includes('C2')) badgeHtml = '<span class="evt-group-badge badge-grp">C2</span>';
+                        if(slotDiv) {
+                            const card = document.createElement('div');
+                            card.className = `event-card type-${evt.type}`;
+                            
+                            let badgeHtml = '';
+                            if(evt.groups.includes('ALL')) badgeHtml = '<span class="evt-group-badge badge-promo">PROMO</span>';
+                            else if(evt.groups.length > 1) badgeHtml = '<span class="evt-group-badge badge-grp">C1 + C2</span>';
+                            else if(evt.groups.includes('C1')) badgeHtml = '<span class="evt-group-badge badge-grp">C1</span>';
+                            else if(evt.groups.includes('C2')) badgeHtml = '<span class="evt-group-badge badge-grp">C2</span>';
 
-                        // Exam Badge
-                        const examBadge = evt.examInfo ? `<div class="exam-badge">PARTIEL PRÉVU</div>` : '';
+                            const examBadge = evt.examInfo ? `<div class="exam-badge">PARTIEL PRÉVU</div>` : '';
 
-                        card.innerHTML = `
-                            ${examBadge}
-                            <div class="evt-top">
-                                <div style="display:flex; gap:5px; align-items:center;">
-                                    <span class="evt-type">${evt.type}</span>
-                                    ${badgeHtml}
+                            card.innerHTML = `
+                                ${examBadge}
+                                <div class="evt-top">
+                                    <div style="display:flex; gap:5px; align-items:center;">
+                                        <span class="evt-type">${evt.type}</span>
+                                        ${badgeHtml}
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="evt-title">${evt.name}</div>
-                            <div class="evt-bot"><span class="evt-room">${evt.room}</span><span>${evt.prof}</span></div>
-                        `;
-                        card.onclick = (e) => { e.stopPropagation(); openDetails(evt); };
-                        slotDiv.appendChild(card);
+                                <div class="evt-title">${evt.name}</div>
+                                <div class="evt-bot"><span class="evt-room">${evt.room}</span><span>${evt.prof}</span></div>
+                            `;
+                            card.onclick = (e) => { e.stopPropagation(); openDetails(evt); };
+                            slotDiv.appendChild(card);
+                        }
                     }
                 }
             });
@@ -587,25 +637,35 @@
             });
         }
 
-        // --- DATE PICKER LOGIC (New) ---
+        // --- DATE PICKER LOGIC ---
         window.pickDate = function(dayIdx) {
             if(!isAdmin) return;
             const picker = document.getElementById('hiddenDatePicker');
-            picker.showPicker(); // Opens native calendar
-            
-            // When user picks a date
+            picker.showPicker();
             picker.onchange = async (e) => {
                 const dateObj = new Date(e.target.value);
-                // Format: DD/MM (Standard French format)
                 const formatted = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-                
                 if(!dateData[currentWeekIndex]) dateData[currentWeekIndex] = ["...", "...", "...", "...", "..."];
                 dateData[currentWeekIndex][dayIdx] = formatted;
-                
                 await setDoc(doc(db, "meta", "calendarDates"), dateData);
                 renderCalendar();
-                picker.value = ""; // Reset
+                picker.value = "";
             };
+        }
+
+        // --- HOLIDAY LOGIC (Right Click on Header) ---
+        window.toggleDayHoliday = async function(dayIdx) {
+            if(!isAdmin) return;
+            if(!confirm(`Basculer le jour ${dayIdx+1} en mode Vacances/Férié ?`)) return;
+
+            let holidays = settingsData.holidays || {};
+            if(!holidays[currentWeekIndex]) holidays[currentWeekIndex] = {};
+            
+            // Toggle
+            const currentVal = holidays[currentWeekIndex][dayIdx];
+            holidays[currentWeekIndex][dayIdx] = !currentVal;
+
+            await setDoc(doc(db, "meta", "calendarSettings"), { holidays: holidays }, { merge: true });
         }
 
         // --- ADMIN FEATURES ---
@@ -620,7 +680,7 @@
             if(newName) await setDoc(doc(db, "meta", "calendarSettings"), { monthName: newName }, { merge: true });
         }
 
-        window.toggleVacationMode = async function() {
+        window.toggleGlobalVacation = async function() {
             if(!isAdmin) return;
             const newState = document.getElementById('vacationToggle').checked;
             await setDoc(doc(db, "meta", "calendarSettings"), { vacationMode: newState }, { merge: true });
@@ -639,10 +699,8 @@
             document.getElementById('eProf').value = "";
             document.getElementById('eEmail').value = "";
             document.getElementById('eExam').value = "";
-            
             const cf = document.getElementById('groupSelect').value;
             document.getElementById('eGroup').value = cf; 
-
             currentSlot = { day: day, wk: currentWeekIndex, grp: cf };
             openModal('classModal');
             window.toEditMode();
@@ -670,7 +728,6 @@
             document.getElementById('viewMode').style.display = 'none';
             document.getElementById('editMode').classList.remove('hidden');
             document.getElementById('editMode').style.display = 'block';
-            
             if(currentEvent) {
                 document.getElementById('eName').value = currentEvent.name;
                 document.getElementById('eType').value = currentEvent.type;
