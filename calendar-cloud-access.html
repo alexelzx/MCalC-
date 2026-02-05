@@ -430,7 +430,7 @@
         let currentEvent = null;
         let currentSlot = null;
         
-        let currentWeekIndex = 1; // Default
+        let currentWeekIndex = 6; // DEFAULT START WEEK (As requested to match data)
         const SLOTS = [{start:9.00, duration:1.75}, {start:11.00, duration:1.75}, {start:14.25, duration:1.75}, {start:16.25, duration:1.75}];
 
         window.onload = function() {
@@ -485,20 +485,18 @@
         // --- NAVIGATION ---
         window.changeWeek = (dir) => {
             currentWeekIndex += dir;
-            // HARD LIMIT: 1 to 4
+            // No strict limit (allows going to Week 500)
             if(currentWeekIndex < 1) currentWeekIndex = 1; 
-            if(currentWeekIndex > 4) currentWeekIndex = 4;
             document.getElementById('currentWeekLabel').innerText = `Semaine ${currentWeekIndex}`;
             renderCalendar();
         }
 
         window.editWeekNumber = () => {
             if(!isAdmin) return;
-            const newVal = prompt("Aller à la semaine (1-4) :", currentWeekIndex);
+            const newVal = prompt("Aller à la semaine (1-500) :", currentWeekIndex);
             if(newVal && !isNaN(newVal)) {
                 let val = parseInt(newVal);
                 if(val < 1) val = 1;
-                if(val > 4) val = 4;
                 currentWeekIndex = val;
                 document.getElementById('currentWeekLabel').innerText = `Semaine ${currentWeekIndex}`;
                 renderCalendar();
@@ -530,9 +528,10 @@
             const group = document.getElementById('groupSelect').value;
             const dates = dateData[currentWeekIndex] || ["...", "...", "...", "...", "..."];
             
-            // SMART HIGHLIGHT
+            // SMART HIGHLIGHT (Exact Date Match)
             const now = new Date();
-            const todayStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }); // "05/02"
+            // Format: DD/MM (Adjust to match your DB inputs)
+            const todayStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }); 
 
             const weekHolidays = settingsData.holidays ? (settingsData.holidays[currentWeekIndex] || {}) : {};
 
