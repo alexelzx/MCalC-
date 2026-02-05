@@ -300,6 +300,7 @@
         <div id="vacationBanner">
             <h1>IT'S VACAAYYYY TIME! 🌴</h1>
             <p>Profitez bien de vos vacances.</p>
+            <div id="returnDateDisplay" style="margin-top:15px; font-size:1.1rem; color:var(--gemini-cyan); font-weight:700; text-transform:uppercase; letter-spacing:1px;"></div>
         </div>
 
         <div class="cal-title-row">
@@ -492,6 +493,9 @@
                     if(settingsData.vacationMode) {
                         document.getElementById('calContainer').style.display = 'none';
                         document.getElementById('vacationBanner').style.display = 'flex';
+                        // Show Return Date
+                        const msg = settingsData.vacationReturnDate ? `ON SE VOIT DE RETOUR LE ${settingsData.vacationReturnDate}` : "";
+                        document.getElementById('returnDateDisplay').innerText = msg;
                     } else {
                         document.getElementById('calContainer').style.display = 'flex';
                         document.getElementById('vacationBanner').style.display = 'none';
@@ -560,6 +564,7 @@
             
             // SMART HIGHLIGHT
             const now = new Date();
+            // Format: DD/MM (Adjust to match your DB inputs)
             const todayStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }); 
 
             const weekHolidays = settingsData.holidays ? (settingsData.holidays[realWeekID] || {}) : {};
@@ -642,16 +647,13 @@
             });
         }
 
-        // --- DATE PICKER LOGIC (New) ---
+        // --- DATE PICKER LOGIC ---
         window.pickDate = function(dayIdx) {
             if(!isAdmin) return;
             const picker = document.getElementById('hiddenDatePicker');
-            picker.showPicker(); // Opens native calendar
-            
-            // When user picks a date
+            picker.showPicker();
             picker.onchange = async (e) => {
                 const dateObj = new Date(e.target.value);
-                // Format: DD/MM (Standard French format)
                 const formatted = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
                 
                 const realWeekID = settingsData.weekMap[currentViewIndex];
@@ -660,11 +662,11 @@
                 dateData[realWeekID][dayIdx] = formatted;
                 await setDoc(doc(db, "meta", "calendarDates"), dateData);
                 renderCalendar();
-                picker.value = ""; // Reset
+                picker.value = "";
             };
         }
 
-        // --- HOLIDAY LOGIC (Right Click on Header) ---
+        // --- HOLIDAY LOGIC ---
         window.toggleDayHoliday = async function(dayIdx) {
             if(!isAdmin) return;
             if(!confirm(`Basculer le jour ${dayIdx+1} en mode Vacances/Férié ?`)) return;
@@ -673,7 +675,6 @@
             let holidays = settingsData.holidays || {};
             if(!holidays[realWeekID]) holidays[realWeekID] = {};
             
-            // Toggle
             const currentVal = holidays[realWeekID][dayIdx];
             holidays[realWeekID][dayIdx] = !currentVal;
 
@@ -694,8 +695,24 @@
 
         window.toggleGlobalVacation = async function() {
             if(!isAdmin) return;
-            const newState = document.getElementById('vacationToggle').checked;
-            await setDoc(doc(db, "meta", "calendarSettings"), { vacationMode: newState }, { merge: true });
+            const checkbox = document.getElementById('vacationToggle');
+            const newState = checkbox.checked;
+            
+            let returnDate = settingsData.vacationReturnDate || "";
+            
+            if (newState) {
+                const input = prompt("Date de retour (ex: Lundi 12 Mars) :", returnDate);
+                if (input === null) {
+                    checkbox.checked = !newState; // Cancel toggle
+                    return;
+                }
+                returnDate = input;
+            }
+            
+            await setDoc(doc(db, "meta", "calendarSettings"), { 
+                vacationMode: newState, 
+                vacationReturnDate: returnDate 
+            }, { merge: true });
         }
 
         // --- EDITOR LOGIC ---
@@ -711,10 +728,9 @@
             document.getElementById('eProf').value = "";
             document.getElementById('eEmail').value = "";
             document.getElementById('eExam').value = "";
-            
             const cf = document.getElementById('groupSelect').value;
             document.getElementById('eGroup').value = cf; 
-
+            
             const realWeekID = settingsData.weekMap[currentViewIndex];
             currentSlot = { day: day, wk: realWeekID, grp: cf };
             openModal('classModal');
@@ -743,7 +759,6 @@
             document.getElementById('viewMode').style.display = 'none';
             document.getElementById('editMode').classList.remove('hidden');
             document.getElementById('editMode').style.display = 'block';
-            
             if(currentEvent) {
                 document.getElementById('eName').value = currentEvent.name;
                 document.getElementById('eType').value = currentEvent.type;
