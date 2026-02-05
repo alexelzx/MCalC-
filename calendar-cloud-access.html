@@ -134,10 +134,18 @@
             display: flex; flex-direction: column; gap: 4px; border-radius: 8px; padding: 5px; border: 1px solid transparent; user-select: none;
         }
         
-        /* INTELLIGENT HIGHLIGHT */
-        .cal-header.today { background: rgba(34, 211, 238, 0.1); border-color: rgba(34, 211, 238, 0.5); box-shadow: 0 0 15px rgba(34, 211, 238, 0.1); }
+        /* INTELLIGENT HIGHLIGHT - TODAY */
+        .cal-header.today { 
+            background: rgba(34, 211, 238, 0.15); /* Distinct Cyan Background */
+            border: 1px solid var(--gemini-cyan);
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+        }
         .cal-header.today .day-name { color: var(--gemini-cyan); }
-        .day-col.today { background: rgba(34, 211, 238, 0.03); border-radius: 12px; border: 1px solid rgba(34, 211, 238, 0.1); }
+        .day-col.today { 
+            background: rgba(34, 211, 238, 0.02); 
+            border-radius: 12px;
+            border: 1px solid rgba(34, 211, 238, 0.05);
+        }
 
         .day-name { font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
         .day-date { 
@@ -634,13 +642,16 @@
             });
         }
 
-        // --- DATE PICKER ---
+        // --- DATE PICKER LOGIC (New) ---
         window.pickDate = function(dayIdx) {
             if(!isAdmin) return;
             const picker = document.getElementById('hiddenDatePicker');
-            picker.showPicker();
+            picker.showPicker(); // Opens native calendar
+            
+            // When user picks a date
             picker.onchange = async (e) => {
                 const dateObj = new Date(e.target.value);
+                // Format: DD/MM (Standard French format)
                 const formatted = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
                 
                 const realWeekID = settingsData.weekMap[currentViewIndex];
@@ -649,11 +660,11 @@
                 dateData[realWeekID][dayIdx] = formatted;
                 await setDoc(doc(db, "meta", "calendarDates"), dateData);
                 renderCalendar();
-                picker.value = "";
+                picker.value = ""; // Reset
             };
         }
 
-        // --- HOLIDAY LOGIC ---
+        // --- HOLIDAY LOGIC (Right Click on Header) ---
         window.toggleDayHoliday = async function(dayIdx) {
             if(!isAdmin) return;
             if(!confirm(`Basculer le jour ${dayIdx+1} en mode Vacances/Férié ?`)) return;
@@ -662,6 +673,7 @@
             let holidays = settingsData.holidays || {};
             if(!holidays[realWeekID]) holidays[realWeekID] = {};
             
+            // Toggle
             const currentVal = holidays[realWeekID][dayIdx];
             holidays[realWeekID][dayIdx] = !currentVal;
 
@@ -699,9 +711,10 @@
             document.getElementById('eProf').value = "";
             document.getElementById('eEmail').value = "";
             document.getElementById('eExam').value = "";
+            
             const cf = document.getElementById('groupSelect').value;
             document.getElementById('eGroup').value = cf; 
-            
+
             const realWeekID = settingsData.weekMap[currentViewIndex];
             currentSlot = { day: day, wk: realWeekID, grp: cf };
             openModal('classModal');
@@ -730,6 +743,7 @@
             document.getElementById('viewMode').style.display = 'none';
             document.getElementById('editMode').classList.remove('hidden');
             document.getElementById('editMode').style.display = 'block';
+            
             if(currentEvent) {
                 document.getElementById('eName').value = currentEvent.name;
                 document.getElementById('eType').value = currentEvent.type;
