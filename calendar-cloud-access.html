@@ -103,7 +103,10 @@
             margin-bottom: 25px;
         }
         .month-label { font-size: 1.2rem; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 2px; }
-        .week-label { font-size: 0.9rem; color: var(--gemini-cyan); font-weight: 700; background: rgba(34, 211, 238, 0.1); padding: 4px 12px; border-radius: 12px; margin-bottom: 5px; cursor: pointer; }
+        
+        /* WEEK LABEL NEXT TO MONTH */
+        .title-group { display: flex; align-items: baseline; gap: 10px; }
+        .week-label { font-size: 0.9rem; color: var(--gemini-cyan); font-weight: 700; background: rgba(34, 211, 238, 0.1); padding: 2px 10px; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
         .editable-month { cursor: pointer; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.2); }
 
         /* SLIDER CONTAINER */
@@ -119,6 +122,7 @@
             font-size: 2rem; font-weight: 300;
         }
         .nav-arrow:hover { background: rgba(255,255,255,0.05); color: var(--gemini-cyan); border-color: var(--gemini-cyan); box-shadow: 0 0 20px rgba(34, 211, 238, 0.1); }
+        .nav-arrow:disabled { opacity: 0.2; cursor: not-allowed; border-color: transparent; }
 
         /* GRID */
         .cal-wrapper {
@@ -291,14 +295,16 @@
         </div>
 
         <div class="cal-title-row">
-            <div id="currentWeekLabel" class="week-label" onclick="editWeekNumber()">Semaine 1</div>
-            <div class="month-label">
-                <span id="monthDisplay" class="editable-month" onclick="editMonthName()">...</span>
+            <div class="title-group">
+                <div id="currentWeekLabel" class="week-label" onclick="editWeekMapping()">Semaine ...</div>
+                <div class="month-label">
+                    <span id="monthDisplay" class="editable-month" onclick="editMonthName()">...</span>
+                </div>
             </div>
         </div>
 
         <div class="slider-container" id="calContainer">
-            <button class="nav-arrow" onclick="changeWeek(-1)">&lt;</button>
+            <button class="nav-arrow" id="btnPrev" onclick="changeSlot(-1)">&lt;</button>
 
             <div class="cal-wrapper">
                 <div class="cal-header"></div>
@@ -323,7 +329,7 @@
                 <div class="day-col" id="day-4"></div>
             </div>
 
-            <button class="nav-arrow" onclick="changeWeek(1)">&gt;</button>
+            <button class="nav-arrow" id="btnNext" onclick="changeSlot(1)">&gt;</button>
         </div>
     </div>
 
@@ -425,12 +431,13 @@
 
         let scheduleData = [];
         let dateData = {}; 
-        let settingsData = { monthName: "...", vacationMode: false, holidays: {} };
+        let settingsData = { monthName: "...", vacationMode: false, holidays: {}, weekMap: [6, 7, 8, 9] };
         let isAdmin = false;
         let currentEvent = null;
         let currentSlot = null;
         
-        let currentWeekIndex = 6; // DEFAULT START WEEK (As requested to match data)
+        // VIEW STATE: Only 4 Slots (0, 1, 2, 3)
+        let currentViewIndex = 0; 
         const SLOTS = [{start:9.00, duration:1.75}, {start:11.00, duration:1.75}, {start:14.25, duration:1.75}, {start:16.25, duration:1.75}];
 
         window.onload = function() {
@@ -466,7 +473,12 @@
 
             onSnapshot(doc(db, "meta", "calendarSettings"), (doc) => {
                 if(doc.exists()) {
-                    settingsData = { ...settingsData, ...doc.data() };
+                    const d = doc.data();
+                    // Merge with defaults
+                    settingsData = { ...settingsData, ...d };
+                    // Default weekMap if missing
+                    if(!settingsData.weekMap || settingsData.weekMap.length !== 4) settingsData.weekMap = [1,2,3,4];
+                    
                     document.getElementById('monthDisplay').innerText = settingsData.monthName || "MOIS";
                     
                     if(settingsData.vacationMode) {
@@ -477,28 +489,30 @@
                         document.getElementById('vacationBanner').style.display = 'none';
                     }
                     if(isAdmin) document.getElementById('vacationToggle').checked = settingsData.vacationMode;
-                    renderCalendar(); // Refresh for holidays
+                    renderCalendar(); 
                 }
             });
         }
 
-        // --- NAVIGATION ---
-        window.changeWeek = (dir) => {
-            currentWeekIndex += dir;
-            // No strict limit (allows going to Week 500)
-            if(currentWeekIndex < 1) currentWeekIndex = 1; 
-            document.getElementById('currentWeekLabel').innerText = `Semaine ${currentWeekIndex}`;
+        // --- NAVIGATION (LOCKED TO 4 SLOTS) ---
+        window.changeSlot = (dir) => {
+            currentViewIndex += dir;
+            // HARD LIMIT 0 to 3
+            if(currentViewIndex < 0) currentViewIndex = 0; 
+            if(currentViewIndex > 3) currentViewIndex = 3;
             renderCalendar();
         }
 
-        window.editWeekNumber = () => {
+        window.editWeekMapping = async () => {
             if(!isAdmin) return;
-            const newVal = prompt("Aller à la semaine (1-500) :", currentWeekIndex);
+            const currentMapped = settingsData.weekMap[currentViewIndex];
+            const newVal = prompt(`Semaine ${currentMapped}. Entrer le N° réel pour ce créneau :`, currentMapped);
+            
             if(newVal && !isNaN(newVal)) {
                 let val = parseInt(newVal);
-                if(val < 1) val = 1;
-                currentWeekIndex = val;
-                document.getElementById('currentWeekLabel').innerText = `Semaine ${currentWeekIndex}`;
+                // Update local & DB
+                settingsData.weekMap[currentViewIndex] = val;
+                await setDoc(doc(db, "meta", "calendarSettings"), { weekMap: settingsData.weekMap }, { merge: true });
                 renderCalendar();
             }
         }
@@ -525,15 +539,22 @@
         }
 
         window.renderCalendar = function() {
+            // Update Buttons State
+            document.getElementById('btnPrev').disabled = (currentViewIndex === 0);
+            document.getElementById('btnNext').disabled = (currentViewIndex === 3);
+
+            // Get Real Week ID from Map
+            const realWeekID = settingsData.weekMap[currentViewIndex];
+            document.getElementById('currentWeekLabel').innerText = `Semaine ${realWeekID}`;
+
             const group = document.getElementById('groupSelect').value;
-            const dates = dateData[currentWeekIndex] || ["...", "...", "...", "...", "..."];
+            const dates = dateData[realWeekID] || ["...", "...", "...", "...", "..."];
             
-            // SMART HIGHLIGHT (Exact Date Match)
+            // SMART HIGHLIGHT
             const now = new Date();
-            // Format: DD/MM (Adjust to match your DB inputs)
             const todayStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }); 
 
-            const weekHolidays = settingsData.holidays ? (settingsData.holidays[currentWeekIndex] || {}) : {};
+            const weekHolidays = settingsData.holidays ? (settingsData.holidays[realWeekID] || {}) : {};
 
             for(let i=0; i<5; i++) {
                 const el = document.getElementById(`date-${i}`);
@@ -544,7 +565,6 @@
                 const head = document.getElementById(`head-${i}`);
                 const col = document.getElementById(`day-${i}`);
                 
-                // Compare system date with column date string
                 if (dbDate === todayStr) {
                     head.classList.add('today');
                     col.classList.add('today');
@@ -553,13 +573,13 @@
                     col.classList.remove('today');
                 }
 
-                // Render slots or holiday
                 const isHoliday = weekHolidays[i] === true;
                 renderSlots(i, isHoliday);
             }
 
+            // Query using REAL ID
             const events = scheduleData.filter(e => 
-                e.weeks && e.weeks.includes(currentWeekIndex) && 
+                e.weeks && e.weeks.includes(realWeekID) && 
                 (e.groups.includes(group) || e.groups.includes("ALL"))
             );
 
@@ -614,7 +634,7 @@
             });
         }
 
-        // --- DATE PICKER LOGIC ---
+        // --- DATE PICKER ---
         window.pickDate = function(dayIdx) {
             if(!isAdmin) return;
             const picker = document.getElementById('hiddenDatePicker');
@@ -622,25 +642,28 @@
             picker.onchange = async (e) => {
                 const dateObj = new Date(e.target.value);
                 const formatted = dateObj.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
-                if(!dateData[currentWeekIndex]) dateData[currentWeekIndex] = ["...", "...", "...", "...", "..."];
-                dateData[currentWeekIndex][dayIdx] = formatted;
+                
+                const realWeekID = settingsData.weekMap[currentViewIndex];
+                if(!dateData[realWeekID]) dateData[realWeekID] = ["...", "...", "...", "...", "..."];
+                
+                dateData[realWeekID][dayIdx] = formatted;
                 await setDoc(doc(db, "meta", "calendarDates"), dateData);
                 renderCalendar();
                 picker.value = "";
             };
         }
 
-        // --- HOLIDAY LOGIC (Right Click on Header) ---
+        // --- HOLIDAY LOGIC ---
         window.toggleDayHoliday = async function(dayIdx) {
             if(!isAdmin) return;
             if(!confirm(`Basculer le jour ${dayIdx+1} en mode Vacances/Férié ?`)) return;
 
+            const realWeekID = settingsData.weekMap[currentViewIndex];
             let holidays = settingsData.holidays || {};
-            if(!holidays[currentWeekIndex]) holidays[currentWeekIndex] = {};
+            if(!holidays[realWeekID]) holidays[realWeekID] = {};
             
-            // Toggle
-            const currentVal = holidays[currentWeekIndex][dayIdx];
-            holidays[currentWeekIndex][dayIdx] = !currentVal;
+            const currentVal = holidays[realWeekID][dayIdx];
+            holidays[realWeekID][dayIdx] = !currentVal;
 
             await setDoc(doc(db, "meta", "calendarSettings"), { holidays: holidays }, { merge: true });
         }
@@ -678,7 +701,9 @@
             document.getElementById('eExam').value = "";
             const cf = document.getElementById('groupSelect').value;
             document.getElementById('eGroup').value = cf; 
-            currentSlot = { day: day, wk: currentWeekIndex, grp: cf };
+            
+            const realWeekID = settingsData.weekMap[currentViewIndex];
+            currentSlot = { day: day, wk: realWeekID, grp: cf };
             openModal('classModal');
             window.toEditMode();
         }
