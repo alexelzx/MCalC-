@@ -6,6 +6,8 @@
   "background_color": "#02040a",
   "theme_color": "#0f172a",
   "orientation": "portrait",
+  "id": "/index.html",
+  "description": "Portail étudiant unifié pour les étudiants de l'IUT.",
   "icons": [
     {
       "src": "https://icons.veryicon.com/png/o/miscellaneous/street-network-app/student-13.png",
