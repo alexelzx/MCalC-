@@ -179,6 +179,36 @@
         .stat-lbl { font-size: 0.6rem; color: var(--text-mute); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
         .c-red { color: var(--gemini-red); } .c-gold { color: var(--gemini-gold); } .c-green { color: var(--gemini-green); }
 
+        /* XP & LEVEL STYLES */
+        .xp-card {
+            background: linear-gradient(135deg, rgba(34, 211, 238, 0.05), rgba(168, 85, 247, 0.05));
+            border: 1px solid rgba(34, 211, 238, 0.2) !important;
+            order: -1; /* Keep at top */
+        }
+        .level-badge {
+            font-size: 2.5rem; font-weight: 900;
+            background: linear-gradient(135deg, var(--gemini-cyan), var(--gemini-purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+        .mastery-title {
+            font-size: 0.8rem; font-weight: 800; color: var(--gemini-gold);
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .xp-progress-container {
+            width: 100%; height: 12px; background: rgba(255,255,255,0.05);
+            border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 10px; position: relative;
+        }
+        .xp-progress-bar {
+            height: 100%; background: linear-gradient(90deg, var(--gemini-cyan), var(--gemini-purple));
+            width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+        }
+        .xp-text { font-size: 0.75rem; color: var(--text-mute); font-weight: 600; }
+        .mastery-icon { width: 18px; height: 18px; filter: drop-shadow(0 0 5px var(--gemini-gold)); }
+
         .hw-item { background: rgba(255,255,255,0.02); padding: 14px; border-radius: 12px; display: flex; align-items: flex-start; gap: 12px; border: 1px solid rgba(255,255,255,0.05); }
         .hw-check { min-width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--text-mute); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 2px; }
         .hw-check.done { background: var(--gemini-cyan); border-color: var(--gemini-cyan); }
@@ -358,6 +388,26 @@
         </div>
 
         <div class="grid">
+            <div class="card glass-panel xp-card">
+                <div class="card-head"><div class="card-title">XP & Niveau</div></div>
+                <div style="text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1;">
+                    <div id="masteryContainer" class="mastery-title" style="display:none;">
+                        <svg class="mastery-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                        <span id="masteryRank">Master Legend</span>
+                    </div>
+                    <div class="level-badge" id="levelVal">1</div>
+                    <div class="xp-text" style="margin-bottom:15px; text-transform:uppercase; letter-spacing:1px;">Niveau Actuel</div>
+                    
+                    <div class="xp-progress-container">
+                        <div class="xp-progress-bar" id="xpBar"></div>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; width:100%;">
+                        <span class="xp-text" id="xpCurrent">0 XP</span>
+                        <span class="xp-text" id="xpNext">100 XP</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Notes</div></div>
                 <div style="text-align:center; margin-bottom:20px;"><div class="gpa-display" id="gpaVal">--</div><span>Moyenne</span></div>
@@ -580,6 +630,16 @@
                 });
                 renderHomework();
             });
+
+            // 4. STUDENT DATA (XP & PROFILE)
+            onSnapshot(doc(db, "students", currentUser.id), (doc) => {
+                if(doc.exists()) {
+                    const data = doc.data();
+                    // Update current user info if it changed
+                    currentUser = { ...currentUser, ...data };
+                    renderXP(data.xp || 0);
+                }
+            });
         }
 
         // --- RENDER FUNCTIONS ---
@@ -649,6 +709,48 @@
             });
         }
 
+        function renderXP(xp) {
+            const levelVal = document.getElementById('levelVal');
+            const xpBar = document.getElementById('xpBar');
+            const xpCurrent = document.getElementById('xpCurrent');
+            const xpNext = document.getElementById('xpNext');
+            const masteryContainer = document.getElementById('masteryContainer');
+            const masteryRank = document.getElementById('masteryRank');
+
+            let level = 1;
+            let currentXP = xp;
+            let nextLevelXP = 100;
+            
+            // Logic: 100 XP per level
+            // Mastery levels start after Level 100
+            const totalLevel = Math.floor(xp / 100) + 1;
+            
+            if (totalLevel <= 100) {
+                level = totalLevel;
+                currentXP = xp % 100;
+                nextLevelXP = 100;
+                masteryContainer.style.display = 'none';
+            } else {
+                // Mastery Logic
+                const masteryTotal = totalLevel - 100;
+                const masteryIndex = Math.floor((masteryTotal - 1) / 100) + 1;
+                const subLevel = ((masteryTotal - 1) % 100) + 1;
+                
+                level = subLevel;
+                currentXP = xp % 100;
+                nextLevelXP = 100;
+                
+                masteryContainer.style.display = 'flex';
+                const masteryNames = ["Mastery I", "Mastery II", "Mastery III", "Mastery IV", "Mastery V", "Mastery VI", "Mastery VII", "Mastery VIII", "Mastery IX", "Master Legend"];
+                masteryRank.innerText = masteryNames[Math.min(masteryIndex - 1, 9)];
+            }
+
+            levelVal.innerText = level;
+            xpBar.style.width = `${(currentXP / nextLevelXP) * 100}%`;
+            xpCurrent.innerText = `${currentXP} XP`;
+            xpNext.innerText = `${nextLevelXP} XP`;
+        }
+
         // --- ACTIONS ---
         window.addGrade = async function() {
             const n = document.getElementById('grName').value;
@@ -698,10 +800,12 @@
         window.toggleTask = async function(id, isDone) {
             const task = localData.homework.find(h=>h.id===id);
             let doneBy = task.doneBy || [];
-            if(isDone) doneBy = doneBy.filter(i=>i!==currentUser.id); 
-            else { 
+            if(isDone) {
+                doneBy = doneBy.filter(i=>i!==currentUser.id); 
+                await addXP(-10);
+            } else { 
                 doneBy.push(currentUser.id); 
-                addXP(10); 
+                await addXP(10); 
             }
             await updateDoc(doc(db, "homework", id), { doneBy });
         }
@@ -786,7 +890,7 @@
             });
         }
 
-        window.deleteGrade = async (id) => { if(confirm("Supprimer?")) await deleteDoc(doc(db, "grades", id)); }
+        window.deleteGrade = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "grades", id)); await addXP(-20); } }
         window.deleteTask = async (id) => { if(confirm("Supprimer?")) await deleteDoc(doc(db, "homework", id)); }
         window.deleteAbsence = async (id) => { if(confirm("Supprimer?")) await deleteDoc(doc(db, "attendance", id)); }
         
