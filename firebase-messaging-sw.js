@@ -32,3 +32,11 @@ messaging.onBackgroundMessage((payload) => {
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
+
+// Basic fetch handler to satisfy PWA installation criteria
+self.addEventListener('fetch', (event) => {
+    // We don't need to cache anything specifically for now, 
+    // but the presence of a fetch handler is required by some browsers.
+    // We just let the request go through to the network.
+    event.respondWith(fetch(event.request));
+});
