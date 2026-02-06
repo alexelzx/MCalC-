@@ -27,7 +27,6 @@
             --gemini-orange: #f97316;
             --text-main: #f8fafc;
             --text-mute: #94a3b8;
-            --glow-blue: 0 0 30px rgba(59, 130, 246, 0.2);
             --safe-top: env(safe-area-inset-top);
             --safe-bottom: env(safe-area-inset-bottom);
         }
@@ -63,9 +62,8 @@
             box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.02), 0 5px 15px rgba(0,0,0,0.5);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px 24px; border-radius: 50px; /* Fully Rounded */
-            font-size: 0.8rem;
-            text-decoration: none;
+            padding: 12px 24px; border-radius: 50px;
+            font-size: 0.8rem; text-decoration: none;
         }
         .liquid-btn:hover {
             background: rgba(255, 255, 255, 0.1);
@@ -156,32 +154,24 @@
         .group-tag { background: rgba(59, 130, 246, 0.15); padding: 5px 12px; border-radius: 8px; color: var(--gemini-cyan); font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.3); }
         
         .nav-actions { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
-        .nav-btn { flex: 1; padding: 14px; border-radius: 16px; font-size: 0.9rem; text-decoration: none;}
+        .nav-btn { flex: 1; padding: 14px; border-radius: 16px; font-size: 0.9rem; }
 
         /* GRID */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
         .card { border-radius: 24px; padding: 30px; display: flex; flex-direction: column; min-height: 320px; }
-        
         .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .card-title { font-size: 0.9rem; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
+        .card-title { font-size: 0.9rem; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
         
         .gpa-display { font-size: 4rem; font-weight: 800; color: white; letter-spacing: -3px; text-shadow: 0 0 40px rgba(255,255,255,0.1); }
-        
         .grade-list, .hw-list, .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 200px; padding-right: 5px; }
         
-        .item-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: 12px;
-            font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s;
-        }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: 12px; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
         .item-row:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); transform: translateX(3px); }
         .val-hl { font-weight: 800; color: var(--gemini-purple); font-size: 1.1rem; }
         
-        .del-btn { color: var(--gemini-red); cursor: pointer; opacity: 0.5; transition: 0.2s; padding: 5px; font-size: 1.2rem; }
-        .ok-btn { color: var(--gemini-green); cursor: pointer; opacity: 0.5; transition: 0.2s; padding: 5px; font-size: 1.2rem; }
-        .del-btn:hover, .ok-btn:hover { opacity: 1; transform: scale(1.2); text-shadow: 0 0 10px currentColor; }
-
-        .att-alert { background: rgba(244, 63, 94, 0.1); border: 1px solid var(--gemini-red); color: var(--gemini-red); padding: 12px; border-radius: 12px; font-weight: 800; text-align: center; margin-bottom: 20px; font-size: 0.8rem; display: none; box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); animation: pulse 2s infinite; }
+        .del-btn { color: var(--gemini-red); cursor: pointer; opacity: 0.5; padding: 5px; }
+        .ok-btn { color: var(--gemini-green); cursor: pointer; opacity: 0.5; padding: 5px; }
+        
         .att-stats { display: flex; justify-content: space-between; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
         .stat-item { text-align: center; flex: 1; position: relative; }
         .stat-item:not(:last-child)::after { content:''; position: absolute; right: 0; top: 10%; height: 80%; width: 1px; background: rgba(255,255,255,0.1); }
@@ -189,79 +179,36 @@
         .stat-lbl { font-size: 0.6rem; color: var(--text-mute); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
         .c-red { color: var(--gemini-red); } .c-gold { color: var(--gemini-gold); } .c-green { color: var(--gemini-green); }
 
-        .hw-item { background: rgba(255,255,255,0.02); padding: 14px; border-radius: 12px; display: flex; align-items: flex-start; gap: 12px; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
-        .hw-check { min-width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--text-mute); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 2px; transition: 0.2s; }
-        .hw-check:hover { border-color: white; }
-        .hw-check.done { background: var(--gemini-cyan); border-color: var(--gemini-cyan); box-shadow: 0 0 10px rgba(34, 211, 238, 0.3); }
+        .hw-item { background: rgba(255,255,255,0.02); padding: 14px; border-radius: 12px; display: flex; align-items: flex-start; gap: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .hw-check { min-width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--text-mute); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 2px; }
+        .hw-check.done { background: var(--gemini-cyan); border-color: var(--gemini-cyan); }
         .hw-check svg { width: 14px; color: black; display: none; }
         .hw-check.done svg { display: block; }
         .hw-text { font-size: 0.95rem; color: #e2e8f0; flex: 1; line-height: 1.5; }
         .hw-item.done .hw-text { text-decoration: line-through; color: rgba(255,255,255,0.3); }
 
+        /* XP UI */
+        .xp-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-top: 10px; }
+        .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gemini-blue), var(--gemini-purple)); width: 0%; transition: 1s ease; }
+        .xp-text { font-size: 0.7rem; color: var(--text-mute); margin-top: 5px; text-align: right; font-family: monospace; }
+
         .add-row, .admin-controls { display: none; gap: 10px; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
-        .admin-controls { flex-direction: column; }
         .admin-visible { display: flex !important; }
-        .st-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 12px; width: 100%; transition: 0.2s; }
-        .st-input:focus { background: rgba(255,255,255,0.1); border-color: var(--gemini-cyan); outline: none; }
-        .admin-tag { font-size: 0.65rem; color: var(--gemini-gold); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        .st-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 12px; width: 100%; }
+        .st-input option { background-color: #02040a; }
+
+        /* DATE INPUT STYLING */
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         
-        /* ADMIN REGISTRY */
-        #admin-registry { display: none; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .registry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: var(--border-glass); }
-        .reg-title h1 { margin: 0; font-size: 2rem; font-weight: 700; color: white; }
-        .registry-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
-        #adminSearch { width: 100%; max-width: 300px; padding: 14px 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; margin-bottom: 30px; font-size: 1rem; backdrop-filter: blur(10px); }
-        .student-card { border-radius: 20px; padding: 25px; cursor: pointer; position: relative; overflow: hidden; height: 200px; display: flex; flex-direction: column; justify-content: space-between; }
-        .student-card:hover { border-color: var(--gemini-cyan); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(34, 211, 238, 0.05); transform: translateY(-5px); }
-        .st-card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .st-avatar { width: 60px; height: 60px; border-radius: 18px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(34, 211, 238, 0.2)); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.4rem; box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
-        .st-grp-badge { background: rgba(255,255,255,0.05); padding: 6px 14px; border-radius: 10px; font-size: 0.8rem; font-weight: 700; color: var(--text-mute); border: 1px solid rgba(255,255,255,0.05); }
-        .st-name { font-size: 1.3rem; font-weight: 700; color: white; margin: 0; }
-        .st-id { font-size: 0.9rem; color: var(--text-mute); font-family: monospace; letter-spacing: 1px; margin-top: 5px; }
-
-        /* FOOTER LEGAL (Persistent) */
-        .footer-legal {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px);
-            border-top: var(--border-glass);
-            display: flex; justify-content: center; gap: 20px;
-            padding: 15px; 
-            z-index: 9500; /* Floating above login */
-            padding-bottom: calc(15px + var(--safe-bottom));
-        }
-        .foot-btn {
-            padding: 8px 16px; border-radius: 20px;
-            color: var(--text-mute); font-size: 0.75rem; font-weight: 700; 
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-        .foot-btn:hover { color: white; background: rgba(255,255,255,0.05); }
-        .foot-btn.support { color: var(--gemini-gold); border: 1px solid rgba(251, 191, 36, 0.2); background: rgba(251, 191, 36, 0.05); }
-        .foot-btn.support:hover { background: rgba(251, 191, 36, 0.15); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); color: white; }
-
-        /* MODALS */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 20000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
-        .modal-box { padding: 40px; border-radius: 24px; width: 90%; max-width: 600px; box-shadow: 0 0 100px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); }
-        .scroll-text { max-height: 50vh; overflow-y: auto; background: rgba(255,255,255,0.02); padding: 25px; border-radius: 16px; font-size: 0.95rem; color: #ccc; line-height: 1.7; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); text-align: left; }
-        .scroll-text h4 { color: var(--gemini-cyan); margin-top: 25px; margin-bottom: 10px; font-size: 1.1rem; }
-        .scroll-text h3 { color: white; margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; font-size: 1.5rem; }
-        .privacy-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
         @media (max-width: 768px) {
             body { font-size: 14px; }
-            #dashboard, #admin-registry { padding: 15px; width: 100%; padding-top: var(--safe-top); padding-bottom: 80px; }
+            #dashboard { padding: 15px; width: 100%; padding-top: var(--safe-top); padding-bottom: 80px; }
             .header { flex-direction: column; align-items: flex-start; gap: 15px; }
             .profile { width: 100%; }
             .header > div:last-child { width: 100%; justify-content: flex-end; gap: 10px; }
             .nav-actions { flex-direction: column; gap: 10px; }
             .nav-btn { width: 100%; justify-content: center; padding: 15px; font-size: 1rem; }
             .grid { grid-template-columns: 1fr; }
-            .login-card { width: 90%; max-width: none; }
-            .brand-title { font-size: 3rem; }
-            .registry-header { flex-direction: column; gap: 15px; align-items: flex-start; }
-            .registry-header > div { width: 100%; flex-direction: column; gap: 10px; }
-            .registry-grid { grid-template-columns: 1fr; }
-            .modal-box { width: 95%; padding: 25px 20px; }
-            .footer-legal { flex-wrap: wrap; gap: 10px; }
         }
     </style>
 </head>
@@ -270,54 +217,6 @@
     <div id="loader">
         <div class="loader-circle"></div>
         <div class="loader-text">CONNEXION...</div>
-    </div>
-
-    <div id="login-screen">
-        <a href="index.html" class="top-back-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-            Retour au Menu
-        </a>
-
-        <div class="login-card">
-            <h1 class="brand-title">SmartST</h1>
-            <div class="brand-sub">Student Operating System</div>
-            
-            <div class="login-tabs">
-                <button class="tab-btn active" id="tabStudent" onclick="switchTab('student')">ÉTUDIANT</button>
-                <button class="tab-btn" id="tabAdmin" onclick="switchTab('admin')">ADMIN</button>
-            </div>
-
-            <div id="studentLogin">
-                <div id="stLoginMode">
-                    <input type="email" id="stEmail" class="login-input" placeholder="EMAIL ÉTUDIANT">
-                    <input type="password" id="stPwd" class="login-input" placeholder="MOT DE PASSE">
-                    <button class="liquid-btn main-action-btn" onclick="handleStudentAuth('login')">ENTRER</button>
-                    <div class="switch-link" onclick="toggleStMode()">Pas de compte ? Créer un compte</div>
-                </div>
-
-                <div id="stSignupMode" class="hidden">
-                    <input type="email" id="suEmail" class="login-input" placeholder="EMAIL (ex: prenom.nom@etu...)">
-                    <input type="password" id="suPwd" class="login-input" placeholder="MOT DE PASSE">
-                    <input type="text" id="suPrenom" class="login-input" placeholder="PRÉNOM">
-                    <input type="text" id="suNom" class="login-input" placeholder="NOM">
-                    <select id="suGroup" class="login-input">
-                        <option value="" disabled selected>CHOISIR GROUPE</option>
-                        <option value="C1">Groupe C1</option>
-                        <option value="C2">Groupe C2</option>
-                    </select>
-                    <button class="liquid-btn main-action-btn" onclick="handleStudentAuth('signup')">S'INSCRIRE</button>
-                    <div class="switch-link" onclick="toggleStMode()">J'ai déjà un compte</div>
-                </div>
-            </div>
-            
-            <div id="adminLogin" class="hidden">
-                <input type="text" id="adminUser" class="login-input" placeholder="EMAIL ADMIN" style="margin-bottom:10px;">
-                <input type="password" id="adminPwd" class="login-input" style="margin-top:0;" placeholder="MOT DE PASSE">
-                <button class="liquid-btn main-action-btn" onclick="attemptAdminLogin()">CONNEXION ADMIN</button>
-            </div>
-            
-            <div id="errorMsg" style="color:var(--gemini-red); margin-top:20px; font-size:0.85rem; opacity:0; transition:0.3s; text-align:center;">Erreur</div>
-        </div>
     </div>
 
     <div id="dashboard">
@@ -330,8 +229,6 @@
                 </div>
             </div>
             <div style="display:flex; gap:10px;">
-                <button class="btn-privacy liquid-btn" onclick="openModal('privacyModal')" style="width:40px; height:40px; padding:0;"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></button>
-                <button class="liquid-btn btn-logout admin-back" id="adminBackBtn" style="display:none;" onclick="exitAdmin()">Retour</button>
                 <button class="liquid-btn btn-logout" onclick="logout()">Déconnexion</button>
             </div>
         </div>
@@ -350,7 +247,7 @@
                 <div class="card-head"><div class="card-title">Notes</div></div>
                 <div style="text-align:center; margin-bottom:20px;"><div class="gpa-display" id="gpaVal">--</div><span>Moyenne</span></div>
                 <div class="grade-list" id="gradeList"></div>
-                <div class="add-row">
+                <div class="add-row" style="display:flex !important;">
                     <input type="text" id="grName" class="st-input" placeholder="Matière" style="flex:2">
                     <input type="number" id="grVal" class="st-input" placeholder="/20" style="flex:1">
                     <button class="liquid-btn st-btn" onclick="addGrade()">+</button>
@@ -359,7 +256,6 @@
 
             <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Assiduité</div></div>
-                <div id="warnLevel1" class="att-alert">⚠️ AVERTISSEMENT (5+ Pts)</div>
                 <div class="att-stats">
                     <div class="stat-item"><span class="stat-val c-red" id="countAbs">0</span><span class="stat-lbl">Abs</span></div>
                     <div class="stat-item"><span class="stat-val c-green" id="countJus">0</span><span class="stat-lbl">Jus</span></div>
@@ -368,10 +264,11 @@
                 <div class="history-list" id="absList"></div>
                 <div class="admin-controls" id="adminAbsBox">
                     <span class="admin-tag">Admin: Ajouter Absence</span>
-                    <div style="display:flex; gap:5px;">
+                    <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                        <input type="date" id="adAbsDate" class="st-input" style="flex:1; min-width:120px;">
                         <select id="adAbsType" class="st-input" style="flex:1"><option value="absent">Absence</option><option value="late">Retard</option></select>
-                        <input type="text" id="adAbsReason" class="st-input" placeholder="Motif" style="flex:2">
-                        <button class="liquid-btn st-btn" style="border-color:var(--gemini-red); color:var(--gemini-red)" onclick="addAbsence()">OK</button>
+                        <input type="text" id="adAbsReason" class="st-input" placeholder="Motif" style="flex:2; min-width:100%;">
+                        <button class="liquid-btn st-btn" style="border-color:var(--gemini-red); color:var(--gemini-red); width:100%;" onclick="addAbsence()">VALIDER</button>
                     </div>
                 </div>
             </div>
@@ -379,43 +276,29 @@
             <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Devoirs</div></div>
                 <div class="hw-list" id="hwList"></div>
-                 <div class="admin-controls" id="adminHwBox">
+                <div class="admin-controls" id="adminHwBox" style="display:flex !important;">
                     <div style="display:flex; gap:5px;">
                         <input type="text" id="adHwTxt" class="st-input" placeholder="Titre..." style="flex:2">
-                        <select id="adHwTgt" class="st-input" style="flex:1"><option value="ALL">Tous</option></select>
-                        <button class="liquid-btn st-btn" style="border-color:var(--gemini-gold); color:var(--gemini-gold);" onclick="addHomework()">+</button>
+                        <select id="adHwTgt" class="st-input" style="flex:1">
+                            <option value="PERSONAL">Personnel</option>
+                            <option value="ALL">Promo (Tous)</option>
+                            <option value="C1">Groupe C1</option>
+                            <option value="C2">Groupe C2</option>
+                        </select>
+                        <button class="liquid-btn st-btn" onclick="addHomework()">+</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="admin-registry">
-        <div class="registry-header">
-            <h1>Registre Admin</h1>
-            <div style="display:flex; gap:10px;">
-                <button class="liquid-btn" onclick="window.location.href='attendance.html'" style="color:var(--gemini-green); border-color:var(--gemini-green);">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-                    Faire l'Appel
-                </button>
-                <button class="liquid-btn btn-logout" onclick="window.location.href='setup_students.html'" style="color:var(--gemini-cyan); border-color:var(--gemini-cyan);">Database</button>
-                <button class="liquid-btn btn-logout" onclick="logout()">Déconnexion</button>
-            </div>
+    <div id="login-screen">
         </div>
-        <input type="text" id="adminSearch" placeholder="Rechercher..." onkeyup="filterStudents()">
-        <div class="registry-grid" id="studentGrid"></div>
-    </div>
-
-    <div class="footer-legal">
-        <button class="foot-btn liquid-btn" onclick="openModal('tosModal')">CGU</button>
-        <button class="foot-btn liquid-btn" onclick="openModal('gdprModal')">Confidentialité</button>
-        <button class="foot-btn support liquid-btn" onclick="window.location.href='supdocs.html'">Support</button>
-    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, orderBy, deleteDoc, addDoc, updateDoc, writeBatch, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, deleteUser, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, orderBy, deleteDoc, addDoc, updateDoc, writeBatch, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -432,382 +315,221 @@
 
         let currentUser = null;
         let isAdmin = false; 
-        let isLoginAdmin = false; 
-        let isSignupMode = false;
-        let localData = { grades: [], attendance: [], homework: [], scheduleMap: {} };
-        let allStudents = []; 
+        let localData = { grades: [], attendance: [], homework: [] };
 
-        const SESSION_KEY = 'smartst_session';
-        const TIMEOUT_MS = 30 * 60 * 1000;
-
-        // UI Logic
-        window.switchTab = (mode) => {
-            isLoginAdmin = (mode === 'admin');
-            document.getElementById('tabStudent').className = isLoginAdmin ? 'tab-btn' : 'tab-btn active';
-            document.getElementById('tabAdmin').className = isLoginAdmin ? 'tab-btn active' : 'tab-btn';
-            
-            if(isLoginAdmin) {
-                document.getElementById('studentLogin').classList.add('hidden');
-                document.getElementById('adminLogin').classList.remove('hidden');
-            } else {
-                document.getElementById('studentLogin').classList.remove('hidden');
-                document.getElementById('adminLogin').classList.add('hidden');
-            }
-        };
-
-        window.toggleStMode = () => {
-            isSignupMode = !isSignupMode;
-            if(isSignupMode) {
-                document.getElementById('stLoginMode').classList.add('hidden');
-                document.getElementById('stSignupMode').classList.remove('hidden');
-            } else {
-                document.getElementById('stLoginMode').classList.remove('hidden');
-                document.getElementById('stSignupMode').classList.add('hidden');
-            }
-        };
-
-        window.onload = function() { 
-            if (!checkSession()) {
-                document.getElementById('loader').style.display='none'; 
-            }
-        };
-
-        function checkSession() {
-            const stored = localStorage.getItem(SESSION_KEY);
-            if (!stored) return false;
-            const session = JSON.parse(stored);
-            if (Date.now() - session.timestamp > TIMEOUT_MS) {
-                localStorage.removeItem(SESSION_KEY);
-                return false;
-            } else {
-                session.timestamp = Date.now();
-                localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-                loadDashboard(session.user, session.isAdmin);
-                return true;
-            }
-        }
-
-        function saveSession(user, adminStatus) {
-            localStorage.setItem(SESSION_KEY, JSON.stringify({ user, isAdmin: adminStatus, timestamp: Date.now() }));
-        }
-
-        // --- AUTH LOGIC (Existing) ---
-        window.handleStudentAuth = async function(action) {
-            const loader = document.getElementById('loader');
-            loader.style.display = 'flex';
-
-            if (action === 'signup') {
-                const email = document.getElementById('suEmail').value;
-                const pwd = document.getElementById('suPwd').value;
-                const nom = document.getElementById('suNom').value;
-                const prenom = document.getElementById('suPrenom').value;
-                const grp = document.getElementById('suGroup').value;
-
-                if(!email || !pwd || !nom || !prenom || !grp) {
-                    loader.style.display='none';
-                    return alert("Remplissez tous les champs.");
+        // AUTH LISTENER
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const docRef = doc(db, "students", user.uid);
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    currentUser = { id: docSnap.id, ...docSnap.data() };
+                    loadDashboard(currentUser, false);
+                } else if (user.uid === "WA5k4NI4mWWsmzdLgRS9tGRRfVz2" || user.uid === "hWVtA8MsXYWusnBeEOAVQghIWbb2") {
+                    currentUser = { id: user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
+                    loadDashboard(currentUser, true);
                 }
-
-                createUserWithEmailAndPassword(auth, email, pwd)
-                    .then(async (cred) => {
-                        const shortId = 'U' + Math.floor(1000 + Math.random() * 9000);
-                        const newUser = { id: cred.user.uid, shortId, email, nom, prenom, grp, xp: 0, level: 1 };
-                        await setDoc(doc(db, "students", cred.user.uid), newUser);
-                        saveSession(newUser, false);
-                        loadDashboard(newUser, false);
-                    })
-                    .catch((error) => {
-                        loader.style.display='none';
-                        alert("Erreur Inscription: " + error.message);
-                    });
-
             } else {
-                const email = document.getElementById('stEmail').value;
-                const pwd = document.getElementById('stPwd').value;
-
-                signInWithEmailAndPassword(auth, email, pwd)
-                    .then(async (cred) => {
-                        const docRef = doc(db, "students", cred.user.uid);
-                        const docSnap = await getDoc(docRef);
-                        if(docSnap.exists()) {
-                            const user = { id: docSnap.id, ...docSnap.data() };
-                            saveSession(user, false);
-                            loadDashboard(user, false);
-                        } else {
-                            loader.style.display='none';
-                            alert("Compte existant mais aucune donnée étudiante trouvée.");
-                        }
-                    })
-                    .catch((error) => {
-                        loader.style.display='none';
-                        alert("Erreur Connexion: " + error.message);
-                    });
+                document.getElementById('loader').style.display='none';
+                document.getElementById('login-screen').style.display='flex';
             }
-        };
+        });
 
-        window.attemptAdminLogin = async function() {
-            const u = document.getElementById('adminUser').value;
-            const p = document.getElementById('adminPwd').value;
-            document.getElementById('loader').style.display = 'flex'; 
-
-            signInWithEmailAndPassword(auth, u, p)
-                .then(async (userCredential) => {
-                    const email = userCredential.user.email;
-                    const q = query(collection(db, "admins"), where("email", "==", email));
-                    const snapshot = await getDocs(q);
-
-                    // Master override or DB check
-                    if (snapshot.empty && userCredential.user.uid !== "WA5k4NI4mWWsmzdLgRS9tGRRfVz2" && userCredential.user.uid !== "hWVtA8MsXYWusnBeEOAVQghIWbb2") {
-                        await signOut(auth);
-                        document.getElementById('loader').style.display = 'none';
-                        alert("ACCÈS REFUSÉ: Vous n'êtes pas sur la liste des administrateurs.");
-                        return;
-                    }
-
-                    const adminUser = { id: userCredential.user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
-                    saveSession(adminUser, true);
-                    loadDashboard(adminUser, true);
-                })
-                .catch((error) => {
-                    document.getElementById('loader').style.display = 'none';
-                    alert("Erreur: " + error.message);
-                });
-        }
-
-        // --- DASHBOARD LOADER ---
-        window.loadDashboard = async function(user, adminMode, forceView = false) {
+        window.loadDashboard = async function(user, adminMode) {
             currentUser = user;
             isAdmin = adminMode;
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('loader').style.display = 'none';
-
-            if(isAdmin && !forceView) {
-                document.getElementById('admin-registry').style.display = 'block';
-                document.getElementById('dashboard').style.display = 'none';
-                loadAdminRegistry();
-            } else {
-                document.getElementById('dashboard').style.display = 'block';
-                document.getElementById('admin-registry').style.display = 'none';
-                document.getElementById('greeting').innerText = `Hello, ${user.prenom}`;
-                document.getElementById('dashGroup').innerText = user.grp;
-                document.getElementById('dashAvatar').innerText = user.prenom.charAt(0) + user.nom.charAt(0);
-                
-                if(isAdmin) {
-                    document.getElementById('adminBackBtn').style.display = 'flex';
-                    document.getElementById('adminHwBox').classList.add('admin-visible');
-                    document.getElementById('adminAbsBox').classList.add('admin-visible');
-                    document.querySelectorAll('.add-row').forEach(e => e.classList.add('admin-visible'));
-                }
-                
-                await syncData();
-            }
-        }
-
-        async function addXP(amount) {
-            if(!currentUser || isAdmin) return; 
-            const userRef = doc(db, "students", currentUser.id);
-            try {
-                // Background update only
-                await updateDoc(userRef, { xp: increment(amount) });
-                console.log(`+${amount} XP Saved!`);
-            } catch(e) { console.error("XP Error:", e); }
-        }
-
-        // --- DATA SYNC ---
-        async function syncData() {
-            localData = { grades: [], attendance: [], homework: [], scheduleMap: {} };
+            document.getElementById('dashboard').style.display = 'block';
             
-            const schSnap = await getDocs(collection(db, "schedule"));
-            schSnap.forEach(d => localData.scheduleMap[d.id] = d.data());
-
-            // SYNC PROFILE AGAIN TO GET XP UPDATES
-            if(currentUser && currentUser.id) {
-                const userSnap = await getDoc(doc(db, "students", currentUser.id));
-                if(userSnap.exists()) {
-                    currentUser = { id: userSnap.id, ...userSnap.data() };
-                }
+            document.getElementById('greeting').innerText = `Hello, ${user.prenom}`;
+            document.getElementById('dashGroup').innerText = user.grp;
+            document.getElementById('dashAvatar').innerText = user.prenom.charAt(0) + user.nom.charAt(0);
+            
+            // ADMIN ONLY
+            if(isAdmin) {
+                document.getElementById('adminBackBtn').style.display = 'flex';
+                document.getElementById('navAppel').style.display = 'flex';
+                document.getElementById('adminAbsBox').classList.add('admin-visible');
             }
-
-            const grQ = query(collection(db, "grades"), where("userId", "==", currentUser.id));
-            const grS = await getDocs(grQ);
-            grS.forEach(d => localData.grades.push({ ...d.data(), id: d.id }));
-
-            const atQ = query(collection(db, "attendance"), where("studentId", "==", currentUser.id));
-            const atS = await getDocs(atQ);
-            atS.forEach(d => localData.attendance.push({ ...d.data(), id: d.id }));
-
-            const hwSnap = await getDocs(collection(db, "homework"));
-            hwSnap.forEach(d => localData.homework.push({ ...d.data(), id: d.id }));
-
-            renderAll();
+            
+            // START LIVE LISTENERS
+            startLiveListeners();
         }
 
-        function renderAll() {
-            const gList = document.getElementById('gradeList');
-            gList.innerHTML = '';
-            let gSum = 0;
-            localData.grades.forEach(g => {
-                gSum += parseFloat(g.val);
-                gList.innerHTML += `<div class="item-row"><span>${g.name}</span><div style="display:flex;align-items:center;"><span class="val-hl">${g.val}</span>${isAdmin?`<div class="del-btn" onclick="window.deleteGrade('${g.id}')">&times;</div>`:''}</div></div>`;
+        // --- LIVE DATA LISTENERS (Replacing One-Time Fetch) ---
+        function startLiveListeners() {
+            // 1. GRADES
+            const grQ = query(collection(db, "grades"), where("userId", "==", currentUser.id));
+            onSnapshot(grQ, (snapshot) => {
+                localData.grades = [];
+                snapshot.forEach(doc => localData.grades.push({ ...doc.data(), id: doc.id }));
+                renderGrades();
             });
-            document.getElementById('gpaVal').innerText = localData.grades.length ? (gSum/localData.grades.length).toFixed(2) : '--';
 
-            const aList = document.getElementById('absList');
-            aList.innerHTML = '';
+            // 2. ATTENDANCE
+            const atQ = query(collection(db, "attendance"), where("studentId", "==", currentUser.id));
+            onSnapshot(atQ, (snapshot) => {
+                localData.attendance = [];
+                snapshot.forEach(doc => localData.attendance.push({ ...doc.data(), id: doc.id }));
+                renderAttendance();
+            });
+
+            // 3. HOMEWORK (Fetch ALL then Filter in JS for complexity reasons)
+            // Ideally should use composite index, but JS filter works for small scale
+            const hwQ = query(collection(db, "homework"));
+            onSnapshot(hwQ, (snapshot) => {
+                localData.homework = [];
+                snapshot.forEach(doc => {
+                    const h = doc.data();
+                    // FILTER: Show if Targeted to ALL, My Group, or Personal
+                    const isTargeted = (h.targetType === 'ALL' || h.targetType === currentUser.grp);
+                    const isPersonal = (h.targetType === 'PERSONAL' && h.authorId === currentUser.id);
+                    
+                    if (isTargeted || isPersonal || isAdmin) {
+                        localData.homework.push({ ...h, id: doc.id });
+                    }
+                });
+                renderHomework();
+            });
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function renderGrades() {
+            const list = document.getElementById('gradeList');
+            list.innerHTML = '';
+            let sum = 0;
+            localData.grades.forEach(g => {
+                sum += parseFloat(g.val);
+                list.innerHTML += `
+                    <div class="item-row">
+                        <span>${g.name}</span>
+                        <div style="display:flex;align-items:center;">
+                            <span class="val-hl">${g.val}</span>
+                            <div class="del-btn" onclick="deleteGrade('${g.id}')">&times;</div>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('gpaVal').innerText = localData.grades.length ? (sum/localData.grades.length).toFixed(2) : '--';
+        }
+
+        function renderAttendance() {
+            const list = document.getElementById('absList');
+            list.innerHTML = '';
             let abs=0, lat=0, jus=0;
             localData.attendance.forEach(a => {
-                let statusClass = 'c-red';
-                let statusText = 'ABS';
-                if(a.status === 'absent') { abs++; }
-                else if(a.status === 'late') { lat++; statusClass = 'c-gold'; statusText = 'RET'; }
-                else if(a.status === 'justified') { jus++; statusClass = 'c-green'; statusText = 'JUS'; }
-
-                let actions = '';
-                if(isAdmin) {
-                    actions += `<div class="del-btn" onclick="window.deleteAbsence('${a.id}')">&times;</div>`;
-                    if(a.status === 'absent') actions += `<div class="ok-btn" onclick="window.justifyAbsence('${a.id}')">✓</div>`;
-                }
-
-                aList.innerHTML += `<div class="item-row"><div><strong>${a.date}</strong><br><small>${a.reason || 'Aucun motif'}</small></div><div style="display:flex; align-items:center;"><span class="${statusClass}" style="font-weight:700;">${statusText}</span>${actions}</div></div>`;
+                let sClass = 'c-red', sText = 'ABS';
+                if(a.status === 'absent') abs++;
+                else if(a.status === 'late') { lat++; sClass = 'c-gold'; sText = 'RET'; }
+                else if(a.status === 'justified') { jus++; sClass = 'c-green'; sText = 'JUS'; }
+                
+                const actions = isAdmin ? `<div class="del-btn" onclick="deleteAbsence('${a.id}')">&times;</div>` : '';
+                list.innerHTML += `
+                    <div class="item-row">
+                        <div><strong>${a.date}</strong><br><small>${a.reason || '...'}</small></div>
+                        <div style="display:flex; align-items:center;">
+                            <span class="${sClass}" style="font-weight:700; margin-right:10px;">${sText}</span>
+                            ${actions}
+                        </div>
+                    </div>`;
             });
             document.getElementById('countAbs').innerText = abs;
             document.getElementById('countLate').innerText = lat;
             document.getElementById('countJus').innerText = jus;
-            document.getElementById('warnLevel1').style.display = (abs+lat) > 5 ? 'block' : 'none';
+        }
 
-            const hList = document.getElementById('hwList');
-            hList.innerHTML = '';
+        function renderHomework() {
+            const list = document.getElementById('hwList');
+            list.innerHTML = '';
             localData.homework.forEach(h => {
                 const done = h.doneBy && h.doneBy.includes(currentUser.id);
-                hList.innerHTML += `<div class="hw-item ${done?'done':''}"><div class="hw-check ${done?'done':''}" onclick="window.toggleTask('${h.id}', ${done})"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="hw-text">${h.text}</div>${isAdmin?`<div class="del-btn" onclick="window.deleteTask('${h.id}')">&times;</div>`:''}</div>`;
+                // Show delete button if Admin OR if Student owns the task
+                const canDelete = isAdmin || (h.authorId === currentUser.id);
+                const delBtn = canDelete ? `<div class="del-btn" onclick="deleteTask('${h.id}')">&times;</div>` : '';
+                
+                list.innerHTML += `
+                    <div class="hw-item ${done?'done':''}">
+                        <div class="hw-check ${done?'done':''}" onclick="toggleTask('${h.id}', ${done})">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <div class="hw-text">
+                            ${h.text} 
+                            <span style="font-size:0.6rem; opacity:0.5; display:block;">${h.targetType === 'PERSONAL' ? 'Personnel' : h.targetType}</span>
+                        </div>
+                        ${delBtn}
+                    </div>`;
             });
         }
 
-        // --- ACTION FUNCTIONS ---
-        window.toggleTask = async function(id, isDone) {
-            const task = localData.homework.find(h=>h.id===id);
-            let doneBy = task.doneBy || [];
-            if(isDone) doneBy = doneBy.filter(i=>i!==currentUser.id); 
-            else { 
-                doneBy.push(currentUser.id); 
-                addXP(10); // Reward for completing homework
-            }
-            await updateDoc(doc(db, "homework", id), { doneBy });
-            await syncData();
-        }
-
+        // --- ACTIONS ---
         window.addGrade = async function() {
             const n = document.getElementById('grName').value;
             const v = document.getElementById('grVal').value;
             if(n && v) { 
                 await addDoc(collection(db, "grades"), { userId: currentUser.id, name: n, val: v }); 
-                addXP(20); // Reward for adding a grade
-                document.getElementById('grName').value=''; document.getElementById('grVal').value=''; await syncData(); 
+                await addXP(20); 
+                document.getElementById('grName').value=''; document.getElementById('grVal').value=''; 
             }
         }
 
         window.addHomework = async function() {
             const t = document.getElementById('adHwTxt').value;
             const tgt = document.getElementById('adHwTgt').value;
-            if(t) { await addDoc(collection(db, "homework"), { text: t, targetType: tgt, targetVal: tgt==='ALL'?'ALL':currentUser.grp }); document.getElementById('adHwTxt').value=''; await syncData(); }
+            
+            // If Student, force "PERSONAL"
+            const finalTarget = isAdmin ? tgt : 'PERSONAL';
+            const finalGroup = isAdmin ? (tgt === 'ALL' ? 'ALL' : tgt) : currentUser.grp; // Just reference
+            
+            if(t) { 
+                await addDoc(collection(db, "homework"), { 
+                    text: t, 
+                    targetType: finalTarget, 
+                    authorId: currentUser.id, // Track who made it
+                    doneBy: [] 
+                }); 
+                document.getElementById('adHwTxt').value=''; 
+            }
         }
 
         window.addAbsence = async function() {
+            // Admin Only Function
+            if(!isAdmin) return;
+            const d = document.getElementById('adAbsDate').value || new Date().toISOString().split('T')[0]; // Default to today
             const t = document.getElementById('adAbsType').value;
             const r = document.getElementById('adAbsReason').value;
-            const now = new Date();
-            await addDoc(collection(db, "attendance"), { studentId: currentUser.id, date: now.toISOString().split('T')[0], status: t, reason: r, timestamp: now, classId: 'MANUAL' });
-            document.getElementById('adAbsReason').value=''; await syncData();
-        }
-
-        window.justifyAbsence = async function(id) { if(confirm("Justifier cette absence ?")) { await updateDoc(doc(db, "attendance", id), { status: 'justified' }); await syncData(); } }
-        window.deleteAbsence = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "attendance", id)); await syncData(); } }
-        window.deleteGrade = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "grades", id)); await syncData(); } }
-        window.deleteTask = async (id) => { if(confirm("Supprimer?")) { await deleteDoc(doc(db, "homework", id)); await syncData(); } }
-
-        window.loadAdminRegistry = async function() {
-            document.getElementById('login-screen').style.display='none';
-            document.getElementById('dashboard').style.display='none';
-            document.getElementById('admin-registry').style.display='block';
-            const q = query(collection(db, "students"), orderBy("nom"));
-            const snap = await getDocs(q);
-            const grid = document.getElementById('studentGrid');
-            grid.innerHTML = '';
-            allStudents = [];
-            snap.forEach(d => {
-                const s = d.data();
-                allStudents.push({id:d.id, ...s});
-                const displayId = s.shortId || s.id;
-                const el = document.createElement('div');
-                el.className = 'student-card glass-panel';
-                el.innerHTML = `<div class="st-card-top"><div class="st-avatar">${s.prenom[0]}</div><div class="st-grp-badge">${s.grp}</div></div><div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${displayId}</div></div>`;
-                el.onclick = () => loadDashboard({id:d.id, ...s}, true, true);
-                grid.appendChild(el);
+            
+            await addDoc(collection(db, "attendance"), { 
+                studentId: currentUser.id, 
+                date: d, // Uses the picker date
+                status: t, 
+                reason: r, 
+                classId: 'MANUAL' 
             });
+            document.getElementById('adAbsReason').value=''; 
         }
 
-        window.filterStudents = function() {
-            const term = document.getElementById('adminSearch').value.toLowerCase();
-            const filtered = allStudents.filter(s => s.nom.toLowerCase().includes(term) || (s.shortId || s.id).toLowerCase().includes(term));
-            const grid = document.getElementById('studentGrid');
-            grid.innerHTML = '';
-            filtered.forEach(s => {
-                const displayId = s.shortId || s.id;
-                const el = document.createElement('div');
-                el.className = 'student-card glass-panel';
-                el.innerHTML = `<div class="st-card-top"><div class="st-avatar">${s.prenom[0]}</div><div class="st-grp-badge">${s.grp}</div></div><div style="margin-top:auto;"><div class="st-name">${s.nom} ${s.prenom}</div><div class="st-id">${displayId}</div></div>`;
-                el.onclick = () => loadDashboard(s, true, true);
-                grid.appendChild(el);
-            });
-        }
-
-        window.exitAdmin = () => loadAdminRegistry();
-        window.logout = () => { signOut(auth).then(() => { localStorage.removeItem(SESSION_KEY); location.reload(); }); }
-        window.openModal = (id) => document.getElementById(id).style.display='flex';
-        window.closeModal = () => document.querySelectorAll('.modal-overlay').forEach(e=>e.style.display='none');
-        
-        window.downloadData = () => {
-            if(!currentUser) return alert("Veuillez vous connecter pour télécharger vos données.");
-            const exportData = { userProfile: currentUser, academicData: localData, exportDate: new Date().toISOString(), platform: "SmartST Student OS" };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "smartst_data_export.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        }
-
-        window.deleteAccount = async () => {
-            if(!confirm("ATTENTION: Cette action est irréversible. Toutes vos données seront effacées.")) return;
-            const loader = document.getElementById('loader');
-            loader.style.display = 'flex';
-            try {
-                const uid = currentUser.id;
-                const batch = writeBatch(db);
-                const gradesQ = query(collection(db, "grades"), where("userId", "==", uid));
-                const gradesSnap = await getDocs(gradesQ);
-                gradesSnap.forEach(doc => batch.delete(doc.ref));
-                const attQ = query(collection(db, "attendance"), where("studentId", "==", uid));
-                const attSnap = await getDocs(attQ);
-                attSnap.forEach(doc => batch.delete(doc.ref));
-                const tickQ = query(collection(db, "support_tickets"), where("userId", "==", uid));
-                const tickSnap = await getDocs(tickQ);
-                tickSnap.forEach(doc => batch.delete(doc.ref));
-                const studentRef = doc(db, "students", uid);
-                batch.delete(studentRef);
-                await batch.commit();
-                const user = auth.currentUser;
-                if(user) await deleteUser(user);
-                localStorage.clear();
-                alert("Compte supprimé avec succès.");
-                location.reload();
-            } catch (error) {
-                console.error(error);
-                loader.style.display = 'none';
-                alert("Erreur: Une reconnexion récente est nécessaire pour supprimer le compte.");
+        window.toggleTask = async function(id, isDone) {
+            const task = localData.homework.find(h=>h.id===id);
+            let doneBy = task.doneBy || [];
+            if(isDone) doneBy = doneBy.filter(i=>i!==currentUser.id); 
+            else { 
+                doneBy.push(currentUser.id); 
+                addXP(10); 
             }
+            await updateDoc(doc(db, "homework", id), { doneBy });
         }
+
+        async function addXP(amount) {
+            if(isAdmin) return;
+            try { await updateDoc(doc(db, "students", currentUser.id), { xp: increment(amount) }); } 
+            catch(e) { console.error("XP Error:", e); }
+        }
+
+        window.deleteGrade = async (id) => { if(confirm("Supprimer?")) await deleteDoc(doc(db, "grades", id)); }
+        window.deleteTask = async (id) => { if(confirm("Supprimer?")) await deleteDoc(doc(db, "homework", id)); }
+        window.deleteAbsence = async (id) => { if(confirm("Supprimer?")) await deleteDoc(doc(db, "attendance", id)); }
+        window.logout = () => { signOut(auth).then(() => location.reload()); }
     </script>
 </body>
 </html>
