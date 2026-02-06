@@ -49,8 +49,6 @@
         .profile { display: flex; align-items: center; gap: 20px; position: relative; }
         .avatar-lg { width: 64px; height: 64px; border-radius: 20px; background: rgba(34, 211, 238, 0.1); border: 1px solid var(--gemini-cyan); color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; box-shadow: 0 0 30px rgba(34, 211, 238, 0.15); cursor: pointer; transition: 0.3s; }
         .avatar-lg:hover { transform: scale(1.05); border-color: white; }
-        .xp-popover { position: absolute; top: 80px; left: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 20px; width: 280px; z-index: 1000; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .profile:hover .xp-popover { opacity: 1; visibility: visible; transform: translateY(0); }
         .user-info h1 { margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .group-tag { background: rgba(59, 130, 246, 0.15); padding: 5px 12px; border-radius: 8px; color: var(--gemini-cyan); font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.3); }
         .nav-actions { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
@@ -75,30 +73,15 @@
         .hw-check.done { background: var(--gemini-cyan); border-color: var(--gemini-cyan); }
         .hw-check svg { width: 14px; color: black; display: none; } .hw-check.done svg { display: block; }
         .hw-text { font-size: 0.95rem; color: #e2e8f0; flex: 1; line-height: 1.5; } .hw-item.done .hw-text { text-decoration: line-through; color: rgba(255,255,255,0.3); }
+        
         .add-row, .admin-controls { display: none; gap: 10px; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
         .admin-visible { display: flex !important; }
+        
         .st-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 12px; width: 100%; }
         .st-input option { background-color: #02040a; }
         .admin-tag { font-size: 0.65rem; color: var(--gemini-gold); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
         input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         
-        /* XP STYLES */
-        .level-badge-mini { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, var(--gemini-cyan), var(--gemini-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
-        .xp-info-mini { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
-        .xp-progress-mini { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
-        .xp-bar-mini { height: 100%; background: linear-gradient(90deg, var(--gemini-cyan), var(--gemini-purple)); width: 0%; transition: width 0.5s ease; }
-        .xp-text-mini { font-size: 0.65rem; color: var(--text-mute); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .mastery-tag-mini { font-size: 0.6rem; font-weight: 800; color: var(--gemini-gold); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 4px; }
-        .more-info-btn { margin-top: 15px; width: 100%; padding: 8px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--gemini-cyan); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; }
-        .more-info-btn:hover { background: rgba(34, 211, 238, 0.1); border-color: var(--gemini-cyan); }
-        .xp-design-bronze { border-color: #cd7f32aa; background: linear-gradient(135deg, #cd7f3233, rgba(15, 23, 42, 0.95)); }
-        .xp-design-silver { border-color: #c0c0c0aa; background: linear-gradient(135deg, #c0c0c033, rgba(15, 23, 42, 0.95)); }
-        .xp-design-gold { border-color: #ffd700aa; background: linear-gradient(135deg, #ffd70033, rgba(15, 23, 42, 0.95)); }
-        .xp-design-platinum { border-color: #e5e4e2aa; background: linear-gradient(135deg, #e5e4e233, rgba(15, 23, 42, 0.95)); }
-        .xp-design-mastery { border-color: var(--gemini-gold); background: radial-gradient(circle at top right, #fbbf2444, rgba(15, 23, 42, 0.95) 70%); box-shadow: 0 0 30px #fbbf2422; }
-        .xp-design-legend { border-color: var(--gemini-cyan); background: radial-gradient(circle at top right, #22d3ee44, #a855f722); box-shadow: 0 0 40px #22d3ee33; animation: borderGlow 3s infinite alternate; }
-        @keyframes borderGlow { from { border-color: var(--gemini-cyan); } to { border-color: var(--gemini-purple); } }
-
         /* NOTIFICATIONS & TOAST */
         .notif-btn { position: relative; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; }
         .notif-badge { position: absolute; top: 0px; right: 0px; background: var(--gemini-red); width: 10px; height: 10px; border-radius: 50%; display: none; box-shadow: 0 0 5px var(--gemini-red); border:2px solid #0f172a; }
@@ -199,19 +182,6 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="xpInfoModal" onclick="closeModal()">
-        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
-            <h3 style="color:var(--gemini-cyan); margin-top:0;">Système d'XP & Maîtrise</h3>
-            <div class="scroll-text">
-                <h4>Comment gagner de l'XP ?</h4>
-                <ul><li>Note : +20 XP</li><li>Devoir : +10 XP</li><li>Focus : 0-100 XP</li></ul>
-                <h4>Paliers</h4>
-                <p>Bronze, Argent, Or, Platine, Maîtrise.</p>
-            </div>
-            <button class="liquid-btn" onclick="closeModal()" style="width:100%;">Fermer</button>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="privacyModal" onclick="closeModal()">
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <h3 style="color:var(--gemini-blue); margin-top:0;">Données Personnelles</h3>
@@ -289,20 +259,6 @@
                     <h1 id="greeting">Bienvenue</h1>
                     <p><span class="group-tag" id="dashGroup">--</span> BUT InfoCom</p>
                 </div>
-                <div id="xpPopover" class="xp-popover">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <div id="miniMastery" class="mastery-tag-mini" style="display:none;">Mastery</div>
-                        <div class="level-badge-mini" id="levelValMini">1</div>
-                    </div>
-                    <div class="xp-info-mini">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span class="xp-text-mini" id="xpCurrentMini">0 XP</span>
-                            <span class="xp-text-mini" id="xpNextMini">100 XP</span>
-                        </div>
-                        <div class="xp-progress-mini"><div class="xp-bar-mini" id="xpBarMini"></div></div>
-                    </div>
-                    <button class="more-info-btn" onclick="openModal('xpInfoModal')">More Info</button>
-                </div>
             </div>
             <div style="display:flex; gap:10px;">
                 <button class="liquid-btn notif-btn" onclick="openModal('notifModal')">
@@ -341,7 +297,7 @@
                 <div class="card-head"><div class="card-title">Notes</div></div>
                 <div style="text-align:center; margin-bottom:20px;"><div class="gpa-display" id="gpaVal">--</div><span>Moyenne</span></div>
                 <div class="grade-list" id="gradeList"></div>
-                <div class="add-row" style="display:flex !important;">
+                <div class="add-row" id="adminGradeInput" style="display:none !important;">
                     <input type="text" id="grName" class="st-input" placeholder="Matière" style="flex:2">
                     <input type="number" id="grVal" class="st-input" placeholder="/20" style="flex:1">
                     <button class="liquid-btn st-btn" onclick="addGrade()">+</button>
@@ -370,7 +326,7 @@
             <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Devoirs</div></div>
                 <div class="hw-list" id="hwList"></div>
-                <div class="admin-controls" id="adminHwBox" style="display:flex !important;">
+                <div class="admin-controls" id="adminHwBox" style="display:none !important;">
                     <div style="display:flex; gap:5px;">
                         <input type="text" id="adHwTxt" class="st-input" placeholder="Titre..." style="flex:2">
                         <select id="adHwTgt" class="st-input" style="flex:1; display:none;">
@@ -434,7 +390,7 @@
         let localData = { grades: [], attendance: [], homework: [] };
         let allStudents = [];
         let pageLoadTime = Date.now();
-        let unreadNotifs = []; // Store IDs to mark read
+        let unreadNotifs = [];
 
         const SESSION_KEY = 'smartst_session';
         const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
@@ -457,84 +413,23 @@
 
         window.openModal = (id) => {
             document.getElementById(id).style.display='flex';
+            if (id === 'notifModal') {
+                markAllRead();
+            }
         };
         window.closeModal = () => document.querySelectorAll('.modal-overlay').forEach(e=>e.style.display='none');
 
-        // MARK ALL READ
         window.markAllRead = async () => {
             if(unreadNotifs.length === 0) return;
+            if(document.getElementById('notifBadge')) document.getElementById('notifBadge').style.display='none';
+            if(document.getElementById('notifBadgeAdmin')) document.getElementById('notifBadgeAdmin').style.display='none';
             const batch = writeBatch(db);
             unreadNotifs.forEach(id => {
                 const ref = doc(db, "notifications", id);
                 batch.update(ref, { readBy: arrayUnion(currentUser.id) });
             });
-            await batch.commit();
-            unreadNotifs = []; // Clear local list
-            document.getElementById('notifBadge').style.display='none';
-            document.getElementById('notifBadgeAdmin').style.display='none';
+            try { await batch.commit(); unreadNotifs = []; } catch(e) { console.error("Mark read failed", e); }
         }
-        
-
-         // 1. CALCULATE AND DISPLAY XP
-function renderXP(xp) {
-    // Ensure we have a number, default to 0 if missing
-    const safeXP = typeof xp === 'number' ? xp : 0;
-
-    // Logic: Every 100 XP is a new level
-    // Level 1 = 0-99 XP, Level 2 = 100-199 XP, etc.
-    let level = Math.floor(safeXP / 100) + 1;
-    let currentLevelXP = safeXP % 100; // XP progress in the current level (0 to 99)
-    
-    // UI Elements
-    const lVal = document.getElementById('levelValMini');
-    const bar = document.getElementById('xpBarMini');
-    const curr = document.getElementById('xpCurrentMini');
-    const nxt = document.getElementById('xpNextMini');
-    const pop = document.getElementById('xpPopover');
-    const mm = document.getElementById('miniMastery');
-
-    // Reset Classes
-    pop.className = 'xp-popover';
-
-    // Handle Mastery (Level 100+)
-    if (level <= 100) {
-        if(mm) mm.style.display = 'none';
-        
-        // Rank Colors
-        if (level < 20) pop.classList.add('xp-design-bronze');
-        else if (level < 40) pop.classList.add('xp-design-silver');
-        else if (level < 70) pop.classList.add('xp-design-gold');
-        else pop.classList.add('xp-design-platinum');
-    } else {
-        // Mastery Mode
-        if(mm) mm.style.display = 'flex';
-        pop.classList.add('xp-design-legend');
-        // Visual adjustment for mastery (keeps level readable)
-        level = ((level - 101) % 100) + 1; 
-    }
-
-    // Update Text & Width
-    if(lVal) lVal.innerText = level;
-    if(bar) bar.style.width = `${currentLevelXP}%`; // 50 XP = 50% width
-    if(curr) curr.innerText = `${currentLevelXP} XP`;
-    if(nxt) nxt.innerText = `100 XP`;
-}
-
-// 2. CONNECT TO FIREBASE (Put this inside your startLiveListeners function)
-// This listens to: Collection "students" -> Document "CURRENT_USER_ID"
-onSnapshot(doc(db, "students", currentUser.id), (docSnapshot) => {
-    if (docSnapshot.exists()) {
-        const data = docSnapshot.data();
-        
-        // Update local user profile data
-        currentUser = { ...currentUser, ...data };
-        
-        // EXTRACT 'xp' AND RENDER
-        // If 'xp' field is missing in DB, default to 0
-        renderXP(data.xp || 0);
-    }
-});
-
 
         // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
@@ -545,24 +440,18 @@ onSnapshot(doc(db, "students", currentUser.id), (docSnapshot) => {
                     
                     if (docSnap.exists()) {
                         currentUser = { id: docSnap.id, ...docSnap.data() };
-
-                        // Start XP listener ONLY after user is loaded
                         onSnapshot(doc(db, "students", currentUser.id), (d) => {
                             if (d.exists()) {
                                 const data = d.data();
-                                const xp = typeof data.xp === "number" ? data.xp : 0;
                                 currentUser = { ...currentUser, ...data };
-                                renderXP(xp);
                             }
                         });
-
                         loadDashboard(currentUser, false);
                     } else if (user.uid === "WA5k4NI4mWWsmzdLgRS9tGRRfVz2" || user.uid === "hWVtA8MsXYWusnBeEOAVQghIWbb2") {
                         currentUser = { id: user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
                         loadDashboard(currentUser, true);
                     } else {
-                        alert("Compte non trouvé.");
-                        signOut(auth);
+                        alert("Compte non trouvé."); signOut(auth);
                         document.getElementById('loader').style.display='none';
                         document.getElementById('login-screen').style.display='flex';
                     }
@@ -600,16 +489,21 @@ onSnapshot(doc(db, "students", currentUser.id), (docSnapshot) => {
                     document.getElementById('navAppel').style.display = 'flex';
                     document.getElementById('adminAbsBox').classList.add('admin-visible');
                     document.getElementById('adminBroadcastBox').style.setProperty('display', 'block', 'important');
+                    // Show Add Grade/Homework for Admin Only
+                    document.getElementById('adminGradeInput').style.setProperty('display', 'flex', 'important');
+                    document.getElementById('adminHwBox').style.setProperty('display', 'flex', 'important');
+                    document.getElementById('adHwTgt').style.display = 'block';
                 } else {
                     document.getElementById('adminBroadcastBox').style.setProperty('display', 'none', 'important');
+                    // Hide Add Grade/Homework for Students
+                    document.getElementById('adminGradeInput').style.setProperty('display', 'none', 'important');
+                    document.getElementById('adminHwBox').style.setProperty('display', 'none', 'important');
                 }
                 
-                document.getElementById('adHwTgt').style.display = isAdmin ? 'block' : 'none';
                 startLiveListeners();
             }
         }
 
-        // --- NOTIFICATION & TOAST LOGIC ---
         function showToast(title, msg) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -625,7 +519,6 @@ onSnapshot(doc(db, "students", currentUser.id), (docSnapshot) => {
             if (!title) return;
             const body = prompt(`Message pour ${targetName}:`);
             if (!body) return;
-
             try {
                 await addDoc(collection(db, "notifications"), {
                     title: title, body: body, target: targetId, authorId: auth.currentUser.uid, authorName: "Admin", timestamp: new Date(), readBy: []
@@ -651,19 +544,13 @@ onSnapshot(doc(db, "students", currentUser.id), (docSnapshot) => {
             } else { alert("Remplissez le titre et le message."); }
         }
 
-        // --- LIVE DATA LISTENERS ---
         function startLiveListeners() {
-            // 1. GRADES
             onSnapshot(query(collection(db, "grades"), where("userId", "==", currentUser.id)), (snap) => {
                 localData.grades = []; snap.forEach(d => localData.grades.push({ ...d.data(), id: d.id })); renderGrades();
             });
-
-            // 2. ATTENDANCE
             onSnapshot(query(collection(db, "attendance"), where("studentId", "==", currentUser.id)), (snap) => {
                 localData.attendance = []; snap.forEach(d => localData.attendance.push({ ...d.data(), id: d.id })); renderAttendance();
             });
-
-            // 3. HOMEWORK
             onSnapshot(collection(db, "homework"), (snap) => {
                 localData.homework = [];
                 snap.forEach(doc => {
@@ -678,51 +565,32 @@ onSnapshot(doc(db, "students", currentUser.id), (docSnapshot) => {
                 });
                 renderHomework();
             });
-
-            // 5. NOTIFICATIONS
             onSnapshot(collection(db, "notifications"), (snap) => {
                 const list = document.getElementById('notifList');
                 const badge = document.getElementById('notifBadge');
                 const badgeAdmin = document.getElementById('notifBadgeAdmin');
                 list.innerHTML = '';
-                unreadNotifs = []; // Reset local list
-                
+                unreadNotifs = []; 
                 let rawNotifs = [];
                 snap.forEach(d => rawNotifs.push({ ...d.data(), id: d.id }));
                 rawNotifs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-
                 let unreadCount = 0;
                 rawNotifs.forEach(n => {
                     const isForMe = isAdmin || (n.target === 'ALL') || (n.target === currentUser.grp) || (n.target === currentUser.id);
-                    
                     if(isForMe) {
-                        // CHECK READ STATUS
                         const isRead = n.readBy && n.readBy.includes(currentUser.id);
                         if (!isRead) {
                             unreadCount++;
                             unreadNotifs.push(n.id);
-                            // Only toast if genuinely new session-wise AND unread
                             if(n.timestamp && n.timestamp.seconds * 1000 > pageLoadTime) showToast(n.title, n.body);
                         }
-
                         let dateStr = "Récemment";
                         if(n.timestamp && n.timestamp.seconds) {
                             dateStr = new Date(n.timestamp.seconds * 1000).toLocaleString('fr-FR', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
                         }
-
-                        list.innerHTML += `
-                        <div class="notif-item ${isRead ? 'read' : ''}">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                                <div class="notif-title" style="margin:0;">${n.title}</div>
-                                <div class="notif-time" style="margin:0;">${dateStr}</div>
-                            </div>
-                            <div class="notif-body">${n.body}</div>
-                            ${isAdmin ? `<button onclick="deleteNotification('${n.id}')" style="color:red;background:none;border:none;font-size:0.7rem;cursor:pointer;margin-top:8px;padding:0;">Supprimer</button>` : ''}
-                        </div>`;
+                        list.innerHTML += `<div class="notif-item ${isRead ? 'read' : ''}"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;"><div class="notif-title" style="margin:0;">${n.title}</div><div class="notif-time" style="margin:0;">${dateStr}</div></div><div class="notif-body">${n.body}</div>${isAdmin ? `<button onclick="deleteNotification('${n.id}')" style="color:red;background:none;border:none;font-size:0.7rem;cursor:pointer;margin-top:8px;padding:0;">Supprimer</button>` : ''}</div>`;
                     }
                 });
-
-                // BADGE VISIBILITY LOGIC
                 if(unreadCount > 0) { 
                     if(badge) badge.style.display = 'block'; 
                     if(badgeAdmin) badgeAdmin.style.display = 'block';
@@ -730,12 +598,10 @@ onSnapshot(doc(db, "students", currentUser.id), (docSnapshot) => {
                     if(badge) badge.style.display = 'none'; 
                     if(badgeAdmin) badgeAdmin.style.display = 'none';
                 }
-                
                 if (list.innerHTML === '') list.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Aucune notification.</div>';
             });
         }
 
-        // --- RENDERERS ---
         function renderGrades() {
             const list = document.getElementById('gradeList'); list.innerHTML = ''; let sum = 0;
             localData.grades.forEach(g => { sum += parseFloat(g.val); list.innerHTML += `<div class="item-row"><span>${g.name}</span><div style="display:flex;align-items:center;"><span class="val-hl">${g.val}</span><div class="del-btn" onclick="deleteGrade('${g.id}')">&times;</div></div></div>`; });
@@ -760,18 +626,6 @@ onSnapshot(doc(db, "students", currentUser.id), (docSnapshot) => {
                 const canDel = isAdmin || (h.authorId === currentUser.id);
                 list.innerHTML += `<div class="hw-item ${done?'done':''}"><div class="hw-check ${done?'done':''}" onclick="toggleTask('${h.id}', ${done})"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="hw-text">${h.text}<span style="font-size:0.6rem;opacity:0.5;display:block;">${h.targetType==='PERSONAL'?'Personnel':h.targetType || 'Promo'}</span></div>${canDel ? `<div class="del-btn" onclick="deleteTask('${h.id}')">&times;</div>` : ''}</div>`;
             });
-        }
-        function renderXP(xp) {
-            const lVal=document.getElementById('levelValMini'), bar=document.getElementById('xpBarMini'), curr=document.getElementById('xpCurrentMini'), nxt=document.getElementById('xpNextMini'), mm=document.getElementById('miniMastery'), pop=document.getElementById('xpPopover');
-            let lvl=Math.floor(xp/100)+1, cxp=xp%100;
-            pop.className='xp-popover';
-            if(lvl<=100) {
-                mm.style.display='none';
-                if(lvl<20) pop.classList.add('xp-design-bronze'); else if(lvl<40) pop.classList.add('xp-design-silver'); else if(lvl<70) pop.classList.add('xp-design-gold'); else pop.classList.add('xp-design-platinum');
-            } else {
-                lvl=((lvl-101)%100)+1; mm.style.display='flex'; pop.classList.add('xp-design-legend');
-            }
-            lVal.innerText=lvl; bar.style.width=`${cxp}%`; curr.innerText=`${cxp} XP`; nxt.innerText=`100 XP`;
         }
 
         window.addGrade = async () => { const n=document.getElementById('grName').value, v=document.getElementById('grVal').value; if(n&&v) { await addDoc(collection(db,"grades"),{userId:currentUser.id,name:n,val:v}); await addXP(20); document.getElementById('grName').value=''; document.getElementById('grVal').value=''; } }
