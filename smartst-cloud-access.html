@@ -180,34 +180,51 @@
         .c-red { color: var(--gemini-red); } .c-gold { color: var(--gemini-gold); } .c-green { color: var(--gemini-green); }
 
         /* XP & LEVEL STYLES */
-        .xp-card {
-            background: linear-gradient(135deg, rgba(34, 211, 238, 0.05), rgba(168, 85, 247, 0.05));
-            border: 1px solid rgba(34, 211, 238, 0.2) !important;
-            order: -1; /* Keep at top */
+        .xp-mini-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+            transition: all 0.4s ease;
+            cursor: default;
+            max-width: fit-content;
         }
-        .level-badge {
-            font-size: 2.5rem; font-weight: 900;
+        .xp-mini-card:hover { transform: translateY(-2px); border-color: var(--gemini-cyan); }
+        
+        .level-badge-mini {
+            font-size: 1.5rem; font-weight: 800;
             background: linear-gradient(135deg, var(--gemini-cyan), var(--gemini-purple));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
+            line-height: 1;
         }
-        .mastery-title {
-            font-size: 0.8rem; font-weight: 800; color: var(--gemini-gold);
-            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .xp-progress-container {
-            width: 100%; height: 12px; background: rgba(255,255,255,0.05);
+        .xp-info-mini { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+        .xp-progress-mini {
+            width: 100%; height: 6px; background: rgba(255,255,255,0.05);
             border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 10px; position: relative;
         }
-        .xp-progress-bar {
+        .xp-bar-mini {
             height: 100%; background: linear-gradient(90deg, var(--gemini-cyan), var(--gemini-purple));
-            width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+            width: 0%; transition: width 0.5s ease;
         }
-        .xp-text { font-size: 0.75rem; color: var(--text-mute); font-weight: 600; }
-        .mastery-icon { width: 18px; height: 18px; filter: drop-shadow(0 0 5px var(--gemini-gold)); }
+        .xp-text-mini { font-size: 0.65rem; color: var(--text-mute); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .mastery-tag-mini {
+            font-size: 0.6rem; font-weight: 800; color: var(--gemini-gold);
+            text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 4px;
+        }
+        
+        /* DESIGN VARIANTS */
+        .xp-design-bronze { border-color: #cd7f3244; background: linear-gradient(135deg, #cd7f3211, transparent); }
+        .xp-design-silver { border-color: #c0c0c044; background: linear-gradient(135deg, #c0c0c011, transparent); }
+        .xp-design-gold { border-color: #ffd70044; background: linear-gradient(135deg, #ffd70011, transparent); }
+        .xp-design-platinum { border-color: #e5e4e244; background: linear-gradient(135deg, #e5e4e211, transparent); }
+        .xp-design-mastery { border-color: var(--gemini-gold); background: radial-gradient(circle at top right, #fbbf2422, transparent 70%); box-shadow: 0 0 15px #fbbf2411; }
+        .xp-design-legend { border-color: var(--gemini-cyan); background: radial-gradient(circle at top right, #22d3ee22, #a855f711); box-shadow: 0 0 25px #22d3ee22; animation: borderGlow 3s infinite alternate; }
+        
+        @keyframes borderGlow { from { border-color: var(--gemini-cyan); } to { border-color: var(--gemini-purple); } }
 
         .hw-item { background: rgba(255,255,255,0.02); padding: 14px; border-radius: 12px; display: flex; align-items: flex-start; gap: 12px; border: 1px solid rgba(255,255,255,0.05); }
         .hw-check { min-width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--text-mute); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 2px; }
@@ -368,7 +385,24 @@
                 <div class="avatar-lg" id="dashAvatar">--</div>
                 <div class="user-info">
                     <h1 id="greeting">Bienvenue</h1>
-                    <p><span class="group-tag" id="dashGroup">--</span> BUT InfoCom</p>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <span class="group-tag" id="dashGroup">--</span>
+                        <div id="xpCardMini" class="xp-mini-card" style="margin-top:0; padding: 6px 12px; border-radius: 12px;">
+                            <div id="miniMastery" class="mastery-tag-mini" style="display:none;">
+                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                            </div>
+                            <div class="level-badge-mini" id="levelValMini" style="font-size: 1.1rem;">1</div>
+                            <div class="xp-info-mini" style="min-width: 80px;">
+                                <div class="xp-progress-mini" style="height: 4px;">
+                                    <div class="xp-bar-mini" id="xpBarMini"></div>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; width:100%;">
+                                    <span class="xp-text-mini" id="xpCurrentMini" style="font-size: 0.5rem;">0 XP</span>
+                                    <span class="xp-text-mini" id="xpNextMini" style="font-size: 0.5rem;">100 XP</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div style="display:flex; gap:10px;">
@@ -388,25 +422,6 @@
         </div>
 
         <div class="grid">
-            <div class="card glass-panel xp-card">
-                <div class="card-head"><div class="card-title">XP & Niveau</div></div>
-                <div style="text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1;">
-                    <div id="masteryContainer" class="mastery-title" style="display:none;">
-                        <svg class="mastery-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                        <span id="masteryRank">Master Legend</span>
-                    </div>
-                    <div class="level-badge" id="levelVal">1</div>
-                    <div class="xp-text" style="margin-bottom:15px; text-transform:uppercase; letter-spacing:1px;">Niveau Actuel</div>
-                    
-                    <div class="xp-progress-container">
-                        <div class="xp-progress-bar" id="xpBar"></div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; width:100%;">
-                        <span class="xp-text" id="xpCurrent">0 XP</span>
-                        <span class="xp-text" id="xpNext">100 XP</span>
-                    </div>
-                </div>
-            </div>
 
             <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Notes</div></div>
@@ -710,39 +725,41 @@
         }
 
         function renderXP(xp) {
-            const levelVal = document.getElementById('levelVal');
-            const xpBar = document.getElementById('xpBar');
-            const xpCurrent = document.getElementById('xpCurrent');
-            const xpNext = document.getElementById('xpNext');
-            const masteryContainer = document.getElementById('masteryContainer');
-            const masteryRank = document.getElementById('masteryRank');
+            const levelVal = document.getElementById('levelValMini');
+            const xpBar = document.getElementById('xpBarMini');
+            const xpCurrent = document.getElementById('xpCurrentMini');
+            const xpNext = document.getElementById('xpNextMini');
+            const miniMastery = document.getElementById('miniMastery');
+            const xpCard = document.getElementById('xpCardMini');
 
             let level = 1;
-            let currentXP = xp;
+            let currentXP = xp % 100;
             let nextLevelXP = 100;
             
-            // Logic: 100 XP per level
-            // Mastery levels start after Level 100
             const totalLevel = Math.floor(xp / 100) + 1;
+            
+            // Design logic
+            xpCard.className = 'xp-mini-card'; // Reset
             
             if (totalLevel <= 100) {
                 level = totalLevel;
-                currentXP = xp % 100;
-                nextLevelXP = 100;
-                masteryContainer.style.display = 'none';
+                miniMastery.style.display = 'none';
+                
+                if (level < 20) xpCard.classList.add('xp-design-bronze');
+                else if (level < 40) xpCard.classList.add('xp-design-silver');
+                else if (level < 70) xpCard.classList.add('xp-design-gold');
+                else xpCard.classList.add('xp-design-platinum');
+                
             } else {
-                // Mastery Logic
                 const masteryTotal = totalLevel - 100;
                 const masteryIndex = Math.floor((masteryTotal - 1) / 100) + 1;
                 const subLevel = ((masteryTotal - 1) % 100) + 1;
                 
                 level = subLevel;
-                currentXP = xp % 100;
-                nextLevelXP = 100;
+                miniMastery.style.display = 'flex';
                 
-                masteryContainer.style.display = 'flex';
-                const masteryNames = ["Mastery I", "Mastery II", "Mastery III", "Mastery IV", "Mastery V", "Mastery VI", "Mastery VII", "Mastery VIII", "Mastery IX", "Master Legend"];
-                masteryRank.innerText = masteryNames[Math.min(masteryIndex - 1, 9)];
+                if (masteryIndex < 10) xpCard.classList.add('xp-design-mastery');
+                else xpCard.classList.add('xp-design-legend');
             }
 
             levelVal.innerText = level;
