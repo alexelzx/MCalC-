@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>MCalC+ | Calendar</title>
     
     <link rel="manifest" href="manifest.json">
@@ -252,15 +252,24 @@
 
         @media screen and (max-width: 768px) {
             body { font-size: 14px; }
-            .calendar-section { justify-content: flex-start; -webkit-overflow-scrolling: touch; }
-            .cal-wrapper { min-width: 800px; margin-bottom: 20px; }
-            .top-bar { height: auto; padding: 20px; align-items: flex-start; flex-direction: column; }
-            .left-group { width: 100%; justify-content: space-between; }
-            .controls-group { width: 100%; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
-            .st-select { flex: 1; text-align: center; }
-            .modal-box { width: 95%; max-height: 85vh; overflow-y: auto; }
-            .slider-container { gap: 5px; }
-            .nav-arrow { width: 40px; }
+            .calendar-section { justify-content: flex-start; -webkit-overflow-scrolling: touch; padding: 10px; }
+            .cal-wrapper { min-width: 700px; margin-bottom: 20px; gap: 5px; grid-template-columns: 50px repeat(5, 1fr); }
+            .top-bar { height: auto; padding: 15px; align-items: center; flex-direction: row; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+            .logo-section { order: 1; }
+            .controls-group { order: 3; width: 100%; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+            .left-group { width: auto; order: 1; }
+            .btn-back { order: 2; padding: 0 12px; }
+            .st-select { flex: 1; min-width: 110px; font-size: 0.8rem; padding: 0 10px; }
+            .btn-admin { padding: 0 12px; font-size: 0.8rem; }
+            .modal-box { width: 95%; max-height: 90vh; overflow-y: auto; padding: 20px; }
+            .slider-container { gap: 8px; }
+            .nav-arrow { width: 35px; height: auto; align-self: stretch; font-size: 1.5rem; }
+            .day-name { font-size: 0.7rem; }
+            .day-date { font-size: 0.7rem; padding: 2px 5px; }
+            .time-labels { padding-right: 5px; }
+            .event-card { padding: 8px; }
+            .evt-title { font-size: 0.8rem; }
+            .evt-type { font-size: 0.6rem; }
         }
     </style>
 </head>
