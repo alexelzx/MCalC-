@@ -148,8 +148,27 @@
         /* DASHBOARD */
         #dashboard { display: none; padding: 30px; padding-top: calc(20px + var(--safe-top)); padding-bottom: calc(100px + var(--safe-bottom)); max-width: 1400px; margin: 0 auto; width: 100%; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: var(--border-glass); }
-        .profile { display: flex; align-items: center; gap: 20px; }
-        .avatar-lg { width: 64px; height: 64px; border-radius: 20px; background: rgba(34, 211, 238, 0.1); border: 1px solid var(--gemini-cyan); color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; box-shadow: 0 0 30px rgba(34, 211, 238, 0.15); }
+        .profile { display: flex; align-items: center; gap: 20px; position: relative; }
+        .avatar-lg { 
+            width: 64px; height: 64px; border-radius: 20px; 
+            background: rgba(34, 211, 238, 0.1); border: 1px solid var(--gemini-cyan); 
+            color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; 
+            font-size: 1.8rem; font-weight: 700; box-shadow: 0 0 30px rgba(34, 211, 238, 0.15);
+            cursor: pointer; transition: 0.3s;
+        }
+        .avatar-lg:hover { transform: scale(1.05); border-color: white; }
+        
+        /* XP POPOVER ON HOVER */
+        .xp-popover {
+            position: absolute; top: 80px; left: 0; 
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px;
+            padding: 20px; width: 280px; z-index: 1000;
+            opacity: 0; visibility: hidden; transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .profile:hover .xp-popover { opacity: 1; visibility: visible; transform: translateY(0); }
         .user-info h1 { margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .group-tag { background: rgba(59, 130, 246, 0.15); padding: 5px 12px; border-radius: 8px; color: var(--gemini-cyan); font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.3); }
         
@@ -217,12 +236,20 @@
         }
         
         /* DESIGN VARIANTS */
-        .xp-design-bronze { border-color: #cd7f3244; background: linear-gradient(135deg, #cd7f3211, transparent); }
-        .xp-design-silver { border-color: #c0c0c044; background: linear-gradient(135deg, #c0c0c011, transparent); }
-        .xp-design-gold { border-color: #ffd70044; background: linear-gradient(135deg, #ffd70011, transparent); }
-        .xp-design-platinum { border-color: #e5e4e244; background: linear-gradient(135deg, #e5e4e211, transparent); }
-        .xp-design-mastery { border-color: var(--gemini-gold); background: radial-gradient(circle at top right, #fbbf2422, transparent 70%); box-shadow: 0 0 15px #fbbf2411; }
-        .xp-design-legend { border-color: var(--gemini-cyan); background: radial-gradient(circle at top right, #22d3ee22, #a855f711); box-shadow: 0 0 25px #22d3ee22; animation: borderGlow 3s infinite alternate; }
+        .xp-design-bronze { border-color: #cd7f32aa; background: linear-gradient(135deg, #cd7f3233, rgba(15, 23, 42, 0.95)); }
+        .xp-design-silver { border-color: #c0c0c0aa; background: linear-gradient(135deg, #c0c0c033, rgba(15, 23, 42, 0.95)); }
+        .xp-design-gold { border-color: #ffd700aa; background: linear-gradient(135deg, #ffd70033, rgba(15, 23, 42, 0.95)); }
+        .xp-design-platinum { border-color: #e5e4e2aa; background: linear-gradient(135deg, #e5e4e233, rgba(15, 23, 42, 0.95)); }
+        .xp-design-mastery { border-color: var(--gemini-gold); background: radial-gradient(circle at top right, #fbbf2444, rgba(15, 23, 42, 0.95) 70%); box-shadow: 0 0 30px #fbbf2422; }
+        .xp-design-legend { border-color: var(--gemini-cyan); background: radial-gradient(circle at top right, #22d3ee44, #a855f722); box-shadow: 0 0 40px #22d3ee33; animation: borderGlow 3s infinite alternate; }
+
+        .more-info-btn {
+            margin-top: 15px; width: 100%; padding: 8px; border-radius: 10px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: var(--gemini-cyan); font-size: 0.7rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s;
+        }
+        .more-info-btn:hover { background: rgba(34, 211, 238, 0.1); border-color: var(--gemini-cyan); }
         
         @keyframes borderGlow { from { border-color: var(--gemini-cyan); } to { border-color: var(--gemini-purple); } }
 
@@ -310,6 +337,36 @@
         <div class="loader-text">CONNEXION...</div>
     </div>
 
+    <div class="modal-overlay" id="xpInfoModal" onclick="closeModal()">
+        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
+            <h3 style="color:var(--gemini-cyan); margin-top:0;">Système d'XP & Maîtrise</h3>
+            <div class="scroll-text">
+                <h4>Comment gagner de l'XP ?</h4>
+                <ul>
+                    <li>Ajouter une note : <strong>+20 XP</strong></li>
+                    <li>Terminer un devoir : <strong>+10 XP</strong></li>
+                </ul>
+                
+                <h4>Paliers de Niveaux</h4>
+                <p>Progressez à travers les rangs pour débloquer des designs exclusifs :</p>
+                <ul>
+                    <li><span style="color:#cd7f32">Bronze</span> : Niveau 1 - 19</li>
+                    <li><span style="color:#c0c0c0">Argent</span> : Niveau 20 - 39</li>
+                    <li><span style="color:#ffd700">Or</span> : Niveau 40 - 69</li>
+                    <li><span style="color:#e5e4e2">Platine</span> : Niveau 70 - 100</li>
+                </ul>
+
+                <h4>Niveaux de Maîtrise</h4>
+                <p>Après le niveau 100, vous entrez dans la <strong>Maîtrise</strong> :</p>
+                <ul>
+                    <li><strong>Mastery I à IX</strong> : Chaque rang possède 100 sous-niveaux.</li>
+                    <li><strong>Master Legend</strong> : Le rang ultime pour les étudiants d'élite.</li>
+                </ul>
+            </div>
+            <button class="liquid-btn" onclick="closeModal()" style="width:100%;">Fermer</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="privacyModal" onclick="closeModal()">
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <h3 style="color:var(--gemini-blue); margin-top:0;">Gestion Données Personnelles</h3>
@@ -385,24 +442,30 @@
                 <div class="avatar-lg" id="dashAvatar">--</div>
                 <div class="user-info">
                     <h1 id="greeting">Bienvenue</h1>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="group-tag" id="dashGroup">--</span>
-                        <div id="xpCardMini" class="xp-mini-card" style="margin-top:0; padding: 6px 12px; border-radius: 12px;">
-                            <div id="miniMastery" class="mastery-tag-mini" style="display:none;">
-                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                            </div>
-                            <div class="level-badge-mini" id="levelValMini" style="font-size: 1.1rem;">1</div>
-                            <div class="xp-info-mini" style="min-width: 80px;">
-                                <div class="xp-progress-mini" style="height: 4px;">
-                                    <div class="xp-bar-mini" id="xpBarMini"></div>
-                                </div>
-                                <div style="display:flex; justify-content:space-between; width:100%;">
-                                    <span class="xp-text-mini" id="xpCurrentMini" style="font-size: 0.5rem;">0 XP</span>
-                                    <span class="xp-text-mini" id="xpNextMini" style="font-size: 0.5rem;">100 XP</span>
-                                </div>
-                            </div>
+                    <span class="group-tag" id="dashGroup">--</span>
+                </div>
+
+                <!-- XP POPOVER -->
+                <div id="xpPopover" class="xp-popover">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <div id="miniMastery" class="mastery-tag-mini" style="display:none;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                            <span id="masteryTitle">Mastery</span>
+                        </div>
+                        <div class="level-badge-mini" id="levelValMini">1</div>
+                    </div>
+                    
+                    <div class="xp-info-mini">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span class="xp-text-mini" id="xpCurrentMini">0 XP</span>
+                            <span class="xp-text-mini" id="xpNextMini">100 XP</span>
+                        </div>
+                        <div class="xp-progress-mini">
+                            <div class="xp-bar-mini" id="xpBarMini"></div>
                         </div>
                     </div>
+                    
+                    <button class="more-info-btn" onclick="openModal('xpInfoModal')">More Info</button>
                 </div>
             </div>
             <div style="display:flex; gap:10px;">
@@ -725,12 +788,14 @@
         }
 
         function renderXP(xp) {
+            console.log("Rendering XP:", xp);
             const levelVal = document.getElementById('levelValMini');
             const xpBar = document.getElementById('xpBarMini');
             const xpCurrent = document.getElementById('xpCurrentMini');
             const xpNext = document.getElementById('xpNextMini');
             const miniMastery = document.getElementById('miniMastery');
-            const xpCard = document.getElementById('xpCardMini');
+            const masteryTitle = document.getElementById('masteryTitle');
+            const xpPopover = document.getElementById('xpPopover');
 
             let level = 1;
             let currentXP = xp % 100;
@@ -738,17 +803,17 @@
             
             const totalLevel = Math.floor(xp / 100) + 1;
             
-            // Design logic
-            xpCard.className = 'xp-mini-card'; // Reset
+            // Reset designs
+            xpPopover.classList.remove('xp-design-bronze', 'xp-design-silver', 'xp-design-gold', 'xp-design-platinum', 'xp-design-mastery', 'xp-design-legend');
             
             if (totalLevel <= 100) {
                 level = totalLevel;
                 miniMastery.style.display = 'none';
                 
-                if (level < 20) xpCard.classList.add('xp-design-bronze');
-                else if (level < 40) xpCard.classList.add('xp-design-silver');
-                else if (level < 70) xpCard.classList.add('xp-design-gold');
-                else xpCard.classList.add('xp-design-platinum');
+                if (level < 20) xpPopover.classList.add('xp-design-bronze');
+                else if (level < 40) xpPopover.classList.add('xp-design-silver');
+                else if (level < 70) xpPopover.classList.add('xp-design-gold');
+                else xpPopover.classList.add('xp-design-platinum');
                 
             } else {
                 const masteryTotal = totalLevel - 100;
@@ -758,14 +823,31 @@
                 level = subLevel;
                 miniMastery.style.display = 'flex';
                 
-                if (masteryIndex < 10) xpCard.classList.add('xp-design-mastery');
-                else xpCard.classList.add('xp-design-legend');
+                if (masteryIndex < 10) {
+                    xpPopover.classList.add('xp-design-mastery');
+                    masteryTitle.innerText = `Mastery ${romanize(masteryIndex)}`;
+                } else {
+                    xpPopover.classList.add('xp-design-legend');
+                    masteryTitle.innerText = `Master Legend`;
+                }
             }
 
             levelVal.innerText = level;
             xpBar.style.width = `${(currentXP / nextLevelXP) * 100}%`;
             xpCurrent.innerText = `${currentXP} XP`;
             xpNext.innerText = `${nextLevelXP} XP`;
+        }
+
+        function romanize(num) {
+            const lookup = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1};
+            let roman = '';
+            for (let i in lookup) {
+                while (num >= lookup[i]) {
+                    roman += i;
+                    num -= lookup[i];
+                }
+            }
+            return roman;
         }
 
         // --- ACTIONS ---
