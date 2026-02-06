@@ -381,7 +381,11 @@
                     <span class="admin-tag">Admin: Ajouter Absence</span>
                     <div style="display:flex; gap:5px; flex-wrap:wrap;">
                         <input type="date" id="adAbsDate" class="st-input" style="flex:1; min-width:120px;">
-                        <select id="adAbsType" class="st-input" style="flex:1"><option value="absent">Absence</option><option value="late">Retard</option></select>
+                        <select id="adAbsType" class="st-input" style="flex:1">
+                            <option value="absent">Absence</option>
+                            <option value="justified">Justifié</option>
+                            <option value="late">Retard</option>
+                        </select>
                         <input type="text" id="adAbsReason" class="st-input" placeholder="Motif" style="flex:2; min-width:100%;">
                         <button class="liquid-btn st-btn" style="border-color:var(--gemini-red); color:var(--gemini-red); width:100%;" onclick="addAbsence()">VALIDER</button>
                     </div>
