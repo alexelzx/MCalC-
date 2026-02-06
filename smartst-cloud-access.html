@@ -474,6 +474,65 @@
             document.getElementById('notifBadgeAdmin').style.display='none';
         }
 
+        // 1. CALCULATE AND DISPLAY XP
+           function renderXP(xp) {
+       // Ensure we have a number, default to 0 if missing
+           const safeXP = typeof xp === 'number' ? xp : 0;
+
+      // Logic: Every 100 XP is a new level
+     // Level 1 = 0-99 XP, Level 2 = 100-199 XP, etc.
+           let level = Math.floor(safeXP / 100) + 1;
+           let currentLevelXP = safeXP % 100; // XP progress in the current level (0 to 99)
+    
+     // UI Elements
+    const lVal = document.getElementById('levelValMini');
+    const bar = document.getElementById('xpBarMini');
+    const curr = document.getElementById('xpCurrentMini');
+    const nxt = document.getElementById('xpNextMini');
+    const pop = document.getElementById('xpPopover');
+    const mm = document.getElementById('miniMastery');
+
+    // Reset Classes
+    pop.className = 'xp-popover';
+
+    // Handle Mastery (Level 100+)
+    if (level <= 100) {
+        if(mm) mm.style.display = 'none';
+        
+        // Rank Colors
+        if (level < 20) pop.classList.add('xp-design-bronze');
+        else if (level < 40) pop.classList.add('xp-design-silver');
+        else if (level < 70) pop.classList.add('xp-design-gold');
+        else pop.classList.add('xp-design-platinum');
+    } else {
+        // Mastery Mode
+        if(mm) mm.style.display = 'flex';
+        pop.classList.add('xp-design-legend');
+        // Visual adjustment for mastery (keeps level readable)
+        level = ((level - 101) % 100) + 1; 
+    }
+
+    // Update Text & Width
+    if(lVal) lVal.innerText = level;
+    if(bar) bar.style.width = `${currentLevelXP}%`; // 50 XP = 50% width
+    if(curr) curr.innerText = `${currentLevelXP} XP`;
+    if(nxt) nxt.innerText = `100 XP`;
+}
+
+// 2. CONNECT TO FIREBASE (Put this inside your startLiveListeners function)
+// This listens to: Collection "students" -> Document "CURRENT_USER_ID"
+onSnapshot(doc(db, "students", currentUser.id), (docSnapshot) => {
+    if (docSnapshot.exists()) {
+        const data = docSnapshot.data();
+        
+        // Update local user profile data
+        currentUser = { ...currentUser, ...data };
+        
+        // EXTRACT 'xp' AND RENDER
+        // If 'xp' field is missing in DB, default to 0
+        renderXP(data.xp || 0);
+    }
+});
         // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -764,3 +823,4 @@
     </script>
 </body>
 </html>
+
