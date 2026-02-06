@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SmartST | Attendance Manager</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -42,6 +42,31 @@
             box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- MOBILE RESPONSIVE --- */
+        @media screen and (max-width: 768px) {
+            .top-bar { padding: 15px 20px; }
+            .logo { font-size: 1rem; }
+            .st-btn { padding: 6px 12px; font-size: 0.8rem; }
+            .nav-controls { gap: 8px; }
+            
+            .container { margin: 15px auto; padding: 0 15px; }
+            .controls-card { 
+                grid-template-columns: 1fr; 
+                padding: 15px;
+                gap: 12px;
+            }
+            
+            .student-card { padding: 12px 15px; }
+            .s-info { gap: 10px; }
+            .s-avatar { width: 35px; height: 35px; font-size: 0.8rem; }
+            .s-name { font-size: 0.9rem; }
+            
+            .status-btn { width: 35px; height: 35px; }
+            .status-btn svg { width: 16px; height: 16px; }
+            
+            .modal-content { width: 95%; padding: 25px 20px; }
+        }
 
         /* --- HEADER --- */
         .top-bar {
