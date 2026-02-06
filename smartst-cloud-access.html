@@ -269,6 +269,21 @@
         .st-name { font-size: 1.3rem; font-weight: 700; color: white; margin: 0; }
         .st-id { font-size: 0.9rem; color: var(--text-mute); font-family: monospace; letter-spacing: 1px; margin-top: 5px; }
 
+        /* IOS INSTALL MODAL */
+        #ios-install-modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 25000;
+            justify-content: center; align-items: flex-end; padding-bottom: 20px; backdrop-filter: blur(10px);
+        }
+        .ios-card {
+            background: #1e1e1e; border-radius: 20px; padding: 25px; width: 90%; max-width: 400px;
+            color: white; text-align: center; border: 1px solid rgba(255,255,255,0.1);
+            animation: slideUp 0.4s ease; box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .ios-icon { width: 60px; height: 60px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .ios-step { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 15px 0; font-size: 0.95rem; color: #ccc; }
+        .share-icon { width: 24px; vertical-align: middle; color: #3b82f6; }
+
         /* FOOTER LEGAL */
         .footer-legal {
             position: fixed; bottom: 0; left: 0; width: 100%;
@@ -322,6 +337,23 @@
         <div class="loader-text">CONNEXION...</div>
     </div>
 
+    <div id="ios-install-modal">
+        <div class="ios-card">
+            <img src="https://icons.veryicon.com/png/o/miscellaneous/street-network-app/student-13.png" class="ios-icon">
+            <h3 style="margin:0; font-size:1.2rem;">Installer SmartST</h3>
+            <p style="color:#aaa; font-size:0.9rem; margin-top:5px;">Pour une meilleure expérience, ajoutez l'app à votre écran d'accueil.</p>
+            
+            <div class="ios-step">
+                1. Appuyez sur <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> <strong>Partager</strong>
+            </div>
+            <div class="ios-step">
+                2. Sélectionnez <strong>"Sur l'écran d'accueil"</strong>
+            </div>
+            
+            <button class="liquid-btn" style="width:100%; margin-top:20px;" onclick="document.getElementById('ios-install-modal').style.display='none'">Fermer</button>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="xpInfoModal" onclick="closeModal()">
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <h3 style="color:var(--gemini-cyan); margin-top:0;">Système d'XP & Maîtrise</h3>
@@ -330,6 +362,7 @@
                 <ul>
                     <li>Ajouter une note : <strong>+20 XP</strong></li>
                     <li>Terminer un devoir : <strong>+10 XP</strong></li>
+                    <li>Séances Focus (Pomodoro) : <strong>0 à 100 XP</strong></li>
                 </ul>
                 <h4>Paliers de Niveaux</h4>
                 <p>Progressez pour débloquer des designs exclusifs.</p>
@@ -413,7 +446,7 @@
                 <div class="avatar-lg" id="dashAvatar">--</div>
                 <div class="user-info">
                     <h1 id="greeting">Bienvenue</h1>
-                    <span class="group-tag" id="dashGroup">--</span>
+                    <p><span class="group-tag" id="dashGroup">--</span> BUT InfoCom</p>
                 </div>
 
                 <div id="xpPopover" class="xp-popover">
@@ -444,7 +477,9 @@
         <div class="nav-actions">
             <a href="index.html" class="liquid-btn nav-btn">Accueil</a>
             <a href="calendar-cloud-access.html" class="liquid-btn nav-btn">Emploi du temps</a>
-            <a href="pomodoro.html" class="liquid-btn nav-btn" style="border-color:var(--gemini-purple); color:var(--gemini-purple);">Focus Mode</a>
+            <a href="pomodoro.html" class="liquid-btn nav-btn" style="border-color:var(--gemini-purple); color:var(--gemini-purple);">
+                Focus Mode
+            </a>
             <a href="attendance.html" id="navAppel" class="liquid-btn nav-btn" style="display:none;">Appel (Admin)</a>
         </div>
 
@@ -550,6 +585,10 @@
 
         const SESSION_KEY = 'smartst_session';
 
+        // IOS CHECK FOR INSTALL PROMPT
+        const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
+
         // UI Logic
         window.switchTab = (mode) => {
             isLoginAdmin = (mode === 'admin');
@@ -602,6 +641,10 @@
             } else {
                 document.getElementById('loader').style.display='none';
                 document.getElementById('login-screen').style.display='flex';
+                
+                if (isIos() && !isInStandaloneMode()) {
+                    document.getElementById('ios-install-modal').style.display = 'flex';
+                }
             }
         });
 
@@ -623,24 +666,19 @@
                 document.getElementById('dashGroup').innerText = user.grp;
                 document.getElementById('dashAvatar').innerText = user.prenom.charAt(0) + user.nom.charAt(0);
                 
-                // Show Admin Specifics
                 if(isAdmin) {
                     document.getElementById('adminBackBtn').style.display = 'flex';
                     document.getElementById('navAppel').style.display = 'flex';
                     document.getElementById('adminAbsBox').classList.add('admin-visible');
                 }
                 
-                // SHOW HW TARGET DROPDOWN ONLY IF ADMIN
                 document.getElementById('adHwTgt').style.display = isAdmin ? 'block' : 'none';
-                
-                // START LIVE LISTENERS
                 startLiveListeners();
             }
         }
 
         // --- LIVE DATA LISTENERS ---
         function startLiveListeners() {
-            // 1. GRADES
             const grQ = query(collection(db, "grades"), where("userId", "==", currentUser.id));
             onSnapshot(grQ, (snapshot) => {
                 localData.grades = [];
@@ -648,7 +686,6 @@
                 renderGrades();
             });
 
-            // 2. ATTENDANCE
             const atQ = query(collection(db, "attendance"), where("studentId", "==", currentUser.id));
             onSnapshot(atQ, (snapshot) => {
                 localData.attendance = [];
@@ -656,7 +693,6 @@
                 renderAttendance();
             });
 
-            // 3. HOMEWORK
             const hwQ = query(collection(db, "homework"));
             onSnapshot(hwQ, (snapshot) => {
                 localData.homework = [];
@@ -671,13 +707,13 @@
                 renderHomework();
             });
 
-            // 4. STUDENT DATA (XP & PROFILE)
+            // LIVE XP LISTENER
             onSnapshot(doc(db, "students", currentUser.id), (doc) => {
                 if(doc.exists()) {
                     const data = doc.data();
-                    // Update current user info if it changed
                     currentUser = { ...currentUser, ...data };
-                    renderXP(data.xp || 0);
+                    // Default to 0 if undefined
+                    renderXP(data.xp || 0); 
                 }
             });
         }
@@ -731,7 +767,6 @@
             list.innerHTML = '';
             localData.homework.forEach(h => {
                 const done = h.doneBy && h.doneBy.includes(currentUser.id);
-                // Allow delete if: Admin OR Author of the task
                 const canDelete = isAdmin || (h.authorId === currentUser.id);
                 const delBtn = canDelete ? `<div class="del-btn" onclick="deleteTask('${h.id}')">&times;</div>` : '';
                 
@@ -750,7 +785,6 @@
         }
 
         function renderXP(xp) {
-            console.log("Rendering XP:", xp);
             const levelVal = document.getElementById('levelValMini');
             const xpBar = document.getElementById('xpBarMini');
             const xpCurrent = document.getElementById('xpCurrentMini');
@@ -762,29 +796,23 @@
             let level = 1;
             let currentXP = xp % 100;
             let nextLevelXP = 100;
-            
             const totalLevel = Math.floor(xp / 100) + 1;
             
-            // Reset designs
             xpPopover.classList.remove('xp-design-bronze', 'xp-design-silver', 'xp-design-gold', 'xp-design-platinum', 'xp-design-mastery', 'xp-design-legend');
             
             if (totalLevel <= 100) {
                 level = totalLevel;
                 miniMastery.style.display = 'none';
-                
                 if (level < 20) xpPopover.classList.add('xp-design-bronze');
                 else if (level < 40) xpPopover.classList.add('xp-design-silver');
                 else if (level < 70) xpPopover.classList.add('xp-design-gold');
                 else xpPopover.classList.add('xp-design-platinum');
-                
             } else {
                 const masteryTotal = totalLevel - 100;
                 const masteryIndex = Math.floor((masteryTotal - 1) / 100) + 1;
                 const subLevel = ((masteryTotal - 1) % 100) + 1;
-                
                 level = subLevel;
                 miniMastery.style.display = 'flex';
-                
                 if (masteryIndex < 10) {
                     xpPopover.classList.add('xp-design-mastery');
                     masteryTitle.innerText = `Mastery ${romanize(masteryIndex)}`;
@@ -826,10 +854,7 @@
         window.addHomework = async function() {
             const t = document.getElementById('adHwTxt').value;
             const tgt = document.getElementById('adHwTgt').value;
-            
-            // If Student adds -> Force PERSONAL. If Admin adds -> Use Dropdown.
             const finalTarget = isAdmin ? tgt : 'PERSONAL';
-            
             if(t) { 
                 await addDoc(collection(db, "homework"), { 
                     text: t, 
@@ -842,12 +867,10 @@
         }
 
         window.addAbsence = async function() {
-            // Admin Only
             if(!isAdmin) return;
             const d = document.getElementById('adAbsDate').value || new Date().toISOString().split('T')[0];
             const t = document.getElementById('adAbsType').value;
             const r = document.getElementById('adAbsReason').value;
-            
             await addDoc(collection(db, "attendance"), { 
                 studentId: currentUser.id, 
                 date: d, 
