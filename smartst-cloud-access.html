@@ -394,7 +394,7 @@
                 <div class="admin-controls" id="adminHwBox" style="display:flex !important;">
                     <div style="display:flex; gap:5px;">
                         <input type="text" id="adHwTxt" class="st-input" placeholder="Titre..." style="flex:2">
-                        <select id="adHwTgt" class="st-input" style="flex:1">
+                        <select id="adHwTgt" class="st-input" style="flex:1; display:none;">
                             <option value="PERSONAL">Personnel</option>
                             <option value="ALL">Promo (Tous)</option>
                             <option value="C1">Groupe C1</option>
@@ -482,7 +482,7 @@
             }
         };
 
-        // AUTH LISTENER - MAIN ENTRY
+        // AUTH LISTENER
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
@@ -490,15 +490,12 @@
                     const docSnap = await getDoc(docRef);
                     
                     if (docSnap.exists()) {
-                        // Regular Student
                         currentUser = { id: docSnap.id, ...docSnap.data() };
                         loadDashboard(currentUser, false);
                     } else if (user.uid === "WA5k4NI4mWWsmzdLgRS9tGRRfVz2" || user.uid === "hWVtA8MsXYWusnBeEOAVQghIWbb2") {
-                        // Admin Mode
                         currentUser = { id: user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
                         loadDashboard(currentUser, true);
                     } else {
-                        // User exists in Auth but not in DB (Safety Fallback)
                         alert("Erreur: Profil introuvable. Veuillez contacter le support.");
                         signOut(auth);
                         document.getElementById('loader').style.display='none';
@@ -532,20 +529,24 @@
                 document.getElementById('dashGroup').innerText = user.grp;
                 document.getElementById('dashAvatar').innerText = user.prenom.charAt(0) + user.nom.charAt(0);
                 
+                // Show Admin Specifics
                 if(isAdmin) {
                     document.getElementById('adminBackBtn').style.display = 'flex';
                     document.getElementById('navAppel').style.display = 'flex';
                     document.getElementById('adminAbsBox').classList.add('admin-visible');
                 }
                 
+                // SHOW HW TARGET DROPDOWN ONLY IF ADMIN
+                document.getElementById('adHwTgt').style.display = isAdmin ? 'block' : 'none';
+                
                 // START LIVE LISTENERS
                 startLiveListeners();
             }
         }
 
-        // --- LIVE DATA LISTENERS (Real-time) ---
+        // --- LIVE DATA LISTENERS ---
         function startLiveListeners() {
-            // 1. GRADES LISTENER
+            // 1. GRADES
             const grQ = query(collection(db, "grades"), where("userId", "==", currentUser.id));
             onSnapshot(grQ, (snapshot) => {
                 localData.grades = [];
@@ -553,7 +554,7 @@
                 renderGrades();
             });
 
-            // 2. ATTENDANCE LISTENER
+            // 2. ATTENDANCE
             const atQ = query(collection(db, "attendance"), where("studentId", "==", currentUser.id));
             onSnapshot(atQ, (snapshot) => {
                 localData.attendance = [];
@@ -561,17 +562,14 @@
                 renderAttendance();
             });
 
-            // 3. HOMEWORK LISTENER (All homework, then filtered locally)
-            // Ideally use composite indexes in production, but filter works here
+            // 3. HOMEWORK
             const hwQ = query(collection(db, "homework"));
             onSnapshot(hwQ, (snapshot) => {
                 localData.homework = [];
                 snapshot.forEach(doc => {
                     const h = doc.data();
-                    // SHOW IF: Targeted to ALL, Targeted to my group, Targeted to me (Personal), OR if I am Admin
                     const isTargeted = (h.targetType === 'ALL' || h.targetType === currentUser.grp);
                     const isPersonal = (h.targetType === 'PERSONAL' && h.authorId === currentUser.id);
-                    
                     if (isTargeted || isPersonal || isAdmin) {
                         localData.homework.push({ ...h, id: doc.id });
                     }
@@ -669,7 +667,7 @@
                 await addDoc(collection(db, "homework"), { 
                     text: t, 
                     targetType: finalTarget, 
-                    authorId: currentUser.id, // Track ownership
+                    authorId: currentUser.id, 
                     doneBy: [] 
                 }); 
                 document.getElementById('adHwTxt').value=''; 
@@ -677,9 +675,8 @@
         }
 
         window.addAbsence = async function() {
-            // Only Admin can add Absence
+            // Admin Only
             if(!isAdmin) return;
-            // Use date picker or fallback to today
             const d = document.getElementById('adAbsDate').value || new Date().toISOString().split('T')[0];
             const t = document.getElementById('adAbsType').value;
             const r = document.getElementById('adAbsReason').value;
@@ -793,6 +790,48 @@
         window.logout = () => { signOut(auth).then(() => location.reload()); }
         window.openModal = (id) => document.getElementById(id).style.display='flex';
         window.closeModal = () => document.querySelectorAll('.modal-overlay').forEach(e=>e.style.display='none');
+        window.downloadData = () => {
+            if(!currentUser) return alert("Veuillez vous connecter.");
+            const exportData = { userProfile: currentUser, academicData: localData, exportDate: new Date().toISOString(), platform: "SmartST Student OS" };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "smartst_data_export.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+        window.deleteAccount = async () => {
+            if(!confirm("ATTENTION: Cette action est irréversible. Toutes vos données seront effacées.")) return;
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+            try {
+                const uid = currentUser.id;
+                const batch = writeBatch(db);
+                // Delete Sub-Collections (Manual query because client SDK can't delete collection)
+                const gradesQ = query(collection(db, "grades"), where("userId", "==", uid));
+                const gradesSnap = await getDocs(gradesQ);
+                gradesSnap.forEach(doc => batch.delete(doc.ref));
+                
+                const attQ = query(collection(db, "attendance"), where("studentId", "==", uid));
+                const attSnap = await getDocs(attQ);
+                attSnap.forEach(doc => batch.delete(doc.ref));
+
+                const studentRef = doc(db, "students", uid);
+                batch.delete(studentRef);
+                await batch.commit();
+                
+                const user = auth.currentUser;
+                if(user) await deleteUser(user);
+                localStorage.clear();
+                alert("Compte supprimé avec succès.");
+                location.reload();
+            } catch (error) {
+                console.error(error);
+                loader.style.display = 'none';
+                alert("Erreur: Une reconnexion récente est nécessaire.");
+            }
+        }
     </script>
 </body>
 </html>
