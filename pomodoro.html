@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SmartST | Focus</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -88,6 +88,20 @@
         .status-red { color:var(--red); }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- MOBILE RESPONSIVE --- */
+        @media screen and (max-width: 768px) {
+            body { height: auto; min-height: 100vh; overflow-y: auto; }
+            .top-bar { padding: 15px; position: sticky; top: 0; background: rgba(2, 4, 10, 0.8); backdrop-filter: blur(10px); }
+            .screen { height: auto; min-height: calc(100vh - 70px); padding: 20px 15px; }
+            .glass-panel { padding: 30px 20px; border-radius: 20px; }
+            h1 { font-size: 1.5rem; }
+            .time-val { font-size: 3.5rem; }
+            .timer-container { width: 220px; height: 220px; margin: 30px 0; }
+            .task-row { flex-direction: column; gap: 5px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 12px; }
+            .t-time { width: 100%; text-align: left; }
+            .btn { padding: 14px 20px; font-size: 0.8rem; }
+        }
     </style>
 </head>
 <body>
