@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>MCalC+ | Portail Étudiant</title>
     
     <link rel="manifest" href="manifest.json">
@@ -361,6 +361,11 @@
     </div>
 
     <div class="footer-nav">
+        <button class="f-link" onclick="openNotifications()" style="position:relative;">
+            <svg class="icon" style="width:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            Notifications
+            <span id="notifBadge" class="hidden" style="position:absolute; top:2px; right:2px; width:8px; height:8px; background:var(--gemini-red); border-radius:50%;"></span>
+        </button>
         <button class="f-link" onclick="openNews()">
             <svg class="icon" style="width:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
             Nouveautés
@@ -444,6 +449,21 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="notifModal" onclick="closeModal('notifModal')">
+        <div class="modal-box modal-news" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-bottom:20px;">
+                <h2 style="margin:0; font-size:1.5rem; color:white;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; color:var(--gemini-cyan);"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    Notifications
+                </h2>
+                <span onclick="closeModal('notifModal')" style="cursor:pointer; font-size:1.5rem; color:#666;">&times;</span>
+            </div>
+            <div id="notifContainer" class="news-scroll">
+                <div style="color:#666; text-align:center; padding:20px;">Aucune notification.</div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="installModal" onclick="closeModal('installModal')">
         <div class="modal-box" onclick="event.stopPropagation()">
             <span onclick="closeModal('installModal')" style="position:absolute; top:20px; right:20px; cursor:pointer; font-size:1.5rem; color:#666;">&times;</span>
@@ -474,11 +494,11 @@
     </div>
 
     <script type="module">
-        // 1. FIREBASE SETUP
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, doc, deleteDoc, query, orderBy, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, doc, deleteDoc, query, orderBy, writeBatch, where, limit, onSnapshot, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         // ADDED AUTHENTICATION IMPORT
-        import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
@@ -493,12 +513,14 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app); // INITIALIZE AUTH
+        const messaging = getMessaging(app);
 
         // STATE
         let roadmapData = [];
         let clickCount = 0;
         let selectedItemId = null;
         let deferredPrompt;
+        let currentUser = null;
 
         // INIT
         window.onload = function() {
@@ -507,9 +529,93 @@
             // Service Worker Registration for PWA
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('firebase-messaging-sw.js')
-                .then(reg => console.log('SW Registered', reg))
+                .then(reg => {
+                    console.log('SW Registered', reg);
+                    setupMessaging();
+                })
                 .catch(err => console.log('SW Error', err));
             }
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    const docSnap = await getDoc(doc(db, "students", user.uid));
+                    if (docSnap.exists()) {
+                        currentUser = { id: docSnap.id, ...docSnap.data() };
+                        loadNotifications();
+                    }
+                }
+            });
+        }
+
+        // --- MESSAGING LOGIC ---
+        async function setupMessaging() {
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted' && auth.currentUser) {
+                    const token = await getToken(messaging, { 
+                        vapidKey: "BCkGPek8Vhg6dkdb31PaZbn82al9eWDzQp6eFhAXuMOQaR0kPprDfh5k6cBp9CjkdQMHbb10CxvRvJljq2-SUCE",
+                        serviceWorkerRegistration: await navigator.serviceWorker.ready 
+                    });
+                    if (token) {
+                        await updateDoc(doc(db, "students", auth.currentUser.uid), {
+                            fcmToken: token,
+                            lastTokenUpdate: Date.now()
+                        });
+                    }
+                }
+            } catch (e) { console.log("Messaging setup failed", e); }
+
+            onMessage(messaging, (payload) => {
+                document.getElementById('notifBadge').classList.remove('hidden');
+                loadNotifications();
+                if (payload.notification) {
+                    alert(`MCalC+: ${payload.notification.title}\n${payload.notification.body}`);
+                }
+            });
+        }
+
+        window.openNotifications = function() {
+            document.getElementById('notifModal').style.display = 'flex';
+            document.getElementById('notifBadge').classList.add('hidden');
+            loadNotifications();
+        }
+
+        async function loadNotifications() {
+            const container = document.getElementById('notifContainer');
+            const targets = ["ALL"];
+            if (currentUser) {
+                targets.push(currentUser.id);
+                if (currentUser.grp) targets.push(currentUser.grp);
+            }
+
+            const q = query(
+                collection(db, "notifications"),
+                where("target", "in", targets),
+                orderBy("timestamp", "desc"),
+                limit(15)
+            );
+
+            onSnapshot(q, (snapshot) => {
+                container.innerHTML = '';
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="color:#666;text-align:center;padding:20px;">Aucune notification.</div>';
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const el = document.createElement('div');
+                    el.className = 'news-item';
+                    el.style.borderLeftColor = 'var(--gemini-purple)';
+                    el.innerHTML = `
+                        <div class="news-header">
+                            <span class="news-date">${new Date(data.timestamp).toLocaleDateString()}</span>
+                        </div>
+                        <div class="news-title">${data.title}</div>
+                        <div class="news-body">${data.body}</div>
+                    `;
+                    container.appendChild(el);
+                });
+            });
         }
 
         // --- INSTALLATION LOGIC ---
