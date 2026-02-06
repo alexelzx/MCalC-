@@ -591,6 +591,8 @@
             const q = query(
                 collection(db, "notifications"),
                 where("target", "in", targets),
+                where("source", "!=", "smartst"),
+                orderBy("source"),
                 orderBy("timestamp", "desc"),
                 limit(15)
             );
