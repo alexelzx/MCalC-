@@ -866,7 +866,7 @@
         });
 
         // 3. HOMEWORK
-        const hwQ = query(collection(db, "homework"));
+        const hwQ = query(collection(db, "homework"), orderBy("timestamp", "desc"));
         onSnapshot(hwQ, (snapshot) => {
             localData.homework = [];
             snapshot.forEach(doc => {
@@ -878,6 +878,22 @@
                 }
             });
             renderHomework();
+        }, (error) => {
+            console.error("Homework Listener Error:", error);
+            // Fallback for indexes being built
+            const hwSimpleQ = query(collection(db, "homework"));
+            onSnapshot(hwSimpleQ, (snapshot) => {
+                localData.homework = [];
+                snapshot.forEach(doc => {
+                    const h = doc.data();
+                    const isTargeted = (h.targetType === 'ALL' || h.targetType === currentUser.grp);
+                    const isPersonal = (h.targetType === 'PERSONAL' && h.authorId === currentUser.id);
+                    if (isTargeted || isPersonal || isAdmin) {
+                        localData.homework.push({ ...h, id: doc.id });
+                    }
+                });
+                renderHomework();
+            });
         });
 
         // 4. STUDENT DATA (XP & PROFILE)
@@ -1026,7 +1042,13 @@
         const n = document.getElementById('grName').value;
         const v = document.getElementById('grVal').value;
         if(n && v) {
-            await addDoc(collection(db, "grades"), { userId: currentUser.id, name: n, val: v });
+            await addDoc(collection(db, "grades"), { 
+                userId: currentUser.id, 
+                name: n, 
+                val: v,
+                authorId: currentUser.id,
+                timestamp: Date.now()
+            });
             await addXP(20);
             document.getElementById('grName').value=''; document.getElementById('grVal').value='';
         }
@@ -1044,6 +1066,7 @@
                 text: t,
                 targetType: finalTarget,
                 authorId: currentUser.id,
+                timestamp: Date.now(),
                 doneBy: []
             });
             document.getElementById('adHwTxt').value='';
