@@ -9,6 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://icons.veryicon.com/png/o/miscellaneous/street-network-app/student-13.png">
+    <link rel="apple-touch-startup-image" href="https://icons.veryicon.com/png/o/miscellaneous/street-network-app/student-13.png">
     <meta name="theme-color" content="#0f172a">
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -207,6 +208,15 @@
         /* --- NEWS STYLES (NEW) --- */
         .modal-news { width: 90%; max-width: 600px; padding: 30px; align-items: flex-start; text-align: left; max-height: 80vh; }
         .news-scroll { width: 100%; overflow-y: auto; padding-right: 10px; margin-top: 15px; }
+
+        /* --- INSTALL MODAL --- */
+        #installModal .modal-box { max-width: 400px; text-align: center; }
+        .install-icon { width: 80px; height: 80px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .ios-step { display: flex; align-items: center; gap: 15px; margin: 15px 0; text-align: left; width: 100%; }
+        .ios-icon-bg { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .install-btn-main { background: var(--gemini-cyan); color: #000; border: none; padding: 12px 30px; border-radius: 50px; font-weight: 700; margin-top: 20px; cursor: pointer; transition: 0.3s; }
+        .install-btn-main:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(34, 211, 238, 0.4); }
+
         .news-item { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); border-left: 3px solid var(--gemini-cyan); transition: 0.2s; }
         .news-item:hover { background: rgba(255,255,255,0.05); transform: translateX(5px); }
         .news-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -365,6 +375,10 @@
             <svg class="icon" style="width:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
             Bug
         </a>
+        <button id="installBtn" class="f-link" style="display:none;" onclick="showInstallModal()">
+            <svg class="icon" style="width:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Installer
+        </button>
     </div>
 
     <div class="modal-overlay" id="roadmapModal" onclick="closeModal('roadmapModal')">
@@ -428,6 +442,35 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="installModal" onclick="closeModal('installModal')">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <span onclick="closeModal('installModal')" style="position:absolute; top:20px; right:20px; cursor:pointer; font-size:1.5rem; color:#666;">&times;</span>
+            <img src="https://icons.veryicon.com/png/o/miscellaneous/street-network-app/student-13.png" class="install-icon" alt="App Icon">
+            <h2 style="color:white; margin:0 0 10px 0;">Installer MCalC+</h2>
+            <p style="color:var(--text-mute); font-size:0.9rem; margin-bottom:20px;">Accédez instantanément au portail depuis votre écran d'accueil.</p>
+            
+            <div id="androidInstructions" style="display:none;">
+                <button class="install-btn-main" onclick="handleInstallClick()">INSTALLER MAINTENANT</button>
+            </div>
+
+            <div id="iosInstructions" style="display:none;">
+                <div class="ios-step">
+                    <div class="ios-icon-bg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                    </div>
+                    <div style="color:white; font-size:0.9rem;">Appuyez sur le bouton <strong>Partager</strong> dans Safari.</div>
+                </div>
+                <div class="ios-step">
+                    <div class="ios-icon-bg">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                    </div>
+                    <div style="color:white; font-size:0.9rem;">Faites défiler et choisissez <strong>Sur l'écran d'accueil</strong>.</div>
+                </div>
+                <button class="install-btn-main" onclick="closeModal('installModal')">COMPRIS</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         // 1. FIREBASE SETUP
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -453,11 +496,65 @@
         let roadmapData = [];
         let clickCount = 0;
         let selectedItemId = null;
+        let deferredPrompt;
 
         // INIT
         window.onload = function() {
             setTimeout(() => document.getElementById('loader').classList.add('hidden'), 800);
+            
+            // Service Worker Registration for PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('firebase-messaging-sw.js')
+                .then(reg => console.log('SW Registered', reg))
+                .catch(err => console.log('SW Error', err));
+            }
         }
+
+        // --- INSTALLATION LOGIC ---
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').style.display = 'flex';
+        });
+
+        window.showInstallModal = function() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+            if (isStandalone) {
+                alert("MCalC+ est déjà installé !");
+                return;
+            }
+
+            document.getElementById('installModal').style.display = 'flex';
+            if (isIOS) {
+                document.getElementById('iosInstructions').style.display = 'block';
+                document.getElementById('androidInstructions').style.display = 'none';
+            } else {
+                document.getElementById('iosInstructions').style.display = 'none';
+                document.getElementById('androidInstructions').style.display = 'block';
+            }
+        }
+
+        window.handleInstallClick = async function() {
+            if (!deferredPrompt) {
+                alert("L'installation n'est pas disponible pour le moment. Essayez d'ajouter manuellement à l'écran d'accueil.");
+                return;
+            }
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+                document.getElementById('installBtn').style.display = 'none';
+            }
+            deferredPrompt = null;
+            closeModal('installModal');
+        }
+
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA installed');
+            document.getElementById('installBtn').style.display = 'none';
+        });
 
         // --- ROADMAP LOGIC ---
         window.openRoadmap = async function() {
