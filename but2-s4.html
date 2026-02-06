@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>McalC+ | Simulation BUT2 S4</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -62,6 +62,33 @@
 
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        /* --- MOBILE RESPONSIVE --- */
+        @media screen and (max-width: 768px) {
+            body { padding: 10px; align-items: flex-start; }
+            .card { padding: 25px 15px; border-radius: 16px; margin-top: 60px; }
+            .top-nav { top: 15px; right: 15px; left: 15px; justify-content: space-between; width: auto; }
+            .logos-wrapper { padding: 8px 15px; gap: 10px; }
+            .logo-img { height: 25px; }
+            h1 { font-size: 1.4rem; }
+            .subtitle { font-size: 0.7rem; }
+            
+            .stats-grid { grid-template-columns: 1fr; gap: 15px; }
+            .stat-card { padding: 15px; }
+            .stat-value { font-size: 1.5rem; }
+            
+            .ue-container { padding: 15px; border-radius: 16px; }
+            .ue-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .ue-badge { width: 100%; justify-content: center; }
+            
+            .resource-item { grid-template-columns: 1fr auto; gap: 10px; }
+            .res-name { font-size: 0.85rem; }
+            .input-wrapper { width: 80px; }
+            .grade-input { padding: 8px; font-size: 0.9rem; }
+            
+            .action-bar { flex-direction: column; gap: 10px; }
+            .btn { width: 100%; justify-content: center; }
+        }
 
         /* --- MAIN CARD --- */
         .card {
