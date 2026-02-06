@@ -199,21 +199,6 @@
         .c-red { color: var(--gemini-red); } .c-gold { color: var(--gemini-gold); } .c-green { color: var(--gemini-green); }
 
         /* XP & LEVEL STYLES */
-        .xp-mini-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-top: 10px;
-            transition: all 0.4s ease;
-            cursor: default;
-            max-width: fit-content;
-        }
-        .xp-mini-card:hover { transform: translateY(-2px); border-color: var(--gemini-cyan); }
-        
         .level-badge-mini {
             font-size: 1.5rem; font-weight: 800;
             background: linear-gradient(135deg, var(--gemini-cyan), var(--gemini-purple));
@@ -346,22 +331,8 @@
                     <li>Ajouter une note : <strong>+20 XP</strong></li>
                     <li>Terminer un devoir : <strong>+10 XP</strong></li>
                 </ul>
-                
                 <h4>Paliers de Niveaux</h4>
-                <p>Progressez à travers les rangs pour débloquer des designs exclusifs</p>
-                <ul>
-                    <li><span style="color:#cd7f32">Bronze</span> : Niveau 1 - 19</li>
-                    <li><span style="color:#c0c0c0">Argent</span> : Niveau 20 - 39</li>
-                    <li><span style="color:#ffd700">Or</span> : Niveau 40 - 69</li>
-                    <li><span style="color:#e5e4e2">Platine</span> : Niveau 70 - 100</li>
-                </ul>
-
-                <h4>Niveaux de Maîtrise</h4>
-                <p>Après le niveau 100, vous entrez dans la <strong>Maîtrise</strong> :</p>
-                <ul>
-                    <li><strong>Mastery I à IX</strong> : Chaque rang possède 100 sous-niveaux.</li>
-                    <li><strong>Master Legend</strong> : Le rang ultime pour ceux qui utilisent le plus l'application.</li>
-                </ul>
+                <p>Progressez pour débloquer des designs exclusifs.</p>
             </div>
             <button class="liquid-btn" onclick="closeModal()" style="width:100%;">Fermer</button>
         </div>
@@ -445,7 +416,6 @@
                     <span class="group-tag" id="dashGroup">--</span>
                 </div>
 
-                <!-- XP POPOVER -->
                 <div id="xpPopover" class="xp-popover">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                         <div id="miniMastery" class="mastery-tag-mini" style="display:none;">
@@ -454,17 +424,13 @@
                         </div>
                         <div class="level-badge-mini" id="levelValMini">1</div>
                     </div>
-                    
                     <div class="xp-info-mini">
                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
                             <span class="xp-text-mini" id="xpCurrentMini">0 XP</span>
                             <span class="xp-text-mini" id="xpNextMini">100 XP</span>
                         </div>
-                        <div class="xp-progress-mini">
-                            <div class="xp-bar-mini" id="xpBarMini"></div>
-                        </div>
+                        <div class="xp-progress-mini"><div class="xp-bar-mini" id="xpBarMini"></div></div>
                     </div>
-                    
                     <button class="more-info-btn" onclick="openModal('xpInfoModal')">More Info</button>
                 </div>
             </div>
@@ -478,14 +444,11 @@
         <div class="nav-actions">
             <a href="index.html" class="liquid-btn nav-btn">Accueil</a>
             <a href="calendar-cloud-access.html" class="liquid-btn nav-btn">Emploi du temps</a>
-            <a href="pomodoro.html" class="liquid-btn nav-btn" style="border-color:var(--gemini-purple); color:var(--gemini-purple);">
-                Focus Mode
-            </a>
+            <a href="pomodoro.html" class="liquid-btn nav-btn" style="border-color:var(--gemini-purple); color:var(--gemini-purple);">Focus Mode</a>
             <a href="attendance.html" id="navAppel" class="liquid-btn nav-btn" style="display:none;">Appel (Admin)</a>
         </div>
 
         <div class="grid">
-
             <div class="card glass-panel">
                 <div class="card-head"><div class="card-title">Notes</div></div>
                 <div style="text-align:center; margin-bottom:20px;"><div class="gpa-display" id="gpaVal">--</div><span>Moyenne</span></div>
@@ -511,8 +474,7 @@
                         <input type="date" id="adAbsDate" class="st-input" style="flex:1; min-width:120px;">
                         <select id="adAbsType" class="st-input" style="flex:1">
                             <option value="absent">Absence</option>
-                            <option value="justified">Justifié</option>
-                            <option value="late">Retard</option>
+                            <option value="justified">Justifié</option> <option value="late">Retard</option>
                         </select>
                         <input type="text" id="adAbsReason" class="st-input" placeholder="Motif" style="flex:2; min-width:100%;">
                         <button class="liquid-btn st-btn" style="border-color:var(--gemini-red); color:var(--gemini-red); width:100%;" onclick="addAbsence()">VALIDER</button>
@@ -1042,4 +1004,3 @@
     </script>
 </body>
 </html>
-
