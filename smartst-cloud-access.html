@@ -14,248 +14,106 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        :root {
-            --bg-deep: #02040a;
-            --surface-glass: rgba(15, 23, 42, 0.65);
-            --border-glass: 1px solid rgba(56, 189, 248, 0.15);
-            --gemini-cyan: #22d3ee;
-            --gemini-blue: #3b82f6;
-            --gemini-purple: #a855f7;
-            --gemini-red: #f43f5e;
-            --gemini-green: #10b981;
-            --gemini-gold: #fbbf24;
-            --gemini-orange: #f97316;
-            --text-main: #f8fafc;
-            --text-mute: #94a3b8;
-            --safe-top: env(safe-area-inset-top);
-            --safe-bottom: env(safe-area-inset-bottom);
-        }
-
+        :root { --bg-deep: #02040a; --surface-glass: rgba(15, 23, 42, 0.65); --border-glass: 1px solid rgba(56, 189, 248, 0.15); --gemini-cyan: #22d3ee; --gemini-blue: #3b82f6; --gemini-purple: #a855f7; --gemini-red: #f43f5e; --gemini-green: #10b981; --gemini-gold: #fbbf24; --gemini-orange: #f97316; --text-main: #f8fafc; --text-mute: #94a3b8; --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom); }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        
-        body {
-            margin: 0; font-family: 'Outfit', sans-serif;
-            background: radial-gradient(circle at 50% -20%, #0f172a 0%, #02040a 80%);
-            color: var(--text-main); min-height: 100dvh; overflow-x: hidden;
-            display: flex; flex-direction: column;
-            overscroll-behavior: none; user-select: none; -webkit-user-select: none;
-        }
-
+        body { margin: 0; font-family: 'Outfit', sans-serif; background: radial-gradient(circle at 50% -20%, #0f172a 0%, #02040a 80%); color: var(--text-main); min-height: 100dvh; overflow-x: hidden; display: flex; flex-direction: column; overscroll-behavior: none; user-select: none; -webkit-user-select: none; }
         input, textarea, select { user-select: text; -webkit-user-select: text; }
         .hidden { display: none !important; }
         .icon { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
         .btn-reset { background: none; border: none; cursor: pointer; color: inherit; font: inherit; }
-
-        /* --- UI COMPONENTS --- */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .liquid-btn {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.02), 0 5px 15px rgba(0,0,0,0.5);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px 24px; border-radius: 50px;
-            font-size: 0.8rem; text-decoration: none;
-        }
-        .liquid-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--gemini-cyan); color: var(--gemini-cyan);
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.15); transform: translateY(-2px);
-        }
+        .glass-panel { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
+        .liquid-btn { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); color: white; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.02), 0 5px 15px rgba(0,0,0,0.5); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; border-radius: 50px; font-size: 0.8rem; text-decoration: none; }
+        .liquid-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--gemini-cyan); color: var(--gemini-cyan); box-shadow: 0 0 20px rgba(34, 211, 238, 0.15); transform: translateY(-2px); }
         .liquid-btn.danger { border-color: rgba(239, 68, 68, 0.5); color: var(--gemini-red); }
-        .liquid-btn.danger:hover {
-            border-color: var(--gemini-red); color: var(--gemini-red);
-            box-shadow: 0 0 20px rgba(244, 63, 94, 0.2);
-        }
-
-        /* LOADER */
-        #loader {
-            position: fixed; inset: 0; background: #000000; z-index: 20000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.4s ease;
-        }
-        .loader-circle {
-            width: 50px; height: 50px; border-radius: 50%;
-            border: 3px solid rgba(34, 211, 238, 0.1); border-top-color: var(--gemini-cyan);
-            animation: spin 0.8s linear infinite; margin-bottom: 20px;
-            box-shadow: 0 0 30px rgba(34, 211, 238, 0.2);
-        }
+        .liquid-btn.danger:hover { border-color: var(--gemini-red); color: var(--gemini-red); box-shadow: 0 0 20px rgba(244, 63, 94, 0.2); }
+        #loader { position: fixed; inset: 0; background: #000000; z-index: 20000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
+        .loader-circle { width: 50px; height: 50px; border-radius: 50%; border: 3px solid rgba(34, 211, 238, 0.1); border-top-color: var(--gemini-cyan); animation: spin 0.8s linear infinite; margin-bottom: 20px; box-shadow: 0 0 30px rgba(34, 211, 238, 0.2); }
         .loader-text { font-size: 0.8rem; letter-spacing: 4px; color: var(--gemini-blue); font-weight: 700; animation: pulse 1.5s infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-
-        /* LOGIN SCREEN */
-        #login-screen {
-            position: fixed; inset: 0; background: #000000; z-index: 9000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 20px; overflow-y: auto; padding-bottom: 100px;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } } @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        #login-screen { position: fixed; inset: 0; background: #000000; z-index: 9000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; overflow-y: auto; padding-bottom: 100px; }
         .login-card { width: 100%; max-width: 360px; text-align: center; margin: auto; }
-        
-        .brand-title {
-            font-size: 4rem; font-weight: 800; letter-spacing: -2px; margin: 0;
-            background: linear-gradient(135deg, #fff 0%, var(--gemini-cyan) 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 50px rgba(34, 211, 238, 0.3);
-        }
+        .brand-title { font-size: 4rem; font-weight: 800; letter-spacing: -2px; margin: 0; background: linear-gradient(135deg, #fff 0%, var(--gemini-cyan) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 50px rgba(34, 211, 238, 0.3); }
         .brand-sub { font-size: 0.8rem; color: var(--gemini-blue); letter-spacing: 4px; text-transform: uppercase; font-weight: 700; margin-top: 5px; margin-bottom: 40px; }
-
         .login-tabs { display: flex; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 16px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); }
-        .tab-btn {
-            flex: 1; padding: 12px; border-radius: 12px; border: none; background: transparent;
-            color: var(--text-mute); font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: 0.3s;
-        }
+        .tab-btn { flex: 1; padding: 12px; border-radius: 12px; border: none; background: transparent; color: var(--text-mute); font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: 0.3s; }
         .tab-btn.active { background: rgba(255,255,255,0.1); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
-
-        .login-input {
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); color: white;
-            padding: 16px 20px; border-radius: 16px; font-size: 1rem; letter-spacing: 1px;
-            text-align: center; width: 100%; transition: 0.3s; margin-bottom: 15px;
-        }
+        .login-input { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 16px 20px; border-radius: 16px; font-size: 1rem; letter-spacing: 1px; text-align: center; width: 100%; transition: 0.3s; margin-bottom: 15px; }
         .login-input:focus { border-color: var(--gemini-cyan); box-shadow: 0 0 20px rgba(34, 211, 238, 0.1); background: rgba(255,255,255,0.05); outline: none; }
-        select.login-input { appearance: none; cursor: pointer; }
-        select.login-input option { background: #000; color: white; }
-
-        .main-action-btn {
-            width: 100%; padding: 16px; border-radius: 50px; font-size: 1rem; margin-top: 20px;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(34, 211, 238, 0.2));
-            border: 1px solid rgba(34, 211, 238, 0.3);
-        }
+        select.login-input { appearance: none; cursor: pointer; } select.login-input option { background: #000; color: white; }
+        .main-action-btn { width: 100%; padding: 16px; border-radius: 50px; font-size: 1rem; margin-top: 20px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(34, 211, 238, 0.2)); border: 1px solid rgba(34, 211, 238, 0.3); }
         .main-action-btn:hover { background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(34, 211, 238, 0.4)); box-shadow: 0 0 40px rgba(34, 211, 238, 0.3); }
-
-        .switch-link {
-            margin-top: 25px; font-size: 0.85rem; color: var(--text-mute); cursor: pointer; 
-            text-decoration: underline; transition: 0.2s; display: block;
-        }
-        .switch-link:hover { color: white; text-shadow: 0 0 10px white; }
-
-        .top-back-btn {
-            position: absolute; top: 30px; left: 30px; 
-            display: flex; align-items: center; gap: 8px;
-            color: var(--text-mute); text-decoration: none; font-weight: 700; font-size: 0.9rem;
-            transition: 0.3s;
-        }
-        .top-back-btn:hover { color: white; transform: translateX(-5px); }
-
-        /* DASHBOARD */
+        .switch-link { margin-top: 25px; font-size: 0.85rem; color: var(--text-mute); cursor: pointer; text-decoration: underline; transition: 0.2s; display: block; }
+        .top-back-btn { position: absolute; top: 30px; left: 30px; display: flex; align-items: center; gap: 8px; color: var(--text-mute); text-decoration: none; font-weight: 700; font-size: 0.9rem; transition: 0.3s; } .top-back-btn:hover { color: white; transform: translateX(-5px); }
         #dashboard { display: none; padding: 30px; padding-top: calc(20px + var(--safe-top)); padding-bottom: calc(100px + var(--safe-bottom)); max-width: 1400px; margin: 0 auto; width: 100%; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: var(--border-glass); }
         .profile { display: flex; align-items: center; gap: 20px; position: relative; }
-        .avatar-lg { 
-            width: 64px; height: 64px; border-radius: 20px; 
-            background: rgba(34, 211, 238, 0.1); border: 1px solid var(--gemini-cyan); 
-            color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; 
-            font-size: 1.8rem; font-weight: 700; box-shadow: 0 0 30px rgba(34, 211, 238, 0.15);
-            cursor: pointer; transition: 0.3s;
-        }
+        .avatar-lg { width: 64px; height: 64px; border-radius: 20px; background: rgba(34, 211, 238, 0.1); border: 1px solid var(--gemini-cyan); color: var(--gemini-cyan); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; box-shadow: 0 0 30px rgba(34, 211, 238, 0.15); cursor: pointer; transition: 0.3s; }
         .avatar-lg:hover { transform: scale(1.05); border-color: white; }
-        
-        /* XP POPOVER ON HOVER */
-        .xp-popover {
-            position: absolute; top: 80px; left: 0; 
-            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px;
-            padding: 20px; width: 280px; z-index: 1000;
-            opacity: 0; visibility: hidden; transform: translateY(-10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
+        .xp-popover { position: absolute; top: 80px; left: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 20px; width: 280px; z-index: 1000; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .profile:hover .xp-popover { opacity: 1; visibility: visible; transform: translateY(0); }
         .user-info h1 { margin: 0; font-size: 2rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .group-tag { background: rgba(59, 130, 246, 0.15); padding: 5px 12px; border-radius: 8px; color: var(--gemini-cyan); font-weight: 700; font-size: 0.75rem; border: 1px solid rgba(59, 130, 246, 0.3); }
-        
         .nav-actions { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
         .nav-btn { flex: 1; padding: 14px; border-radius: 16px; font-size: 0.9rem; text-decoration: none;}
-
-        /* GRID */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
         .card { border-radius: 24px; padding: 30px; display: flex; flex-direction: column; min-height: 320px; }
         .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .card-title { font-size: 0.9rem; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
-        
         .gpa-display { font-size: 4rem; font-weight: 800; color: white; letter-spacing: -3px; text-shadow: 0 0 40px rgba(255,255,255,0.1); }
         .grade-list, .hw-list, .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; max-height: 200px; padding-right: 5px; }
-        
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(255,255,255,0.02); border-radius: 12px; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.05); transition: 0.2s; }
-        .item-row:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); transform: translateX(3px); }
         .val-hl { font-weight: 800; color: var(--gemini-purple); font-size: 1.1rem; }
-        
         .del-btn { color: var(--gemini-red); cursor: pointer; opacity: 0.5; padding: 5px; }
-        .ok-btn { color: var(--gemini-green); cursor: pointer; opacity: 0.5; padding: 5px; }
-        
         .att-stats { display: flex; justify-content: space-between; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
         .stat-item { text-align: center; flex: 1; position: relative; }
         .stat-item:not(:last-child)::after { content:''; position: absolute; right: 0; top: 10%; height: 80%; width: 1px; background: rgba(255,255,255,0.1); }
         .stat-val { font-size: 1.4rem; font-weight: 800; display: block; margin-bottom: 4px; }
         .stat-lbl { font-size: 0.6rem; color: var(--text-mute); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
         .c-red { color: var(--gemini-red); } .c-gold { color: var(--gemini-gold); } .c-green { color: var(--gemini-green); }
-
-        /* XP & LEVEL STYLES */
-        .level-badge-mini {
-            font-size: 1.5rem; font-weight: 800;
-            background: linear-gradient(135deg, var(--gemini-cyan), var(--gemini-purple));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            line-height: 1;
-        }
-        .xp-info-mini { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
-        .xp-progress-mini {
-            width: 100%; height: 6px; background: rgba(255,255,255,0.05);
-            border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);
-        }
-        .xp-bar-mini {
-            height: 100%; background: linear-gradient(90deg, var(--gemini-cyan), var(--gemini-purple));
-            width: 0%; transition: width 0.5s ease;
-        }
-        .xp-text-mini { font-size: 0.65rem; color: var(--text-mute); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-        .mastery-tag-mini {
-            font-size: 0.6rem; font-weight: 800; color: var(--gemini-gold);
-            text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 4px;
-        }
+        .hw-item { background: rgba(255,255,255,0.02); padding: 14px; border-radius: 12px; display: flex; align-items: flex-start; gap: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 8px; }
+        .hw-check { min-width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--text-mute); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 2px; }
+        .hw-check.done { background: var(--gemini-cyan); border-color: var(--gemini-cyan); }
+        .hw-check svg { width: 14px; color: black; display: none; } .hw-check.done svg { display: block; }
+        .hw-text { font-size: 0.95rem; color: #e2e8f0; flex: 1; line-height: 1.5; } .hw-item.done .hw-text { text-decoration: line-through; color: rgba(255,255,255,0.3); }
+        .add-row, .admin-controls { display: none; gap: 10px; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .admin-visible { display: flex !important; }
+        .st-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 12px; width: 100%; }
+        .st-input option { background-color: #02040a; }
+        .admin-tag { font-size: 0.65rem; color: var(--gemini-gold); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
         
-        /* DESIGN VARIANTS */
+        /* XP STYLES */
+        .level-badge-mini { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, var(--gemini-cyan), var(--gemini-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+        .xp-info-mini { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 120px; }
+        .xp-progress-mini { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        .xp-bar-mini { height: 100%; background: linear-gradient(90deg, var(--gemini-cyan), var(--gemini-purple)); width: 0%; transition: width 0.5s ease; }
+        .xp-text-mini { font-size: 0.65rem; color: var(--text-mute); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .mastery-tag-mini { font-size: 0.6rem; font-weight: 800; color: var(--gemini-gold); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 4px; }
+        .more-info-btn { margin-top: 15px; width: 100%; padding: 8px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--gemini-cyan); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; }
+        .more-info-btn:hover { background: rgba(34, 211, 238, 0.1); border-color: var(--gemini-cyan); }
         .xp-design-bronze { border-color: #cd7f32aa; background: linear-gradient(135deg, #cd7f3233, rgba(15, 23, 42, 0.95)); }
         .xp-design-silver { border-color: #c0c0c0aa; background: linear-gradient(135deg, #c0c0c033, rgba(15, 23, 42, 0.95)); }
         .xp-design-gold { border-color: #ffd700aa; background: linear-gradient(135deg, #ffd70033, rgba(15, 23, 42, 0.95)); }
         .xp-design-platinum { border-color: #e5e4e2aa; background: linear-gradient(135deg, #e5e4e233, rgba(15, 23, 42, 0.95)); }
         .xp-design-mastery { border-color: var(--gemini-gold); background: radial-gradient(circle at top right, #fbbf2444, rgba(15, 23, 42, 0.95) 70%); box-shadow: 0 0 30px #fbbf2422; }
         .xp-design-legend { border-color: var(--gemini-cyan); background: radial-gradient(circle at top right, #22d3ee44, #a855f722); box-shadow: 0 0 40px #22d3ee33; animation: borderGlow 3s infinite alternate; }
-
-        .more-info-btn {
-            margin-top: 15px; width: 100%; padding: 8px; border-radius: 10px;
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            color: var(--gemini-cyan); font-size: 0.7rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s;
-        }
-        .more-info-btn:hover { background: rgba(34, 211, 238, 0.1); border-color: var(--gemini-cyan); }
-        
         @keyframes borderGlow { from { border-color: var(--gemini-cyan); } to { border-color: var(--gemini-purple); } }
 
-        .hw-item { background: rgba(255,255,255,0.02); padding: 14px; border-radius: 12px; display: flex; align-items: flex-start; gap: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 8px; }
-        .hw-check { min-width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--text-mute); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 2px; }
-        .hw-check.done { background: var(--gemini-cyan); border-color: var(--gemini-cyan); }
-        .hw-check svg { width: 14px; color: black; display: none; }
-        .hw-check.done svg { display: block; }
-        .hw-text { font-size: 0.95rem; color: #e2e8f0; flex: 1; line-height: 1.5; }
-        .hw-item.done .hw-text { text-decoration: line-through; color: rgba(255,255,255,0.3); }
+        /* NOTIFICATIONS & TOAST */
+        .notif-btn { position: relative; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; }
+        .notif-badge { position: absolute; top: 0px; right: 0px; background: var(--gemini-red); width: 10px; height: 10px; border-radius: 50%; display: none; box-shadow: 0 0 5px var(--gemini-red); border:2px solid #0f172a; }
+        .notif-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 10px; transition: 0.3s; }
+        .notif-item.read { opacity: 0.5; border-color: rgba(255,255,255,0.05); }
+        .notif-title { color: var(--gemini-cyan); font-weight: 700; margin-bottom: 5px; font-size: 0.95rem; }
+        .notif-body { color: #ccc; font-size: 0.85rem; line-height: 1.4; }
+        .notif-time { font-size: 0.7rem; color: var(--text-mute); margin-top: 8px; text-align: right; }
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 30000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); border: 1px solid var(--gemini-cyan); border-left: 4px solid var(--gemini-cyan); color: white; padding: 16px 20px; border-radius: 12px; width: 300px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); animation: slideInRight 0.4s ease forwards; pointer-events: auto; cursor: pointer; }
+        .toast-title { font-weight: 800; color: var(--gemini-cyan); font-size: 0.9rem; margin-bottom: 4px; }
+        .toast-msg { font-size: 0.8rem; color: #ccc; line-height: 1.4; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateX(20px); } }
 
-        .add-row, .admin-controls { display: none; gap: 10px; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.08); }
-        .admin-visible { display: flex !important; }
-        .st-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 12px; width: 100%; }
-        .st-input option { background-color: #02040a; }
-        
-        .admin-tag { font-size: 0.65rem; color: var(--gemini-gold); font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
-
-        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
-        
-        /* ADMIN REGISTRY */
         #admin-registry { display: none; padding: 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
         .registry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: var(--border-glass); }
         .reg-title h1 { margin: 0; font-size: 2rem; font-weight: 700; color: white; }
@@ -269,48 +127,12 @@
         .st-name { font-size: 1.3rem; font-weight: 700; color: white; margin: 0; }
         .st-id { font-size: 0.9rem; color: var(--text-mute); font-family: monospace; letter-spacing: 1px; margin-top: 5px; }
 
-        /* NOTIFICATIONS & TOAST */
-        .notif-btn { position: relative; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; }
-        .notif-badge { position: absolute; top: 0px; right: 0px; background: var(--gemini-red); width: 10px; height: 10px; border-radius: 50%; display: none; box-shadow: 0 0 5px var(--gemini-red); border:2px solid #0f172a; }
-        .notif-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; margin-bottom: 10px; }
-        .notif-title { color: var(--gemini-cyan); font-weight: 700; margin-bottom: 5px; font-size: 0.95rem; }
-        .notif-body { color: #ccc; font-size: 0.85rem; line-height: 1.4; }
-        .notif-time { font-size: 0.7rem; color: var(--text-mute); margin-top: 8px; text-align: right; }
-
-        /* TOAST POPUP */
-        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 30000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
-        .toast { 
-            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px);
-            border: 1px solid var(--gemini-cyan); border-left: 4px solid var(--gemini-cyan);
-            color: white; padding: 16px 20px; border-radius: 12px;
-            width: 300px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            animation: slideInRight 0.4s ease forwards; pointer-events: auto; cursor: pointer;
-        }
-        .toast-title { font-weight: 800; color: var(--gemini-cyan); font-size: 0.9rem; margin-bottom: 4px; }
-        .toast-msg { font-size: 0.8rem; color: #ccc; line-height: 1.4; }
-        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes fadeOut { to { opacity: 0; transform: translateX(20px); } }
-
-        /* FOOTER LEGAL */
-        .footer-legal {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px);
-            border-top: var(--border-glass);
-            display: flex; justify-content: center; gap: 20px;
-            padding: 15px; 
-            z-index: 9500; 
-            padding-bottom: calc(15px + var(--safe-bottom));
-        }
-        .foot-btn {
-            padding: 8px 16px; border-radius: 20px;
-            color: var(--text-mute); font-size: 0.75rem; font-weight: 700; 
-            text-transform: uppercase; letter-spacing: 1px;
-        }
+        .footer-legal { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(20px); border-top: var(--border-glass); display: flex; justify-content: center; gap: 20px; padding: 15px; z-index: 9500; padding-bottom: calc(15px + var(--safe-bottom)); }
+        .foot-btn { padding: 8px 16px; border-radius: 20px; color: var(--text-mute); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
         .foot-btn:hover { color: white; background: rgba(255,255,255,0.05); }
         .foot-btn.support { color: var(--gemini-gold); border: 1px solid rgba(251, 191, 36, 0.2); background: rgba(251, 191, 36, 0.05); }
         .foot-btn.support:hover { background: rgba(251, 191, 36, 0.15); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); color: white; }
 
-        /* MODALS */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 20000; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
         .modal-box { padding: 40px; border-radius: 24px; width: 90%; max-width: 600px; box-shadow: 0 0 100px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1); }
         .scroll-text { max-height: 50vh; overflow-y: auto; background: rgba(255,255,255,0.02); padding: 25px; border-radius: 16px; font-size: 0.95rem; color: #ccc; line-height: 1.7; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); text-align: left; }
@@ -366,11 +188,14 @@
 
     <div class="modal-overlay" id="notifModal" onclick="closeModal()">
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
-            <h3 style="color:var(--gemini-cyan); margin-top:0;">Notifications</h3>
-            <div class="scroll-text" id="notifList" style="min-height:200px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="color:var(--gemini-cyan); margin:0;">Notifications</h3>
+                <button onclick="markAllRead()" style="background:none; border:none; color:var(--gemini-blue); font-size:0.8rem; cursor:pointer;">Tout marquer comme lu</button>
+            </div>
+            <div class="scroll-text" id="notifList" style="min-height:200px; margin-top:15px;">
                 <p style="color:#666; text-align:center;">Chargement...</p>
             </div>
-            <button class="liquid-btn" onclick="closeModal()" style="width:100%;">Fermer</button>
+            <button class="liquid-btn" onclick="closeModal()" style="width:100%; margin-top:15px;">Fermer</button>
         </div>
     </div>
 
@@ -387,16 +212,24 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="privacyModal" onclick="closeModal()">
+        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
+            <h3 style="color:var(--gemini-blue); margin-top:0;">Données Personnelles</h3>
+            <div class="privacy-actions">
+                <button class="liquid-btn" onclick="downloadData()">Télécharger</button>
+                <button class="liquid-btn" onclick="window.location.href='mailto:alexios.elizalde-xirokosta@etu.iut-tlse3.fr'">Contacter</button>
+            </div>
+            <button class="liquid-btn danger" style="width:100%; margin-top:15px;" onclick="deleteAccount()">Supprimer Compte</button>
+            <button class="liquid-btn" onclick="closeModal()" style="width:100%; margin-top:15px;">Fermer</button>
+        </div>
+    </div>
+    
     <div class="modal-overlay" id="tosModal" onclick="closeModal()">
         <div class="modal-box glass-panel" onclick="event.stopPropagation()">
             <h3 style="color:white; margin-top:0;">Conditions Générales d'Utilisation (CGU)</h3>
             <div class="scroll-text">
                 <p>Bienvenue sur SmartST. En utilisant cette application, vous acceptez les conditions suivantes :</p>
-                <ul>
-                    <li>L'application est destinée à un usage personnel et académique.</li>
-                    <li>Vos données (notes, emploi du temps) sont stockées de manière sécurisée.</li>
-                    <li>L'abus de l'application (spam, fausses informations) peut entraîner une suspension.</li>
-                </ul>
+                <ul><li>L'application est destinée à un usage personnel et académique.</li><li>Vos données sont stockées de manière sécurisée.</li><li>L'abus de l'application peut entraîner une suspension.</li></ul>
             </div>
             <button class="liquid-btn" onclick="closeModal()" style="width:100%;">Accepter et Fermer</button>
         </div>
@@ -407,25 +240,9 @@
             <h3 style="color:white; margin-top:0;">Politique de Confidentialité</h3>
             <div class="scroll-text">
                 <p>Conformément au RGPD, voici comment nous traitons vos données :</p>
-                <ul>
-                    <li>Nous ne collectons que les données nécessaires au fonctionnement de l'application (Nom, Prénom, Email, Groupe, Notes).</li>
-                    <li>Vos données ne sont jamais revendues à des tiers.</li>
-                    <li>Vous disposez d'un droit d'accès, de rectification et de suppression de vos données via les paramètres.</li>
-                </ul>
+                <ul><li>Nous ne collectons que les données nécessaires (Nom, Prénom, Email, Groupe, Notes).</li><li>Vos données ne sont jamais revendues.</li><li>Vous disposez d'un droit d'accès et de suppression.</li></ul>
             </div>
             <button class="liquid-btn" onclick="closeModal()" style="width:100%;">Fermer</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="privacyModal" onclick="closeModal()">
-        <div class="modal-box glass-panel" onclick="event.stopPropagation()">
-            <h3 style="color:var(--gemini-blue); margin-top:0;">Données Personnelles</h3>
-            <div class="privacy-actions">
-                <button class="liquid-btn" onclick="downloadData()">Télécharger</button>
-                <button class="liquid-btn" onclick="window.location.href='mailto:alexios.elizalde-xirokosta@etu.iut-tlse3.fr'">Contacter</button>
-            </div>
-            <button class="liquid-btn danger" style="width:100%; margin-top:15px;" onclick="deleteAccount()">Supprimer Compte</button>
-            <button class="liquid-btn" onclick="closeModal()" style="width:100%; margin-top:15px;">Fermer</button>
         </div>
     </div>
 
@@ -594,7 +411,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, orderBy, deleteDoc, addDoc, updateDoc, writeBatch, increment, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, query, where, orderBy, deleteDoc, addDoc, updateDoc, writeBatch, increment, onSnapshot, limit, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, deleteUser, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
@@ -617,12 +434,13 @@
         let localData = { grades: [], attendance: [], homework: [] };
         let allStudents = [];
         let pageLoadTime = Date.now();
+        let unreadNotifs = []; // Store IDs to mark read
 
         const SESSION_KEY = 'smartst_session';
         const isIos = () => /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
         const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone);
 
-        // GLOBAL SCOPE BINDINGS
+        // UI HELPERS
         window.switchTab = (mode) => {
             isLoginAdmin = (mode === 'admin');
             document.getElementById('tabStudent').className = isLoginAdmin ? 'tab-btn' : 'tab-btn active';
@@ -638,16 +456,23 @@
         };
 
         window.openModal = (id) => {
-            const m = document.getElementById(id);
-            if(m) {
-                m.style.display='flex';
-                if (id === 'notifModal') {
-                    if (document.getElementById('notifBadge')) document.getElementById('notifBadge').style.display='none';
-                    if (document.getElementById('notifBadgeAdmin')) document.getElementById('notifBadgeAdmin').style.display='none';
-                }
-            }
+            document.getElementById(id).style.display='flex';
         };
         window.closeModal = () => document.querySelectorAll('.modal-overlay').forEach(e=>e.style.display='none');
+
+        // MARK ALL READ
+        window.markAllRead = async () => {
+            if(unreadNotifs.length === 0) return;
+            const batch = writeBatch(db);
+            unreadNotifs.forEach(id => {
+                const ref = doc(db, "notifications", id);
+                batch.update(ref, { readBy: arrayUnion(currentUser.id) });
+            });
+            await batch.commit();
+            unreadNotifs = []; // Clear local list
+            document.getElementById('notifBadge').style.display='none';
+            document.getElementById('notifBadgeAdmin').style.display='none';
+        }
 
         // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
@@ -655,14 +480,27 @@
                 try {
                     const docRef = doc(db, "students", user.uid);
                     const docSnap = await getDoc(docRef);
+                    
                     if (docSnap.exists()) {
                         currentUser = { id: docSnap.id, ...docSnap.data() };
+
+                        // Start XP listener ONLY after user is loaded
+                        onSnapshot(doc(db, "students", currentUser.id), (d) => {
+                            if (d.exists()) {
+                                const data = d.data();
+                                const xp = typeof data.xp === "number" ? data.xp : 0;
+                                currentUser = { ...currentUser, ...data };
+                                renderXP(xp);
+                            }
+                        });
+
                         loadDashboard(currentUser, false);
                     } else if (user.uid === "WA5k4NI4mWWsmzdLgRS9tGRRfVz2" || user.uid === "hWVtA8MsXYWusnBeEOAVQghIWbb2") {
                         currentUser = { id: user.uid, prenom: 'Admin', nom: 'System', grp: 'ALL' };
                         loadDashboard(currentUser, true);
                     } else {
-                        alert("Compte non trouvé."); signOut(auth);
+                        alert("Compte non trouvé.");
+                        signOut(auth);
                         document.getElementById('loader').style.display='none';
                         document.getElementById('login-screen').style.display='flex';
                     }
@@ -728,7 +566,7 @@
 
             try {
                 await addDoc(collection(db, "notifications"), {
-                    title: title, body: body, target: targetId, authorId: auth.currentUser.uid, authorName: "Admin", timestamp: new Date()
+                    title: title, body: body, target: targetId, authorId: auth.currentUser.uid, authorName: "Admin", timestamp: new Date(), readBy: []
                 });
                 alert("Notification envoyée.");
             } catch (e) { alert("Erreur: " + e.message); }
@@ -739,11 +577,10 @@
             const t = document.getElementById('notifTitle').value;
             const b = document.getElementById('notifBody').value;
             const tgt = document.getElementById('notifTarget').value;
-            // Simplified Target: Just save "ALL", "C1", or "C2" directly to 'target'
             if(t && b) {
                 try {
                     await addDoc(collection(db, "notifications"), {
-                        title: t, body: b, target: tgt, authorId: auth.currentUser.uid, authorName: "Admin", timestamp: new Date()
+                        title: t, body: b, target: tgt, authorId: auth.currentUser.uid, authorName: "Admin", timestamp: new Date(), readBy: []
                     });
                     alert("Diffusion envoyée !");
                     document.getElementById('notifTitle').value = '';
@@ -765,18 +602,14 @@
             });
 
             // 3. HOMEWORK
-            // Note: We fetch ALL homework and filter in JS to avoid complex index requirements
             onSnapshot(collection(db, "homework"), (snap) => {
                 localData.homework = [];
                 snap.forEach(doc => {
                     const h = doc.data();
-                    // FALLBACK: If targetType is missing, treat as 'ALL' to ensure old tasks show up
                     const type = h.targetType || 'ALL'; 
                     const author = h.authorId || null;
-
                     const isTargeted = (type === 'ALL' || type === currentUser.grp);
                     const isPersonal = (type === 'PERSONAL' && author === currentUser.id);
-                    
                     if (isTargeted || isPersonal || isAdmin) {
                         localData.homework.push({ ...h, id: doc.id });
                     }
@@ -784,42 +617,39 @@
                 renderHomework();
             });
 
-            // 4. STUDENT XP
-            onSnapshot(doc(db, "students", currentUser.id), (d) => { 
-                if(d.exists()) { 
-                    currentUser = { ...currentUser, ...d.data() }; 
-                    renderXP(d.data().xp || 0); 
-                }
-            });
-
-            // 5. NOTIFICATIONS (Removed orderBy to fix missing index error, sorting in JS)
+            // 5. NOTIFICATIONS
             onSnapshot(collection(db, "notifications"), (snap) => {
                 const list = document.getElementById('notifList');
                 const badge = document.getElementById('notifBadge');
                 const badgeAdmin = document.getElementById('notifBadgeAdmin');
                 list.innerHTML = '';
+                unreadNotifs = []; // Reset local list
                 
                 let rawNotifs = [];
                 snap.forEach(d => rawNotifs.push({ ...d.data(), id: d.id }));
-                
-                // Sort Descending by Timestamp
                 rawNotifs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
-                let count = 0;
+                let unreadCount = 0;
                 rawNotifs.forEach(n => {
                     const isForMe = isAdmin || (n.target === 'ALL') || (n.target === currentUser.grp) || (n.target === currentUser.id);
                     
                     if(isForMe) {
-                        count++;
+                        // CHECK READ STATUS
+                        const isRead = n.readBy && n.readBy.includes(currentUser.id);
+                        if (!isRead) {
+                            unreadCount++;
+                            unreadNotifs.push(n.id);
+                            // Only toast if genuinely new session-wise AND unread
+                            if(n.timestamp && n.timestamp.seconds * 1000 > pageLoadTime) showToast(n.title, n.body);
+                        }
+
                         let dateStr = "Récemment";
                         if(n.timestamp && n.timestamp.seconds) {
                             dateStr = new Date(n.timestamp.seconds * 1000).toLocaleString('fr-FR', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
-                            // Toast Logic
-                            if(n.timestamp.seconds * 1000 > pageLoadTime) showToast(n.title, n.body);
                         }
 
                         list.innerHTML += `
-                        <div class="notif-item">
+                        <div class="notif-item ${isRead ? 'read' : ''}">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
                                 <div class="notif-title" style="margin:0;">${n.title}</div>
                                 <div class="notif-time" style="margin:0;">${dateStr}</div>
@@ -830,14 +660,16 @@
                     }
                 });
 
-                if(count > 0) { 
+                // BADGE VISIBILITY LOGIC
+                if(unreadCount > 0) { 
                     if(badge) badge.style.display = 'block'; 
                     if(badgeAdmin) badgeAdmin.style.display = 'block';
                 } else { 
                     if(badge) badge.style.display = 'none'; 
                     if(badgeAdmin) badgeAdmin.style.display = 'none';
-                    list.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Aucune notification.</div>'; 
                 }
+                
+                if (list.innerHTML === '') list.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Aucune notification.</div>';
             });
         }
 
@@ -885,13 +717,12 @@
         window.addHomework = async () => { 
             const t=document.getElementById('adHwTxt').value;
             const tgt=document.getElementById('adHwTgt').value; 
-            // Correct Target Logic
             const finalType = isAdmin ? tgt : 'PERSONAL';
             if(t) { 
                 await addDoc(collection(db,"homework"),{
                     text:t,
                     targetType: finalType,
-                    authorId: currentUser.id, // CRITICAL FOR DELETION PERMISSION
+                    authorId: currentUser.id, 
                     doneBy:[]
                 }); 
                 document.getElementById('adHwTxt').value=''; 
