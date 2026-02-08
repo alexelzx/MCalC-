@@ -186,6 +186,7 @@
             transform: rotate(-90deg); white-space: nowrap;
         }
 
+        /* --- EVENT CARD STYLES --- */
         .event-card {
             position: absolute; inset: 0; border-radius: 12px; padding: 12px;
             display: flex; flex-direction: column; justify-content: space-between;
@@ -195,10 +196,43 @@
         }
         .event-card:hover { transform: scale(1.02); z-index: 20; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
-        .type-CM { background: rgba(59, 130, 246, 0.15); border-color: var(--gemini-blue); }
-        .type-TD { background: rgba(16, 185, 129, 0.15); border-color: var(--gemini-green); }
-        .type-TP { background: rgba(249, 115, 22, 0.15); border-color: var(--gemini-orange); }
-        .type-SAE { background: rgba(168, 85, 247, 0.15); border-color: var(--gemini-purple); }
+        /* Status: ACTIVE (Default) */
+        .status-active.type-CM { background: rgba(59, 130, 246, 0.15); border-color: var(--gemini-blue); }
+        .status-active.type-TD { background: rgba(16, 185, 129, 0.15); border-color: var(--gemini-green); }
+        .status-active.type-TP { background: rgba(249, 115, 22, 0.15); border-color: var(--gemini-orange); }
+        .status-active.type-SAE { background: rgba(168, 85, 247, 0.15); border-color: var(--gemini-purple); }
+
+        /* Status: CANCELLED (Red Stripes) */
+        .status-cancelled {
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(239, 68, 68, 0.1),
+                rgba(239, 68, 68, 0.1) 10px,
+                rgba(239, 68, 68, 0.15) 10px,
+                rgba(239, 68, 68, 0.15) 20px
+            );
+            border-color: var(--gemini-red);
+            opacity: 0.9;
+        }
+        .status-cancelled .evt-title, .status-cancelled .evt-room, .status-cancelled .evt-type {
+            text-decoration: line-through;
+            color: #aaa;
+            opacity: 0.7;
+        }
+
+        /* Status: POSTPONED (Orange) */
+        .status-postponed {
+            background: rgba(249, 115, 22, 0.1); 
+            border-color: var(--gemini-orange);
+            border-style: solid;
+        }
+
+        /* Status: PENDING (Gray Dashed) */
+        .status-pending {
+            background: rgba(148, 163, 184, 0.1); 
+            border-color: var(--text-mute);
+            border-style: dashed;
+        }
 
         /* EXAM BADGE */
         .exam-badge {
@@ -218,6 +252,14 @@
         .evt-title { font-weight: 700; font-size: 0.95rem; color: white; line-height: 1.2; margin-top: 5px; }
         .evt-bot { display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.75rem; color: var(--text-mute); }
         .evt-room { font-weight: 600; color: var(--gemini-cyan); display: flex; align-items: center; gap: 4px; }
+
+        /* STATUS BADGES ON CARD */
+        .card-status-badge {
+            font-size: 0.6rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-left: 5px;
+        }
+        .bs-cancelled { background: var(--gemini-red); color: white; }
+        .bs-postponed { background: var(--gemini-orange); color: white; }
+        .bs-pending { background: var(--text-mute); color: black; }
 
         /* GLOBAL VACATION OVERLAY */
         #vacationBanner {
@@ -400,7 +442,7 @@
             <div id="editMode" class="hidden">
                 <h3 style="color:white; margin-top:0;">Éditer le Cours</h3>
                 
-                <select id="eStatus" class="st-input" onchange="const d=document.getElementById('eReportDate'); d.style.display = this.value==='POSTPONED'?'block':'none';">
+                <select id="eStatus" class="st-input" onchange="toggleReportDate()">
                     <option value="ACTIVE">✅ Maintenu</option>
                     <option value="CANCELLED">❌ ANNULÉ</option>
                     <option value="POSTPONED">➡️ REPORTÉ</option>
@@ -466,15 +508,8 @@
         let currentEvent = null;
         let currentSlot = null;
         
-        // VIEW STATE: Only 4 Slots (0, 1, 2, 3)
         let currentViewIndex = 0; 
         const SLOTS = [{start:9.00, duration:1.75}, {start:11.00, duration:1.75}, {start:14.25, duration:1.75}, {start:16.25, duration:1.75}];
-
-        window.onload = function() {
-            if(!localStorage.getItem('smartst_session')) {
-                window.location.href = 'smartst-cloud-access.html'; 
-            }
-        };
 
         // --- AUTH & DATA ---
         onAuthStateChanged(auth, (user) => {
@@ -504,9 +539,7 @@
             onSnapshot(doc(db, "meta", "calendarSettings"), (doc) => {
                 if(doc.exists()) {
                     const d = doc.data();
-                    // Merge with defaults
                     settingsData = { ...settingsData, ...d };
-                    // Default weekMap if missing
                     if(!settingsData.weekMap || settingsData.weekMap.length !== 4) settingsData.weekMap = [1,2,3,4];
                     
                     document.getElementById('monthDisplay').innerText = settingsData.monthName || "MOIS";
@@ -514,7 +547,6 @@
                     if(settingsData.vacationMode) {
                         document.getElementById('calContainer').style.display = 'none';
                         document.getElementById('vacationBanner').style.display = 'flex';
-                        // Show Return Date
                         const msg = settingsData.vacationReturnDate ? `ON SE VOIT DE RETOUR LE ${settingsData.vacationReturnDate}` : "";
                         document.getElementById('returnDateDisplay').innerText = msg;
                     } else {
@@ -527,10 +559,8 @@
             });
         }
 
-        // --- NAVIGATION (LOCKED TO 4 SLOTS) ---
         window.changeSlot = (dir) => {
             currentViewIndex += dir;
-            // HARD LIMIT 0 to 3
             if(currentViewIndex < 0) currentViewIndex = 0; 
             if(currentViewIndex > 3) currentViewIndex = 3;
             renderCalendar();
@@ -543,14 +573,12 @@
             
             if(newVal && !isNaN(newVal)) {
                 let val = parseInt(newVal);
-                // Update local & DB
                 settingsData.weekMap[currentViewIndex] = val;
                 await setDoc(doc(db, "meta", "calendarSettings"), { weekMap: settingsData.weekMap }, { merge: true });
                 renderCalendar();
             }
         }
 
-        // --- RENDER ---
         function renderSlots(dayIdx, isHoliday) {
             const col = document.getElementById(`day-${dayIdx}`);
             col.innerHTML = '';
@@ -572,20 +600,16 @@
         }
 
         window.renderCalendar = function() {
-            // Update Buttons State
             document.getElementById('btnPrev').disabled = (currentViewIndex === 0);
             document.getElementById('btnNext').disabled = (currentViewIndex === 3);
 
-            // Get Real Week ID from Map
             const realWeekID = settingsData.weekMap[currentViewIndex];
             document.getElementById('currentWeekLabel').innerText = `Semaine ${realWeekID}`;
 
             const group = document.getElementById('groupSelect').value;
             const dates = dateData[realWeekID] || ["...", "...", "...", "...", "..."];
             
-            // SMART HIGHLIGHT
             const now = new Date();
-            // Format: DD/MM (Adjust to match your DB inputs)
             const todayStr = now.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }); 
 
             const weekHolidays = settingsData.holidays ? (settingsData.holidays[realWeekID] || {}) : {};
@@ -611,7 +635,6 @@
                 renderSlots(i, isHoliday);
             }
 
-            // Query using REAL ID
             const events = scheduleData.filter(e => 
                 e.weeks && e.weeks.includes(realWeekID) && 
                 (e.groups.includes(group) || e.groups.includes("ALL"))
@@ -632,7 +655,16 @@
 
                         if(slotDiv) {
                             const card = document.createElement('div');
-                            card.className = `event-card type-${evt.type}`;
+                            // BASE CLASS TYPE (status logic handled below to properly override)
+                            let baseTypeClass = `type-${evt.type}`;
+                            let statusClass = `status-active`; 
+                            
+                            // STATUS LOGIC
+                            if(evt.status === 'CANCELLED') statusClass = 'status-cancelled';
+                            else if(evt.status === 'POSTPONED') statusClass = 'status-postponed';
+                            else if(evt.status === 'PENDING') statusClass = 'status-pending';
+                            
+                            card.className = `event-card ${statusClass} ${baseTypeClass}`;
                             
                             let badgeHtml = '';
                             if(evt.groups.includes('ALL')) badgeHtml = '<span class="evt-group-badge badge-promo">PROMO</span>';
@@ -641,16 +673,9 @@
                             else if(evt.groups.includes('C2')) badgeHtml = '<span class="evt-group-badge badge-grp">C2</span>';
                             
                             // STATUS BADGES
-                            if(evt.status === 'CANCELLED') {
-                                badgeHtml += '<span class="evt-group-badge" style="background:#ef4444; color:white; margin-left:4px;">ANNULÉ</span>';
-                                card.style.opacity = '0.7';
-                                card.style.textDecoration = 'line-through';
-                            } else if(evt.status === 'POSTPONED') {
-                                badgeHtml += '<span class="evt-group-badge" style="background:#f97316; color:white; margin-left:4px;">REPORTÉ</span>';
-                            } else if(evt.status === 'PENDING') {
-                                badgeHtml += '<span class="evt-group-badge" style="background:#64748b; color:white; margin-left:4px;">EADV</span>';
-                                card.style.borderStyle = 'dashed';
-                            }
+                            if(evt.status === 'CANCELLED') badgeHtml += '<span class="card-status-badge bs-cancelled">ANNULÉ</span>';
+                            else if(evt.status === 'POSTPONED') badgeHtml += '<span class="card-status-badge bs-postponed">REPORTÉ</span>';
+                            else if(evt.status === 'PENDING') badgeHtml += '<span class="card-status-badge bs-pending">EADV</span>';
 
                             const examBadge = evt.examInfo ? `<div class="exam-badge">PARTIEL PRÉVU</div>` : '';
 
@@ -680,7 +705,6 @@
             });
         }
 
-        // --- DATE PICKER LOGIC ---
         window.pickDate = function(dayIdx) {
             if(!isAdmin) return;
             const picker = document.getElementById('hiddenDatePicker');
@@ -699,7 +723,6 @@
             };
         }
 
-        // --- HOLIDAY LOGIC ---
         window.toggleDayHoliday = async function(dayIdx) {
             if(!isAdmin) return;
             if(!confirm(`Basculer le jour ${dayIdx+1} en mode Vacances/Férié ?`)) return;
@@ -714,7 +737,6 @@
             await setDoc(doc(db, "meta", "calendarSettings"), { holidays: holidays }, { merge: true });
         }
 
-        // --- ADMIN FEATURES ---
         window.handleAdminClick = function() {
             if(isAdmin) openModal('adminToolsModal'); 
             else openModal('adminLoginModal');
@@ -736,7 +758,7 @@
             if (newState) {
                 const input = prompt("Date de retour (ex: Lundi 12 Mars) :", returnDate);
                 if (input === null) {
-                    checkbox.checked = !newState; // Cancel toggle
+                    checkbox.checked = !newState; 
                     return;
                 }
                 returnDate = input;
@@ -748,7 +770,6 @@
             }, { merge: true });
         }
 
-        // --- EDITOR LOGIC ---
         window.clickSlot = function(day, idx) {
             if(!isAdmin) return;
             currentEvent = null;
@@ -782,13 +803,11 @@
             document.getElementById('mProf').innerText = evt.prof;
             document.getElementById('mEmail').innerText = evt.profEmail || "Non renseigné";
             
-            // Exam Box
             if(evt.examInfo) {
                 document.getElementById('mExamBox').style.display = 'block';
                 document.getElementById('mExamText').innerText = evt.examInfo;
             } else document.getElementById('mExamBox').style.display = 'none';
 
-            // Status Box
             const sBox = document.getElementById('mStatusBox');
             if(evt.status && evt.status !== 'ACTIVE') {
                 sBox.style.display = 'block';
@@ -837,6 +856,11 @@
                 document.getElementById('eGroup').value = gVal;
             }
         }
+        
+        window.toggleReportDate = function() {
+             const val = document.getElementById('eStatus').value;
+             document.getElementById('eReportDate').style.display = (val === 'POSTPONED') ? 'block' : 'none';
+        }
 
         window.saveClass = async function() {
             const tGroup = document.getElementById('eGroup').value;
@@ -877,7 +901,6 @@
             }
         }
 
-        // --- AUTH & HELPERS ---
         window.verifyAdmin = async function() {
             const u = document.getElementById('loginUser').value;
             const p = document.getElementById('loginPass').value;
