@@ -390,12 +390,24 @@
                 <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg><div class="m-val" id="mTimeLoc">...</div></div>
                 <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><div class="m-val" id="mProf">...</div></div>
                 <div class="m-row"><svg class="icon m-icon" style="color:#666" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg><div class="m-val email" style="color:var(--gemini-blue); cursor:pointer; text-decoration:underline;" id="mEmail" onclick="copyEmail()">...</div></div>
+                
                 <div id="mExamBox" style="display:none; margin-top:20px; padding:15px; background:rgba(244, 63, 94, 0.1); border:1px solid var(--gemini-red); border-radius:10px;"><div style="color:var(--gemini-red); font-weight:800; font-size:0.8rem; margin-bottom:5px;">⚠️ EXAMEN PRÉVU</div><div class="m-val" id="mExamText" style="font-size:0.9rem;"></div></div>
+                <div id="mStatusBox" style="display:none; margin-top:10px; padding:15px; border-radius:10px;"></div>
+
                 <button id="btnEdit" class="btn-action btn-primary" style="margin-top:25px; background:var(--gemini-gold); color:black; display:none;" onclick="toEditMode()">MODIFIER (ADMIN)</button>
             </div>
 
             <div id="editMode" class="hidden">
                 <h3 style="color:white; margin-top:0;">Éditer le Cours</h3>
+                
+                <select id="eStatus" class="st-input" onchange="const d=document.getElementById('eReportDate'); d.style.display = this.value==='POSTPONED'?'block':'none';">
+                    <option value="ACTIVE">✅ Maintenu</option>
+                    <option value="CANCELLED">❌ ANNULÉ</option>
+                    <option value="POSTPONED">➡️ REPORTÉ</option>
+                    <option value="PENDING">⚠️ En attente (EADV)</option>
+                </select>
+                <input type="text" id="eReportDate" class="st-input" placeholder="Date de report (ex: Lundi 12/04 14h)" style="display:none; border-color:var(--gemini-orange);">
+
                 <select id="eGroup" class="st-input" style="border:1px solid var(--gemini-gold);">
                     <option value="C1">C1 Uniquement</option>
                     <option value="C2">C2 Uniquement</option>
@@ -627,13 +639,25 @@
                             else if(evt.groups.length > 1) badgeHtml = '<span class="evt-group-badge badge-grp">C1 + C2</span>';
                             else if(evt.groups.includes('C1')) badgeHtml = '<span class="evt-group-badge badge-grp">C1</span>';
                             else if(evt.groups.includes('C2')) badgeHtml = '<span class="evt-group-badge badge-grp">C2</span>';
+                            
+                            // STATUS BADGES
+                            if(evt.status === 'CANCELLED') {
+                                badgeHtml += '<span class="evt-group-badge" style="background:#ef4444; color:white; margin-left:4px;">ANNULÉ</span>';
+                                card.style.opacity = '0.7';
+                                card.style.textDecoration = 'line-through';
+                            } else if(evt.status === 'POSTPONED') {
+                                badgeHtml += '<span class="evt-group-badge" style="background:#f97316; color:white; margin-left:4px;">REPORTÉ</span>';
+                            } else if(evt.status === 'PENDING') {
+                                badgeHtml += '<span class="evt-group-badge" style="background:#64748b; color:white; margin-left:4px;">EADV</span>';
+                                card.style.borderStyle = 'dashed';
+                            }
 
                             const examBadge = evt.examInfo ? `<div class="exam-badge">PARTIEL PRÉVU</div>` : '';
 
                             card.innerHTML = `
                                 ${examBadge}
                                 <div class="evt-top">
-                                    <div style="display:flex; gap:5px; align-items:center;">
+                                    <div style="display:flex; gap:5px; align-items:center; flex-wrap:wrap;">
                                         <span class="evt-type">${evt.type}</span>
                                         ${badgeHtml}
                                     </div>
@@ -737,6 +761,10 @@
             document.getElementById('eProf').value = "";
             document.getElementById('eEmail').value = "";
             document.getElementById('eExam').value = "";
+            document.getElementById('eStatus').value = "ACTIVE";
+            document.getElementById('eReportDate').value = "";
+            document.getElementById('eReportDate').style.display = "none";
+
             const cf = document.getElementById('groupSelect').value;
             document.getElementById('eGroup').value = cf; 
             
@@ -753,10 +781,30 @@
             document.getElementById('mTimeLoc').innerText = `${formatTime(evt.start)} - ${formatTime(evt.start+evt.duration)} • ${evt.room}`;
             document.getElementById('mProf').innerText = evt.prof;
             document.getElementById('mEmail').innerText = evt.profEmail || "Non renseigné";
+            
+            // Exam Box
             if(evt.examInfo) {
                 document.getElementById('mExamBox').style.display = 'block';
                 document.getElementById('mExamText').innerText = evt.examInfo;
             } else document.getElementById('mExamBox').style.display = 'none';
+
+            // Status Box
+            const sBox = document.getElementById('mStatusBox');
+            if(evt.status && evt.status !== 'ACTIVE') {
+                sBox.style.display = 'block';
+                if(evt.status === 'CANCELLED') {
+                    sBox.style.background = 'rgba(239, 68, 68, 0.1)'; sBox.style.border = '1px solid #ef4444';
+                    sBox.innerHTML = '<div style="color:#ef4444; font-weight:800;">🚫 COURS ANNULÉ</div>';
+                } else if(evt.status === 'POSTPONED') {
+                    sBox.style.background = 'rgba(249, 115, 22, 0.1)'; sBox.style.border = '1px solid #f97316';
+                    sBox.innerHTML = `<div style="color:#f97316; font-weight:800;">📅 REPORTÉ : ${evt.reportDate || 'Date à définir'}</div>`;
+                } else if(evt.status === 'PENDING') {
+                    sBox.style.background = 'rgba(100, 116, 139, 0.2)'; sBox.style.border = '1px dashed #94a3b8';
+                    sBox.innerHTML = '<div style="color:#94a3b8; font-weight:800;">⚠️ EN ATTENTE DE VALIDATION</div>';
+                }
+            } else {
+                sBox.style.display = 'none';
+            }
 
             document.getElementById('viewMode').style.display = 'block';
             document.getElementById('editMode').style.display = 'none';
@@ -777,6 +825,10 @@
                 document.getElementById('eProf').value = currentEvent.prof;
                 document.getElementById('eEmail').value = currentEvent.profEmail;
                 document.getElementById('eExam').value = currentEvent.examInfo;
+                document.getElementById('eStatus').value = currentEvent.status || 'ACTIVE';
+                document.getElementById('eReportDate').value = currentEvent.reportDate || '';
+                document.getElementById('eReportDate').style.display = (currentEvent.status === 'POSTPONED') ? 'block' : 'none';
+                
                 let gVal = 'C1'; 
                 if(currentEvent.groups.includes('ALL')) gVal = 'ALL';
                 else if(currentEvent.groups.includes('C1') && currentEvent.groups.includes('C2')) gVal = 'C_FULL';
@@ -801,7 +853,9 @@
                 prof: document.getElementById('eProf').value,
                 profEmail: document.getElementById('eEmail').value,
                 examInfo: document.getElementById('eExam').value,
-                groups: groupsArr
+                groups: groupsArr,
+                status: document.getElementById('eStatus').value,
+                reportDate: document.getElementById('eReportDate').value
             };
 
             try {
