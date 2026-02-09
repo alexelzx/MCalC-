@@ -1,23 +1,27 @@
 {
   "name": "MCalC+ Smart Student OS",
   "short_name": "MCalC+",
-  "start_url": "index.html",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#02040a",
   "theme_color": "#0f172a",
   "orientation": "portrait",
   "id": "/index.html",
   "description": "Portail étudiant unifié pour les étudiants de l'IUT.",
+  "categories": ["education", "productivity", "utilities"],
   "icons": [
     {
-      "src": "https://icons.veryicon.com/png/o/miscellaneous/street-network-app/student-13.png",
+      "src": "./icons/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "https://icons.veryicon.com/png/o/miscellaneous/street-network-app/student-13.png",
+      "src": "./icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
