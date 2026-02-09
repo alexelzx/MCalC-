@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SmartST | Chrono</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-deep: #02040a;
+            --surface-glass: rgba(15, 23, 42, 0.65);
+            --border-glass: 1px solid rgba(56, 189, 248, 0.15);
+            --gemini-cyan: #22d3ee;
+            --gemini-red: #f43f5e;
+            --gemini-purple: #a855f7;
+            --gemini-gold: #fbbf24;
+            --text-main: #f8fafc;
+            --text-mute: #94a3b8;
+        }
+
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0; font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at 50% -20%, #0f172a 0%, #02040a 80%);
+            color: var(--text-main); min-height: 100vh; overflow-x: hidden;
+            display: flex; flex-direction: column; padding: 20px;
+        }
+
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 40px; padding-bottom: 20px; border-bottom: var(--border-glass);
+        }
+        .logo { font-size: 1.5rem; font-weight: 800; color: white; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--gemini-cyan); }
+        
+        .btn-back {
+            background: rgba(255,255,255,0.05); border: var(--border-glass); color: white;
+            padding: 10px 20px; border-radius: 50px; font-weight: 600; text-decoration: none;
+            font-size: 0.85rem; transition: 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.1); border-color: white; }
+
+        /* GRID */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+
+        /* COUNTDOWN CARD */
+        .cd-card {
+            background: var(--surface-glass); border: var(--border-glass);
+            border-radius: 24px; padding: 30px; position: relative; overflow: hidden;
+            backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; text-align: center;
+            transition: 0.3s;
+        }
+        .cd-card:hover { transform: translateY(-5px); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        
+        .cd-type-VACATION { border-top: 4px solid var(--gemini-cyan); }
+        .cd-type-EXAM { border-top: 4px solid var(--gemini-red); }
+        .cd-type-EVENT { border-top: 4px solid var(--gemini-purple); }
+
+        .cd-label {
+            font-size: 0.7rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 10px; padding: 5px 12px; border-radius: 20px; background: rgba(255,255,255,0.05);
+        }
+        .cd-type-VACATION .cd-label { color: var(--gemini-cyan); border: 1px solid rgba(34, 211, 238, 0.3); }
+        .cd-type-EXAM .cd-label { color: var(--gemini-red); border: 1px solid rgba(244, 63, 94, 0.3); }
+        .cd-type-EVENT .cd-label { color: var(--gemini-purple); border: 1px solid rgba(168, 85, 247, 0.3); }
+
+        .cd-title { font-size: 1.4rem; font-weight: 700; color: white; margin-bottom: 5px; line-height: 1.2; }
+        .cd-date { color: var(--text-mute); font-size: 0.9rem; margin-bottom: 25px; }
+
+        /* TIMERS */
+        .timer-row { display: flex; gap: 15px; justify-content: center; width: 100%; }
+        .timer-box { display: flex; flex-direction: column; align-items: center; }
+        .t-val { font-size: 1.8rem; font-weight: 800; color: white; font-variant-numeric: tabular-nums; }
+        .t-lbl { font-size: 0.6rem; color: var(--text-mute); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+        /* ADMIN CONTROLS */
+        .admin-del {
+            position: absolute; top: 15px; right: 15px;
+            background: none; border: none; color: var(--gemini-red); cursor: pointer; opacity: 0.5;
+        }
+        .admin-del:hover { opacity: 1; transform: scale(1.1); }
+
+        .fab-add {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background: var(--gemini-cyan); color: #000; border-radius: 20px;
+            display: none; align-items: center; justify-content: center;
+            box-shadow: 0 0 30px rgba(34, 211, 238, 0.3); cursor: pointer; transition: 0.3s; z-index: 100;
+        }
+        .fab-add:hover { transform: scale(1.1) rotate(90deg); box-shadow: 0 0 50px rgba(34, 211, 238, 0.5); }
+
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-box { background: #0f1218; border: var(--border-glass); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; }
+        
+        .st-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px; border-radius: 12px; margin-bottom: 15px; font-family: inherit; }
+        .st-input:focus { border-color: var(--gemini-cyan); outline: none; }
+        .st-input option { background-color: #02040a; }
+
+        .btn-action { width: 100%; padding: 14px; border-radius: 12px; font-weight: 800; cursor: pointer; border: none; text-transform: uppercase; margin-top: 10px; }
+        .btn-primary { background: var(--gemini-cyan); color: black; }
+        .btn-primary:hover { box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); }
+
+        @media (max-width: 600px) {
+            .t-val { font-size: 1.4rem; }
+            .timer-row { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            SmartST <span>Chrono</span>
+        </div>
+        <a href="smartst-cloud-access.html" class="btn-back">Retour</a>
+    </div>
+
+    <div id="grid" class="grid">
+        <div style="color:#666; grid-column:1/-1; text-align:center; padding-top:50px;">Chargement des minuteurs...</div>
+    </div>
+
+    <div id="adminFab" class="fab-add" onclick="openModal()">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </div>
+
+    <div class="modal-overlay" id="addModal">
+        <div class="modal-box">
+            <h3 style="color:white; margin-top:0;">Nouveau Décompte</h3>
+            <input type="text" id="cTitle" class="st-input" placeholder="Titre (ex: Vacances Été)">
+            <select id="cType" class="st-input">
+                <option value="VACATION">Vacances 🌴</option>
+                <option value="EXAM">Partiel / Examen 📝</option>
+                <option value="EVENT">Événement 🎉</option>
+            </select>
+            <input type="datetime-local" id="cDate" class="st-input">
+            
+            <button class="btn-action btn-primary" onclick="addCountdown()">Créer</button>
+            <button class="btn-action" style="background:transparent; border:1px solid #444; color:#aaa;" onclick="closeModal()">Annuler</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAR7j3DDQQWHIEwv1_-PHQsSHze3kphPk8",
+            authDomain: "smartst-os.firebaseapp.com",
+            projectId: "smartst-os",
+            storageBucket: "smartst-os.firebasestorage.app",
+            messagingSenderId: "866980185011",
+            appId: "1:866980185011:web:03006fe6a81634d5dec1c6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const ADMIN_UIDS = ["WA5k4NI4mWWsmzdLgRS9tGRRfVz2", "hWVtA8MsXYWusnBeEOAVQghIWbb2"];
+
+        let isAdmin = false;
+        let countdowns = [];
+        let tickInterval;
+
+        // AUTH & INIT
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                isAdmin = ADMIN_UIDS.includes(user.uid);
+                if(isAdmin) document.getElementById('adminFab').style.display = 'flex';
+                loadCountdowns();
+            } else {
+                window.location.href = 'smartst-cloud-access.html';
+            }
+        });
+
+        // LOAD DATA
+        function loadCountdowns() {
+            const q = query(collection(db, "countdowns"), orderBy("targetDate", "asc"));
+            onSnapshot(q, (snapshot) => {
+                countdowns = [];
+                snapshot.forEach(doc => {
+                    countdowns.push({ id: doc.id, ...doc.data() });
+                });
+                renderGrid();
+                startTicker();
+            });
+        }
+
+        // RENDER UI
+        function renderGrid() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+
+            if (countdowns.length === 0) {
+                grid.innerHTML = '<div style="color:#666; grid-column:1/-1; text-align:center;">Aucun événement prévu.</div>';
+                return;
+            }
+
+            countdowns.forEach(c => {
+                const dateObj = new Date(c.targetDate);
+                const dateStr = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit' });
+                
+                const typeLabels = { 'VACATION': 'VACANCES', 'EXAM': 'PARTIEL', 'EVENT': 'ÉVÉNEMENT' };
+
+                const el = document.createElement('div');
+                el.className = `cd-card cd-type-${c.type}`;
+                el.innerHTML = `
+                    ${isAdmin ? `<button class="admin-del" onclick="deleteItem('${c.id}')">✕</button>` : ''}
+                    <div class="cd-label">${typeLabels[c.type]}</div>
+                    <div class="cd-title">${c.title}</div>
+                    <div class="cd-date">${dateStr}</div>
+                    <div class="timer-row" id="timer-${c.id}">
+                        <div class="timer-box"><div class="t-val d">00</div><div class="t-lbl">Jours</div></div>
+                        <div class="timer-box"><div class="t-val h">00</div><div class="t-lbl">Hrs</div></div>
+                        <div class="timer-box"><div class="t-val m">00</div><div class="t-lbl">Min</div></div>
+                        <div class="timer-box"><div class="t-val s">00</div><div class="t-lbl">Sec</div></div>
+                    </div>
+                `;
+                grid.appendChild(el);
+            });
+            updateTimes(); // Instant update
+        }
+
+        // TICKER LOGIC
+        function startTicker() {
+            if(tickInterval) clearInterval(tickInterval);
+            tickInterval = setInterval(updateTimes, 1000);
+        }
+
+        function updateTimes() {
+            const now = new Date().getTime();
+            
+            countdowns.forEach(c => {
+                const target = new Date(c.targetDate).getTime();
+                const diff = target - now;
+                const timerEl = document.getElementById(`timer-${c.id}`);
+                
+                if (!timerEl) return;
+
+                if (diff < 0) {
+                    timerEl.innerHTML = '<div class="t-val" style="color:var(--gemini-green);">TERMINÉ</div>';
+                } else {
+                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((diff % (1000 * 60)) / 1000);
+                    
+                    timerEl.querySelector('.d').innerText = d;
+                    timerEl.querySelector('.h').innerText = h < 10 ? '0'+h : h;
+                    timerEl.querySelector('.m').innerText = m < 10 ? '0'+m : m;
+                    timerEl.querySelector('.s').innerText = s < 10 ? '0'+s : s;
+                }
+            });
+        }
+
+        // ACTIONS
+        window.addCountdown = async () => {
+            const title = document.getElementById('cTitle').value;
+            const type = document.getElementById('cType').value;
+            const date = document.getElementById('cDate').value;
+
+            if(!title || !date) return alert("Remplissez tout !");
+
+            try {
+                await addDoc(collection(db, "countdowns"), {
+                    title: title,
+                    type: type,
+                    targetDate: date,
+                    createdAt: Date.now()
+                });
+                closeModal();
+                // Clear inputs
+                document.getElementById('cTitle').value = "";
+                document.getElementById('cDate').value = "";
+            } catch(e) {
+                alert("Erreur: " + e.message);
+            }
+        }
+
+        window.deleteItem = async (id) => {
+            if(confirm("Supprimer ce décompte ?")) {
+                await deleteDoc(doc(db, "countdowns", id));
+            }
+        }
+
+        // GLOBAL EXPORTS
+        window.openModal = () => document.getElementById('addModal').style.display = 'flex';
+        window.closeModal = () => document.getElementById('addModal').style.display = 'none';
+        window.deleteItem = deleteItem;
+        window.addCountdown = addCountdown;
+
+    </script>
+</body>
+</html>
