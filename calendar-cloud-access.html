@@ -513,13 +513,21 @@
 
         // --- AUTH & DATA ---
         onAuthStateChanged(auth, (user) => {
-            if (user && user.uid === ADMIN_UID) {
-                isAdmin = true;
-                updateAdminBtnUI(true);
+            if (user) {
+                // If logged in, check if admin
+                if(user.uid === ADMIN_UID) {
+                    isAdmin = true;
+                    updateAdminBtnUI(true);
+                } else {
+                    isAdmin = false;
+                    updateAdminBtnUI(false);
+                }
             } else {
+                // No user logged in, public view
                 isAdmin = false;
                 updateAdminBtnUI(false);
             }
+            // Always init data
             initData();
             setTimeout(() => { document.getElementById('loader').style.display='none'; }, 500);
         });
@@ -655,11 +663,9 @@
 
                         if(slotDiv) {
                             const card = document.createElement('div');
-                            // BASE CLASS TYPE (status logic handled below to properly override)
                             let baseTypeClass = `type-${evt.type}`;
                             let statusClass = `status-active`; 
                             
-                            // STATUS LOGIC
                             if(evt.status === 'CANCELLED') statusClass = 'status-cancelled';
                             else if(evt.status === 'POSTPONED') statusClass = 'status-postponed';
                             else if(evt.status === 'PENDING') statusClass = 'status-pending';
@@ -672,7 +678,6 @@
                             else if(evt.groups.includes('C1')) badgeHtml = '<span class="evt-group-badge badge-grp">C1</span>';
                             else if(evt.groups.includes('C2')) badgeHtml = '<span class="evt-group-badge badge-grp">C2</span>';
                             
-                            // STATUS BADGES
                             if(evt.status === 'CANCELLED') badgeHtml += '<span class="card-status-badge bs-cancelled">ANNULÉ</span>';
                             else if(evt.status === 'POSTPONED') badgeHtml += '<span class="card-status-badge bs-postponed">REPORTÉ</span>';
                             else if(evt.status === 'PENDING') badgeHtml += '<span class="card-status-badge bs-pending">EADV</span>';
@@ -797,6 +802,10 @@
 
         window.openDetails = function(evt) {
             currentEvent = evt;
+            // RESET ALL ALERTS FIRST
+            document.getElementById('mStatusBox').style.display = 'none';
+            document.getElementById('mExamBox').style.display = 'none';
+
             document.getElementById('mName').innerText = evt.name;
             document.getElementById('mType').innerText = evt.type;
             document.getElementById('mTimeLoc').innerText = `${formatTime(evt.start)} - ${formatTime(evt.start+evt.duration)} • ${evt.room}`;
@@ -806,7 +815,7 @@
             if(evt.examInfo) {
                 document.getElementById('mExamBox').style.display = 'block';
                 document.getElementById('mExamText').innerText = evt.examInfo;
-            } else document.getElementById('mExamBox').style.display = 'none';
+            }
 
             const sBox = document.getElementById('mStatusBox');
             if(evt.status && evt.status !== 'ACTIVE') {
@@ -821,8 +830,6 @@
                     sBox.style.background = 'rgba(100, 116, 139, 0.2)'; sBox.style.border = '1px dashed #94a3b8';
                     sBox.innerHTML = '<div style="color:#94a3b8; font-weight:800;">⚠️ EN ATTENTE DE VALIDATION</div>';
                 }
-            } else {
-                sBox.style.display = 'none';
             }
 
             document.getElementById('viewMode').style.display = 'block';
