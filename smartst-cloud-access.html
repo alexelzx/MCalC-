@@ -419,23 +419,19 @@
 
         window.openModal = (id) => {
             document.getElementById(id).style.display='flex';
-            if (id === 'notifModal') {
-                markAllRead();
-            }
+            // Note: We removed markAllRead() here so the badge stays red until clicked manually
         };
+
         window.closeModal = () => document.querySelectorAll('.modal-overlay').forEach(e=>e.style.display='none');
 
-        window.markAllRead = async () => {
-            if(unreadNotifs.length === 0) return;
-            if(document.getElementById('notifBadge')) document.getElementById('notifBadge').style.display='none';
-            if(document.getElementById('notifBadgeAdmin')) document.getElementById('notifBadgeAdmin').style.display='none';
-            const batch = writeBatch(db);
-            unreadNotifs.forEach(id => {
+        // NEW: This function runs when the user clicks "ACCEPTER"
+        window.markOneRead = async (id) => {
+            try {
                 const ref = doc(db, "notifications", id);
-                batch.update(ref, { readBy: arrayUnion(currentUser.id) });
-            });
-            try { await batch.commit(); unreadNotifs = []; } catch(e) { console.error("Mark read failed", e); }
-        }
+                // Adds the current user's ID to the 'readBy' list in Firebase
+                await updateDoc(ref, { readBy: arrayUnion(currentUser.id) });
+            } catch(e) { console.error("Mark read failed", e); }
+        };
 
         // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
@@ -580,7 +576,9 @@
                 let rawNotifs = [];
                 snap.forEach(d => rawNotifs.push({ ...d.data(), id: d.id }));
                 rawNotifs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+                
                 let unreadCount = 0;
+                
                 rawNotifs.forEach(n => {
                     const isForMe = isAdmin || (n.target === 'ALL') || (n.target === currentUser.grp) || (n.target === currentUser.id);
                     if(isForMe) {
@@ -590,23 +588,48 @@
                             unreadNotifs.push(n.id);
                             if(n.timestamp && n.timestamp.seconds * 1000 > pageLoadTime) showToast(n.title, n.body);
                         }
+                        
                         let dateStr = "Récemment";
                         if(n.timestamp && n.timestamp.seconds) {
                             dateStr = new Date(n.timestamp.seconds * 1000).toLocaleString('fr-FR', {day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
                         }
-                        list.innerHTML += `<div class="notif-item ${isRead ? 'read' : ''}"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;"><div class="notif-title" style="margin:0;">${n.title}</div><div class="notif-time" style="margin:0;">${dateStr}</div></div><div class="notif-body">${n.body}</div>${isAdmin ? `<button onclick="deleteNotification('${n.id}')" style="color:red;background:none;border:none;font-size:0.7rem;cursor:pointer;margin-top:8px;padding:0;">Supprimer</button>` : ''}</div>`;
+
+                        // BUTTON LOGIC
+                        let actionHtml = '';
+                        let itemClass = 'notif-item';
+
+                        if (isRead) {
+                            itemClass += ' read';
+                            actionHtml = `<div style="text-align:right; font-size:0.7rem; color:var(--text-mute); font-style:italic; margin-top:5px;">Vu</div>`;
+                        } else {
+                            actionHtml = `<button class="liquid-btn" style="padding:8px; font-size:0.75rem; margin-top:10px; width:100%; border-color:var(--gemini-cyan); color:var(--gemini-cyan);" onclick="markOneRead('${n.id}')">ACCEPTER</button>`;
+                        }
+
+                        const adminBtn = isAdmin ? `<button onclick="deleteNotification('${n.id}')" style="color:var(--gemini-red);background:none;border:none;font-size:0.7rem;cursor:pointer;margin-top:5px;padding:0;width:100%;text-align:right;">Supprimer</button>` : '';
+
+                        list.innerHTML += `
+                        <div class="${itemClass}">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                                <div class="notif-title" style="margin:0;">${n.title}</div>
+                                <div class="notif-time" style="margin:0;">${dateStr}</div>
+                            </div>
+                            <div class="notif-body">${n.body}</div>
+                            ${actionHtml}
+                            ${adminBtn}
+                        </div>`;
                     }
                 });
+                
                 if(unreadCount > 0) { 
-                    if(badge) badge.style.display = 'block'; 
-                    if(badgeAdmin) badgeAdmin.style.display = 'block';
+                    if(badge) { badge.innerText = unreadCount > 9 ? '9+' : unreadCount; badge.style.display = 'block'; }
+                    if(badgeAdmin) { badgeAdmin.style.display = 'block'; }
                 } else { 
                     if(badge) badge.style.display = 'none'; 
                     if(badgeAdmin) badgeAdmin.style.display = 'none';
                 }
+                
                 if (list.innerHTML === '') list.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Aucune notification.</div>';
             });
-        }
 
         function renderGrades() {
             const list = document.getElementById('gradeList'); list.innerHTML = ''; let sum = 0;
@@ -686,5 +709,6 @@
     </script>
 </body>
 </html>
+
 
 
