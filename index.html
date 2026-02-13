@@ -278,7 +278,7 @@
         <div class="portal-card" onclick="navTo('smartst-cloud-access.html')">
             <div class="badge-alpha" style="color: var(--gemini-red); border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.1);">
                 <svg onclick="event.stopPropagation(); explainDiscontinuation()" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="cursor:help; margin-right:4px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                FIN DE SUPPORT PRÉVU
+                FIN DE SUPPORT
             </div>
             <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
@@ -546,14 +546,14 @@
             });
         }
 
-        // --- DISCONTINUATION EXPLANATION (ADDED) ---
+        // --- DISCONTINUATION EXPLANATION (UPDATED) ---
         window.explainDiscontinuation = function() {
             alert(
                 "Note de la Direction :\n\n" +
-                "J'ai pris la décision de mettre fin au support de SmartST. " +
-                "Cette étape est nécessaire pour me permettre de concentrer toute mon énergie " +
-                "sur de nouveaux projets et de nouvelles opportunités de développement. " +
-                "\n\nJe vous remercie de votre compréhension.\n— Alexios Elizalde"
+                "Je vous informe que l'application SmartST sera prochainement remplacée par le calendrier CELCAT, l'outil officiel de l'IUT, qui sera déployé dans les semaines à venir. Bien que l'interface puisse différer, CELCAT offre une synchronisation automatique et un accès direct via votre ENT.\n\n" +
+                "L'application SmartST restera pleinement accessible jusqu'au 5 mai 2026. Après cette date, le service sera interrompu. Toutefois, si vous préférez l'usage de SmartST, je vous invite à contacter le support en ouvrant un ticket ; si un nombre suffisant d'étudiants en manifeste le souhait, je maintiendrais les mises à jour et la maintenance de l'outil.\n\n" +
+                "Enfin, je tenais à remercier sincèrement toutes les personnes qui ont soutenu ce projet et contribué à son développement.\n\n" +
+                "— Alexios Elizalde"
             );
         };
 
