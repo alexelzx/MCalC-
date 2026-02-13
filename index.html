@@ -276,10 +276,27 @@
 
     <div id="main-menu">
         <div class="portal-card" onclick="navTo('smartst-cloud-access.html')">
-            <div class="badge-alpha">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-                NOUVEAUTÉ !
-            </div>
+    <div class="badge-alpha" style="color: var(--gemini-red); border-color: rgba(244, 63, 94, 0.3); background: rgba(244, 63, 94, 0.1);">
+        <svg onclick="event.stopPropagation(); explainDiscontinuation()" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="cursor:help; margin-right:4px;"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        FIN DE SUPPORT PRÉVU
+    </div>
+    ```
+
+---
+
+### 2. Logique Explicative (JavaScript)
+Ajoutez la fonction suivante dans votre bloc `<script type="module">`. Fidèle à votre demande, le message est rédigé à la première personne pour expliquer votre décision de vous concentrer sur de nouveaux horizons :
+
+```javascript
+window.explainDiscontinuation = function() {
+    alert(
+        "Note de la Direction :\n\n" +
+        "J'ai pris la décision de mettre fin au support de SmartST. " +
+        "Cette étape est nécessaire pour me permettre de concentrer toute mon énergie " +
+        "sur de nouveaux projets et de nouvelles opportunités de développement. " +
+        "\n\nJe vous remercie de votre compréhension.\n— Alexios Elizalde"
+    );
+};
             <svg class="p-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
                 <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
@@ -897,6 +914,7 @@
     </script>
 </body>
 </html>
+
 
 
 
