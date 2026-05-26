@@ -29,7 +29,6 @@
         body {
             margin: 0;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            /* Deep Space Gradient */
             background: radial-gradient(circle at 50% 0%, #1e2330 0%, #050505 100%);
             color: var(--text-main);
             min-height: 100vh;
@@ -120,7 +119,9 @@
             border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(77, 170, 252, 0.2); 
         }
         .home-btn { border-color: rgba(77, 170, 252, 0.3); color: var(--neon-blue); }
-        
+        .admin-btn { border-color: rgba(255, 0, 100, 0.3); color: #ff4d6d; }
+        .admin-btn:hover { border-color: #ff4d6d; box-shadow: 0 0 10px rgba(255, 77, 109, 0.3); }
+
         /* LOGOS */
         .logos-wrapper { 
             background: white; padding: 12px 30px; border-radius: 16px; 
@@ -175,6 +176,7 @@
             padding: 20px; border-radius: 15px; color: white; font-size: 1.4rem; 
             text-align: center; margin: 20px auto; display: block; font-family: inherit; 
             transition: 0.3s;
+            box-sizing: border-box;
         }
         .identity-input:focus { 
             border-color: var(--neon-cyan); outline: none; box-shadow: var(--glow-input);
@@ -182,8 +184,9 @@
 
         .module-grid { 
             display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; 
-            max-height: 45vh; overflow-y: auto; padding: 10px; margin-bottom: 30px; 
+            max-height: 50vh; overflow-y: auto; padding: 10px; margin-bottom: 30px; 
             background: rgba(0,0,0,0.2); border-radius: 15px; border: var(--border-glass);
+            width: 100%; box-sizing: border-box;
         }
         
         .input-row { 
@@ -193,10 +196,11 @@
         .input-row:hover { background: rgba(255,255,255,0.05); border-color: rgba(77, 170, 252, 0.3); }
         .input-row.rnd-mode { opacity: 0.4; border-style: dashed; }
         
-        .info { flex-grow: 1; }
-        .code { font-size: 0.7rem; color: var(--neon-blue); font-weight: 700; display: block; text-shadow: 0 0 5px rgba(77, 170, 252, 0.3); }
-        .name { font-size: 0.85rem; font-weight: 500; color: #e2e8f0; }
-        .coef { font-size: 0.7rem; color: #94a3b8; background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 4px; margin-left: 5px; }
+        .info { flex-grow: 1; display: flex; flex-direction: column; justify-content: center;}
+        .code { font-size: 0.7rem; color: var(--neon-blue); font-weight: 700; display: block; text-shadow: 0 0 5px rgba(77, 170, 252, 0.3); margin-bottom: 2px;}
+        .name { font-size: 0.85rem; font-weight: 500; color: #e2e8f0; line-height: 1.2;}
+        .alias { font-size: 0.65rem; color: var(--neon-cyan); font-style: italic; margin-top: 2px; }
+        .coef { font-size: 0.7rem; color: #94a3b8; background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 4px; display: inline-block; margin-top: 4px; align-self: flex-start;}
         
         .controls { display: flex; align-items: center; gap: 10px; }
         input[type="number"] { 
@@ -222,11 +226,11 @@
         .analysis-list li::before { content: "•"; color: var(--neon-blue); margin-right: 8px; text-shadow: 0 0 5px var(--neon-blue); }
         .chart-wrapper { height: 250px; width: 100%; }
 
-        /* --- BUTTONS (UPDATED: PURE BLUE NEON) --- */
+        /* --- BUTTONS --- */
         .btn { padding: 18px; border-radius: 12px; border: none; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: 0.3s; text-align: center; }
         
         .btn-primary { 
-            background: linear-gradient(135deg, var(--neon-blue), #2563eb); /* Electric Blue to Royal Blue */
+            background: linear-gradient(135deg, var(--neon-blue), #2563eb);
             color: white; width: 100%; 
             box-shadow: 0 0 20px rgba(77, 170, 252, 0.4);
         }
@@ -250,13 +254,23 @@
 
         /* MODALS */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(10px); }
-        .modal-card { background: #131314; padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); max-width: 600px; position: relative; color: #cbd5e1; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+        .modal-card { background: #131314; padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 600px; position: relative; color: #cbd5e1; box-shadow: 0 0 40px rgba(0,0,0,0.8); box-sizing: border-box; }
+        .close-btn { position:absolute; top:15px; right:20px; cursor:pointer; font-size:1.5rem; transition: 0.2s; }
+        .close-btn:hover { color: white; }
         .math-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 15px 0; font-size: 1.1rem; color: white; border: 1px solid rgba(255,255,255,0.05); }
         .fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 5px; }
         .numerator { border-bottom: 1px solid white; padding: 0 5px; }
         .denominator { padding: 0 5px; }
 
-        /* PDF TEMPLATE STYLING (FIXED) */
+        /* ADMIN TABLE */
+        .admin-table-container { max-height: 50vh; overflow-y: auto; width: 100%; margin-bottom: 20px; background: rgba(0,0,0,0.3); border-radius: 10px; border: var(--border-glass); }
+        .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+        .admin-table th { background: rgba(255,255,255,0.05); padding: 12px; position: sticky; top: 0; backdrop-filter: blur(10px); color: var(--neon-blue); font-weight: 600; }
+        .admin-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .admin-input { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px; border-radius: 6px; width: 100%; box-sizing: border-box; font-family: inherit; transition: 0.2s; }
+        .admin-input:focus { border-color: var(--neon-blue); outline: none; background: rgba(0,0,0,0.5); }
+
+        /* PDF TEMPLATE */
         #pdfWrapper { position: fixed; left: -10000px; top: 0; z-index: -100; }
         #pdfTemplate { background: white; color: #0f172a; padding: 30px; width: 190mm; box-sizing: border-box; }
         .pdf-header { display: flex; justify-content: space-between; border-bottom: 3px solid #0f172a; padding-bottom: 15px; margin-bottom: 20px; }
@@ -281,6 +295,7 @@
     <div class="top-nav">
         <a href="#" onclick="navigateWithLoader(event, 'index.html')" class="nav-btn home-btn">Accueil</a>
         <button class="nav-btn" onclick="openModal('helpModal')">Aide</button>
+        <button class="nav-btn admin-btn" onclick="openModal('adminLoginModal')">Admin</button>
         <button class="nav-btn" onclick="openModal('creditsModal')">Crédits</button>
     </div>
 
@@ -320,7 +335,7 @@
                     <div id="screenScore" class="big-score">--</div>
                     <div id="screenDecision" class="decision-badge">--</div>
                 </div>
-                <hr style="border:0; border-top:1px solid var(--glass-border); margin:15px 0;">
+                <hr style="border:0; border-top:1px solid var(--border-glass); margin:15px 0;">
                 <div class="analysis-box">
                     <h4 style="color:var(--neon-blue); margin:0;">Points Forts</h4><ul id="screenStrengths" class="analysis-list"></ul>
                     <h4 style="color:#ef4444; margin:10px 0 0 0;">Zones de vigilance</h4><ul id="screenWeaknesses" class="analysis-list"></ul>
@@ -333,14 +348,50 @@
         <button class="btn btn-download" onclick="generatePDF()">TÉLÉCHARGER LE RAPPORT COMPLET (PDF)</button>
         <button class="btn btn-secondary" onclick="showStep(2)">MODIFIER LES NOTES</button>
     </div>
+
+    <div id="viewStepAdmin" class="view-section">
+        <h2 style="text-align: center; margin-top: 0;">Panneau d'Administration</h2>
+        <p style="text-align: center; color: var(--text-mute); font-size: 0.85rem; margin-bottom: 20px;">
+            Modifiez le nom ou ajoutez un alias (surnom) pour que vos camarades reconnaissent facilement les modules. Le code officiel reste fixe pour l'exactitude du PDF.
+        </p>
+        
+        <div class="admin-table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Code Officiel</th>
+                        <th>Titre / Nom Complet</th>
+                        <th>Alias (Surnom Affiché)</th>
+                    </tr>
+                </thead>
+                <tbody id="adminTableBody"></tbody>
+            </table>
+        </div>
+
+        <div style="display:flex; gap:15px; width:100%;">
+            <button class="btn btn-secondary" onclick="showStep(1)">ANNULER</button>
+            <button class="btn btn-primary" onclick="saveAdminChanges()">SAUVEGARDER LES MODIFICATIONS</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="adminLoginModal">
+    <div class="modal-card" style="max-width: 400px; text-align: center;">
+        <span onclick="closeModal('adminLoginModal')" class="close-btn">&times;</span>
+        <h2 style="color:white; margin-top:0;">Authentification</h2>
+        <input type="text" id="adminUser" class="identity-input" placeholder="Nom d'utilisateur" style="font-size:1rem; padding: 15px; width: 100%; margin-bottom: 10px;">
+        <input type="password" id="adminPwd" class="identity-input" placeholder="Mot de passe" style="font-size:1rem; padding: 15px; width: 100%; margin-bottom: 20px; margin-top: 0;">
+        <div id="adminErrorMsg" style="color: #ef4444; font-size: 0.85rem; margin-bottom: 15px; display: none;">Identifiants incorrects.</div>
+        <button class="btn btn-primary" onclick="verifyAdmin()">Connexion Sécurisée</button>
+    </div>
 </div>
 
 <div class="modal-overlay" id="helpModal">
     <div class="modal-card">
-        <span onclick="closeModal('helpModal')" style="position:absolute; top:15px; right:20px; cursor:pointer; font-size:1.5rem;">&times;</span>
+        <span onclick="closeModal('helpModal')" class="close-btn">&times;</span>
         <h2 style="color:white; margin-top:0;">Aide & Guide d'utilisation</h2>
         <div style="font-size: 0.9rem;">
-            <p><strong>• Lecture des codes :</strong> Les codes simplifiés correspondent aux codes officiels (ex: <code>R1.04</code> = BITM1R04). Si le code commence par la lettre <strong>S</strong> (ex: <code>S1.01</code>), il s'agit d'une <strong>SAÉ</strong>.</p>
+            <p><strong>• Lecture des codes :</strong> Les codes officiels sont affichés. L'administrateur peut configurer des surnoms/alias pour faciliter la compréhension.</p>
             <p><strong>• Exhaustivité de la liste :</strong> Tous les enseignements du semestre sont listés ici par défaut.</p>
             <p><strong>• Option RND (Résultat Non Disponible) :</strong> Cochez cette case si vous n'avez pas de note. Les lignes en mode RND ne sont pas comptabilisées.</p>
             <hr style="border:0; border-top:1px solid #334155; margin:15px 0;">
@@ -358,7 +409,7 @@
 
 <div class="modal-overlay" id="creditsModal">
     <div class="modal-card">
-        <span onclick="closeModal('creditsModal')" style="position:absolute; top:15px; right:20px; cursor:pointer; font-size:1.5rem;">&times;</span>
+        <span onclick="closeModal('creditsModal')" class="close-btn">&times;</span>
         <h3 style="color:white; margin:0;">Alexios ELIZALDE XIROKOSTA</h3>
         <p style="color:var(--neon-blue);">IUT Toulouse III - Paul Sabatier</p>
         <p style="font-size:0.85rem;">Etudiant| INO1 C2 | Représentant au Conseil de l'IUT | 2026-2028</p>
@@ -377,65 +428,162 @@
             <div style="font-size:0.8rem; color:#64748b;">CANDIDAT(E)</div>
             <div style="font-size:1.2rem; font-weight:bold;" id="pdfName"></div>
         </div>
-        <table class="pdf-table"><tbody id="pdfTableBody"></tbody></table>
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th class="pdf-th">CODE</th>
+                    <th class="pdf-th">ENSEIGNEMENT</th>
+                    <th class="pdf-th" style="text-align:center;">COEF</th>
+                    <th class="pdf-th" style="text-align:right;">NOTE</th>
+                </tr>
+            </thead>
+            <tbody id="pdfTableBody"></tbody>
+        </table>
         <div class="pdf-summary-container">
-            <div class="pdf-analysis-box"><b>Points Forts:</b> <span id="pdfStrengths"></span><br><b>Vigilance:</b> <span id="pdfWeaknesses"></span></div>
+            <div class="pdf-analysis-box"><b>Points Forts:</b> <span id="pdfStrengths"></span><br><br><b>Vigilance:</b> <span id="pdfWeaknesses"></span></div>
             <div class="pdf-score-box"><div style="font-size:3rem; font-weight:bold;" id="pdfAvg"></div><div id="pdfDecision"></div></div>
         </div>
     </div>
 </div>
 
 <script>
-    const modules = [
-        // --- TRONC COMMUN (UE 2.1 & 2.2) ---
-        { id: 'R2.01', name: 'Économie Générale', coef: 9, cat: 'SHS' },
-        { id: 'R2.02', name: 'Sciences Humaines (SHS)', coef: 12, cat: 'SHS' },
-        { id: 'R2.03', name: 'Droit du Travail', coef: 9, cat: 'SHS' },
-        { id: 'R2.04', name: 'Culture Générale', coef: 7, cat: 'SHS' },
-        { id: 'R2.10', name: 'PPP (Projet Pro)', coef: 11, cat: 'Pro' },
+    // --- DATABASE CONFIGURATION ---
+    // Strict adherence to official institutional codes while providing a pre-configured alias capability.
+    const defaultModules = [
+        // TRONC COMMUN (UE 2.1 & 2.2)
+        { id: 'R2.01', name: 'Économie Générale', alias: 'Eco.generale', coef: 9, cat: 'SHS' },
+        { id: 'R2.02', name: 'Sciences Humaines et sociales (2)', alias: 'SHS 2', coef: 12, cat: 'SHS' },
+        { id: 'R2.03', name: 'Droit du travail', alias: 'Droit travail', coef: 9, cat: 'SHS' },
+        { id: 'R2.04', name: 'Culture générale et humanités', alias: 'culture.Humanités', coef: 7, cat: 'SHS' },
+        { id: 'R2.10', name: 'Projet personnel professionnel', alias: 'PPP', coef: 11, cat: 'Pro' },
         
-        { id: 'S2.03', name: 'SAÉ : Environnement Orga.', coef: 17, cat: 'SAÉ' },
-        { id: 'S2.04', name: 'SAÉ : Objets InfoCom', coef: 18, cat: 'SAÉ' },
+        { id: 'CT1-2-S03', name: 'Décrire l\'environnement d\'une orga', alias: 'SAÉ - Organisation', coef: 17, cat: 'SAÉ' },
+        { id: 'CT2-S04', name: 'Ana évolutions objet infocommunicationnel', alias: 'SAÉ - objet&infoCom', coef: 18, cat: 'SAÉ' },
         
-        { id: 'R2.05', name: 'Anglais', coef: 9, cat: 'Lang' },
-        { id: 'R2.06', name: 'Langue Vivante 2', coef: 9, cat: 'Lang' },
-        { id: 'R2.07', name: 'Expression Écrite/Orale', coef: 10, cat: 'Lang' },
-        { id: 'R2.08', name: 'Image & Son', coef: 7, cat: 'Tech' },
-        { id: 'R2.09', name: 'Culture Numérique', coef: 7, cat: 'Tech' },
+        { id: 'R2.05', name: 'Anglais', alias: '', coef: 9, cat: 'Lang' },
+        { id: 'R2.06', name: '2 langue vivante', alias: 'LV2', coef: 9, cat: 'Lang' },
+        { id: 'R2.07', name: 'Expression écrite et orale', alias: 'Expression', coef: 10, cat: 'Lang' },
+        { id: 'R2.08', name: 'Image et son', alias: 'Photo', coef: 7, cat: 'Tech' },
+        { id: 'R2.09', name: 'Culture Numérique', alias: '', coef: 7, cat: 'Tech' },
 
-        // --- SPÉCIALITÉ INFONUM (UE 2.3 & 2.4) ---
-        { id: 'R2.I.12', name: 'Techniques d\'Enquête', coef: 10, cat: 'Tech' },
-        { id: 'R2.I.13', name: 'Bases de Données Doc.', coef: 10, cat: 'Tech' },
-        { id: 'R2.I.15', name: 'Rech. Icono/Audio/Vidéo', coef: 17, cat: 'Tech' },
-        { id: 'R2.I.18', name: 'Data & Documents', coef: 10, cat: 'SIC' },
+        // SPÉCIALITÉ INFONUM (UE 2.3 & 2.4)
+        { id: 'R2.INFONUM.12', name: 'Analyse des besoins', alias: 'Techniques d\'Enquête', coef: 10, cat: 'Tech' },
+        { id: 'R2.INFONUM.13', name: 'Bases de données documentaires', alias: 'BDD', coef: 10, cat: 'Tech' },
+        { id: 'R2.INFONUM.15', name: 'Recherches icono, audio, video', alias: 'PAO.pro', coef: 17, cat: 'Tech' },
+        { id: 'R2.INFONUM.18', name: 'Data & documents', alias: 'RGPD / Storytelling', coef: 10, cat: 'SIC' },
         
-        { id: 'S2.I.05', name: 'SAÉ : Enquête', coef: 18, cat: 'SAÉ' },
+        { id: 'saé-analyse Si', name: '[saé] Enquête', alias: 'SAÉ - Analyse Si', coef: 18, cat: 'SAÉ' },
         
-        { id: 'R2.I.11', name: 'Rech. Info. Spé (2)', coef: 4, cat: 'Tech' },
-        { id: 'R2.I.14', name: 'Veille Informationnelle', coef: 11, cat: 'Tech' },
-        { id: 'R2.I.16', name: 'Web Avancé / Info Pro', coef: 8, cat: 'Tech' },
-        { id: 'R2.I.17', name: 'Anglais Spécialisé', coef: 5, cat: 'Lang' },
+        { id: 'R2.INFONUM.11', name: 'Recherche d\'information spécialisée (2)', alias: 'rech.info.spe(2)', coef: 4, cat: 'Tech' },
+        { id: 'R2.INFONUM.14', name: 'Veille informationnelle', alias: 'Veille', coef: 11, cat: 'Tech' },
+        { id: 'R2.INFONUM.16', name: 'Approfondissements Web et info. pro', alias: 'Informatique.pro (2) / Web', coef: 8, cat: 'Tech' },
+        { id: 'R2.INFONUM.17', name: 'Anglais Spécialisé', alias: 'anglais spe', coef: 5, cat: 'Lang' },
         
-        { id: 'S2.I.06', name: 'SAÉ : Préconisat. Veille', coef: 17, cat: 'SAÉ' },
+        { id: 'CI4-S01', name: '[saé] Préconisations de veille', alias: 'SAÉ - Précos Veille', coef: 17, cat: 'SAÉ' },
 
-        // --- TRANSVERSAL ---
-        { id: 'PORTF', name: 'Portfolio (S2)', coef: 16, cat: 'SAÉ' },
-        { id: 'STAGE', name: 'Stage (InfoNum)', coef: 27, cat: 'Pro' }
+        // TRANSVERSAL
+        { id: 'portfolio', name: 'Portfolio (S2)', alias: '', coef: 16, cat: 'SAÉ' },
+        { id: 'CI-Stage', name: 'Stage en information numérique', alias: 'Stage S2', coef: 27, cat: 'Pro' }
     ];
 
+    let modules = JSON.parse(localStorage.getItem('mcalc_modules')) || defaultModules;
     let myChart = null;
-    const grid = document.getElementById('gridContainer');
-    modules.forEach((m, i) => {
-        grid.innerHTML += `<div class="input-row" id="row-${i}"><div class="info"><span class="code">${m.id}</span><span class="name">${m.name}</span><span class="coef">x${m.coef}</span></div>
-        <div class="controls"><label style="font-size:0.6rem; color:#94a3b8;"><input type="checkbox" id="rnd-${i}" onchange="toggleRND(${i})"> RND</label>
-        <input type="number" id="grade-${i}" placeholder="-" min="0" max="20" step="0.1"></div></div>`;
-    });
 
-    function showStep(s) { document.querySelectorAll('.view-section').forEach(v => v.classList.remove('view-active')); document.getElementById('viewStep'+s).classList.add('view-active'); }
-    function toggleRND(i) { const input = document.getElementById(`grade-${i}`); const row = document.getElementById(`row-${i}`); const isChecked = document.getElementById(`rnd-${i}`).checked; input.disabled = isChecked; if(isChecked) { row.classList.add('rnd-mode'); input.value=''; } else { row.classList.remove('rnd-mode'); } }
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    // --- INITIALIZATION ---
+    function init() {
+        renderGrid();
+    }
+
+    function renderGrid() {
+        const grid = document.getElementById('gridContainer');
+        grid.innerHTML = '';
+        modules.forEach((m, i) => {
+            const aliasHtml = m.alias ? `<div class="alias">A.k.a : ${m.alias}</div>` : '';
+            grid.innerHTML += `
+            <div class="input-row" id="row-${i}">
+                <div class="info">
+                    <span class="code" title="Code Officiel">${m.id}</span>
+                    <span class="name">${m.name}</span>
+                    ${aliasHtml}
+                    <span class="coef">x${m.coef}</span>
+                </div>
+                <div class="controls">
+                    <label style="font-size:0.6rem; color:#94a3b8; cursor:pointer;">
+                        <input type="checkbox" id="rnd-${i}" onchange="toggleRND(${i})"> RND
+                    </label>
+                    <input type="number" id="grade-${i}" placeholder="${m.alias ? m.alias.substring(0,4)+'.' : '-'}" min="0" max="20" step="0.1">
+                </div>
+            </div>`;
+        });
+    }
+
+    // --- VIEW CONTROLLERS ---
+    function showStep(s) { 
+        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('view-active')); 
+        if (s === 'Admin') {
+            document.getElementById('viewStepAdmin').classList.add('view-active');
+            populateAdminTable();
+        } else {
+            document.getElementById('viewStep'+s).classList.add('view-active'); 
+        }
+    }
+    
+    function toggleRND(i) { 
+        const input = document.getElementById(`grade-${i}`); 
+        const row = document.getElementById(`row-${i}`); 
+        const isChecked = document.getElementById(`rnd-${i}`).checked; 
+        input.disabled = isChecked; 
+        if(isChecked) { row.classList.add('rnd-mode'); input.value=''; } else { row.classList.remove('rnd-mode'); } 
+    }
+    
+    function openModal(id) { 
+        document.getElementById(id).style.display = 'flex'; 
+        if (id === 'adminLoginModal') {
+            document.getElementById('adminErrorMsg').style.display = 'none';
+            document.getElementById('adminUser').value = '';
+            document.getElementById('adminPwd').value = '';
+        }
+    }
+    
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+    // --- ADMINISTRATION SYSTEM ---
+    function verifyAdmin() {
+        const user = document.getElementById('adminUser').value;
+        const pwd = document.getElementById('adminPwd').value;
+        
+        if (user === 'nodata' && pwd === 'nodata') {
+            closeModal('adminLoginModal');
+            showStep('Admin');
+        } else {
+            document.getElementById('adminErrorMsg').style.display = 'block';
+        }
+    }
+
+    function populateAdminTable() {
+        const tbody = document.getElementById('adminTableBody');
+        tbody.innerHTML = '';
+        modules.forEach((m, index) => {
+            tbody.innerHTML += `
+            <tr>
+                <td style="color: var(--neon-blue); font-weight: bold; font-size: 0.75rem;">${m.id}</td>
+                <td><input type="text" id="admin-name-${index}" class="admin-input" value="${m.name}" placeholder="Nom Officiel"></td>
+                <td><input type="text" id="admin-alias-${index}" class="admin-input" value="${m.alias}" placeholder="Surnom/Alias"></td>
+            </tr>`;
+        });
+    }
+
+    function saveAdminChanges() {
+        modules.forEach((m, index) => {
+            m.name = document.getElementById(`admin-name-${index}`).value.trim();
+            m.alias = document.getElementById(`admin-alias-${index}`).value.trim();
+        });
+        localStorage.setItem('mcalc_modules', JSON.stringify(modules));
+        renderGrid();
+        showStep(1);
+    }
+
+    // --- CALCULATION & PDF LOGIC ---
     function calculateAndShow() {
         let totalPts = 0, totalCoef = 0, hasData = false;
         let cats = { 'SAÉ':{p:0, c:0}, 'Tech':{p:0, c:0}, 'SIC':{p:0, c:0}, 'Lang':{p:0, c:0}, 'SHS':{p:0, c:0}, 'Pro':{p:0, c:0} };
@@ -447,9 +595,9 @@
             if(!isRND && valStr !== "") {
                 const val = parseFloat(valStr); totalPts += val * m.coef; totalCoef += m.coef; cats[m.cat].p += val * m.coef; cats[m.cat].c += m.coef; hasData = true;
                 if(val >= 14) strengths.push(`${m.name} (${val})`); if(val < 10) weaknesses.push(`${m.name} (${val})`);
-                pdfRows += `<tr><td class="pdf-td"><b>${m.id}</b></td><td class="pdf-td">${m.name}</td><td class="pdf-td" style="text-align:center;">${m.coef}</td><td class="pdf-td" style="text-align:right;"><b>${val}</b></td></tr>`;
+                pdfRows += `<tr><td class="pdf-td" style="font-family:monospace;"><b>${m.id}</b></td><td class="pdf-td">${m.name}</td><td class="pdf-td" style="text-align:center;">${m.coef}</td><td class="pdf-td" style="text-align:right;"><b>${val}</b></td></tr>`;
             } else if (isRND) {
-                pdfRows += `<tr style="color:#94a3b8; font-style:italic;"><td class="pdf-td">${m.id}</td><td class="pdf-td">${m.name}</td><td class="pdf-td" style="text-align:center;">-</td><td class="pdf-td" style="text-align:right;">RND</td></tr>`;
+                pdfRows += `<tr style="color:#94a3b8; font-style:italic;"><td class="pdf-td" style="font-family:monospace;">${m.id}</td><td class="pdf-td">${m.name}</td><td class="pdf-td" style="text-align:center;">-</td><td class="pdf-td" style="text-align:right;">RND</td></tr>`;
             }
         });
 
@@ -457,36 +605,22 @@
         const avg = totalPts / totalCoef;
         const statusColor = avg >= 10 ? "#22c55e" : "#ef4444";
         
-        // --- PERSONALIZED MESSAGES ---
         const rawName = document.getElementById('studentName').value.trim();
         const studentName = rawName ? rawName.split(' ')[0] : "l'étudiant"; 
         
         let message = "";
-        
-        if (avg >= 16) {
-            message = `${studentName}, c'est l'excellence même. Vos résultats sont impressionnants. Continuez sur cette voie magistrale.`;
-        } else if (avg >= 14) {
-            message = `${studentName}, un résultat très solide. Vous dominez votre sujet avec brio. Félicitations pour cette belle performance.`;
-        } else if (avg >= 12) {
-            message = `${studentName}, c'est une réussite claire. Vous avez acquis de bonnes bases. Avec un peu plus de rigueur, l'excellence est à votre portée.`;
-        } else if (avg >= 11) {
-            message = `${studentName}, le semestre est validé sans encombre. C'est bien, mais je sens que vous avez le potentiel pour aller chercher plus haut.`;
-        } else if (avg >= 10.5) {
-            message = `${studentName}, l'objectif est atteint. C'est validé, mais la marge est fine. Il faudra consolider vos acquis pour la suite.`;
-        } else if (avg >= 10.0) {
-            message = `${studentName}, c'était juste, n'est-ce pas ? Une belle frayeur, mais c'est validé. Prenez cela comme un avertissement pour rebondir.`;
-        } else if (avg >= 9.8) {
-            message = `${studentName}, c'est cruellement proche. Il ne manque qu'un souffle. Ne vous découragez surtout pas, la validation est à portée de main.`;
-        } else if (avg >= 9.0) {
-            message = `${studentName}, la validation n'est pas loin, mais elle vous échappe encore. Analysez vos points faibles, le rattrapage est jouable.`;
-        } else if (avg >= 8.0) {
-            message = `${studentName}, le résultat est fragile. Il va falloir changer de méthode de travail et redoubler d'efforts rapidement.`;
-        } else {
-            message = `${studentName}, la situation est préoccupante. Ne restez pas seul(e) face à ces difficultés. Rapprochez-vous de l'équipe pédagogique.`;
-        }
+        if (avg >= 16) { message = `${studentName}, c'est l'excellence même. Vos résultats sont impressionnants. Continuez sur cette voie magistrale.`; } 
+        else if (avg >= 14) { message = `${studentName}, un résultat très solide. Vous dominez votre sujet avec brio. Félicitations pour cette belle performance.`; } 
+        else if (avg >= 12) { message = `${studentName}, c'est une réussite claire. Vous avez acquis de bonnes bases. Avec un peu plus de rigueur, l'excellence est à votre portée.`; } 
+        else if (avg >= 11) { message = `${studentName}, le semestre est validé sans encombre. C'est bien, mais je sens que vous avez le potentiel pour aller chercher plus haut.`; } 
+        else if (avg >= 10.5) { message = `${studentName}, l'objectif est atteint. C'est validé, mais la marge est fine. Il faudra consolider vos acquis pour la suite.`; } 
+        else if (avg >= 10.0) { message = `${studentName}, c'était juste, n'est-ce pas ? Une belle frayeur, mais c'est validé. Prenez cela comme un avertissement pour rebondir.`; } 
+        else if (avg >= 9.8) { message = `${studentName}, c'est cruellement proche. Il ne manque qu'un souffle. Ne vous découragez surtout pas, la validation est à portée de main.`; } 
+        else if (avg >= 9.0) { message = `${studentName}, la validation n'est pas loin, mais elle vous échappe encore. Analysez vos points faibles, le rattrapage est jouable.`; } 
+        else if (avg >= 8.0) { message = `${studentName}, le résultat est fragile. Il va falloir changer de méthode de travail et redoubler d'efforts rapidement.`; } 
+        else { message = `${studentName}, la situation est préoccupante. Ne restez pas seul(e) face à ces difficultés. Rapprochez-vous de l'équipe pédagogique.`; }
         
         document.getElementById('aiGreeting').innerText = message;
-
         document.getElementById('screenScore').innerText = avg.toFixed(2);
         document.getElementById('screenScore').style.color = statusColor;
         document.getElementById('screenDecision').innerText = avg >= 10 ? "ADMIS" : "AJOURNÉ";
@@ -526,24 +660,20 @@
         html2pdf().set(opt).from(element).save();
     }
 
-    // --- LOADER NAVIGATION FUNCTIONS ---
     function navigateWithLoader(event, url) {
         event.preventDefault(); 
         const loader = document.getElementById('loader');
         loader.classList.add('loader-active');
-        
-        setTimeout(() => {
-            window.location.href = url;
-        }, 1500);
+        setTimeout(() => { window.location.href = url; }, 1500);
     }
 
-    // FIX FOR BACK BUTTON (BFCACHE)
     window.addEventListener('pageshow', function(event) {
         const loader = document.getElementById('loader');
-        if (loader.classList.contains('loader-active')) {
-            loader.classList.remove('loader-active');
-        }
+        if (loader.classList.contains('loader-active')) { loader.classList.remove('loader-active'); }
     });
+
+    // Execute application initialization sequence
+    window.onload = init;
 </script>
 </body>
 </html>
