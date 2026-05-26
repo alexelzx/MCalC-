@@ -295,7 +295,7 @@
     <div class="top-nav">
         <a href="#" onclick="navigateWithLoader(event, 'index.html')" class="nav-btn home-btn">Accueil</a>
         <button class="nav-btn" onclick="openModal('helpModal')">Aide</button>
-        <button class="nav-btn admin-btn" onclick="openModal('adminLoginModal')">Admin</button>
+        <button class="nav-btn admin-btn" onclick="openModal('adminLoginModal')">🔒 Admin</button>
         <button class="nav-btn" onclick="openModal('creditsModal')">Crédits</button>
     </div>
 
@@ -448,7 +448,6 @@
 
 <script>
     // --- DATABASE CONFIGURATION ---
-    // Strict adherence to official institutional codes while providing a pre-configured alias capability.
     const defaultModules = [
         // TRONC COMMUN (UE 2.1 & 2.2)
         { id: 'R2.01', name: 'Économie Générale', alias: 'Eco.generale', coef: 9, cat: 'SHS' },
@@ -498,7 +497,7 @@
         const grid = document.getElementById('gridContainer');
         grid.innerHTML = '';
         modules.forEach((m, i) => {
-            const aliasHtml = m.alias ? `<div class="alias">A.k.a : ${m.alias}</div>` : '';
+            const aliasHtml = m.alias ? `<div class="alias">Info: ${m.alias}</div>` : '';
             grid.innerHTML += `
             <div class="input-row" id="row-${i}">
                 <div class="info">
@@ -568,7 +567,7 @@
             <tr>
                 <td style="color: var(--neon-blue); font-weight: bold; font-size: 0.75rem;">${m.id}</td>
                 <td><input type="text" id="admin-name-${index}" class="admin-input" value="${m.name}" placeholder="Nom Officiel"></td>
-                <td><input type="text" id="admin-alias-${index}" class="admin-input" value="${m.alias}" placeholder="Surnom/Alias"></td>
+                <td><input type="text" id="admin-alias-${index}" class="admin-input" value="${m.alias}" placeholder="Info/Surnom"></td>
             </tr>`;
         });
     }
