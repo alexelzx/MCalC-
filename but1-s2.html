@@ -295,7 +295,7 @@
     <div class="top-nav">
         <a href="#" onclick="navigateWithLoader(event, 'index.html')" class="nav-btn home-btn">Accueil</a>
         <button class="nav-btn" onclick="openModal('helpModal')">Aide</button>
-        <button class="nav-btn admin-btn" onclick="openModal('adminLoginModal')">🔒 Admin</button>
+        <button class="nav-btn admin-btn" onclick="openModal('adminLoginModal')">Admin</button>
         <button class="nav-btn" onclick="openModal('creditsModal')">Crédits</button>
     </div>
 
@@ -450,39 +450,39 @@
     // --- DATABASE CONFIGURATION ---
     const defaultModules = [
         // TRONC COMMUN (UE 2.1 & 2.2)
-        { id: 'R2.01', name: 'Économie Générale', alias: 'Eco.generale', coef: 9, cat: 'SHS' },
-        { id: 'R2.02', name: 'Sciences Humaines et sociales (2)', alias: 'SHS 2', coef: 12, cat: 'SHS' },
-        { id: 'R2.03', name: 'Droit du travail', alias: 'Droit travail', coef: 9, cat: 'SHS' },
-        { id: 'R2.04', name: 'Culture générale et humanités', alias: 'culture.Humanités', coef: 7, cat: 'SHS' },
-        { id: 'R2.10', name: 'Projet personnel professionnel', alias: 'PPP', coef: 11, cat: 'Pro' },
+        { id: 'R2.01', name: 'Économie Générale', alias: '(avec M. Falandry)', coef: 9, cat: 'SHS' },
+        { id: 'R2.02', name: 'Sciences Humaines et sociales (2)', alias: '(Avec M. Marchand)', coef: 12, cat: 'SHS' },
+        { id: 'R2.03', name: 'Droit du travail', alias: '(avec M. Falandry)', coef: 9, cat: 'SHS' },
+        { id: 'R2.04', name: 'Culture générale et humanités', alias: '(sur EDT comme CultuG)', coef: 7, cat: 'SHS' },
+        { id: 'R2.10', name: 'Projet personnel professionnel', alias: '(sur EDT comme PPP, avec M. Fisher)', coef: 11, cat: 'Pro' },
         
-        { id: 'CT1-2-S03', name: 'Décrire l\'environnement d\'une orga', alias: 'SAÉ - Organisation', coef: 17, cat: 'SAÉ' },
-        { id: 'CT2-S04', name: 'Ana évolutions objet infocommunicationnel', alias: 'SAÉ - objet&infoCom', coef: 18, cat: 'SAÉ' },
+        { id: 'CT1-2-S03', name: 'Décrire l\'environnement d\'une orga', alias: '(SAÉ  - avec M. Falandry)', coef: 17, cat: 'SAÉ' },
+        { id: 'CT2-S04', name: 'Evolutions objet infocommunicationnel', alias: 'SAÉ - Object Infocom', coef: 18, cat: 'SAÉ' },
         
-        { id: 'R2.05', name: 'Anglais', alias: '', coef: 9, cat: 'Lang' },
-        { id: 'R2.06', name: '2 langue vivante', alias: 'LV2', coef: 9, cat: 'Lang' },
-        { id: 'R2.07', name: 'Expression écrite et orale', alias: 'Expression', coef: 10, cat: 'Lang' },
-        { id: 'R2.08', name: 'Image et son', alias: 'Photo', coef: 7, cat: 'Tech' },
-        { id: 'R2.09', name: 'Culture Numérique', alias: '', coef: 7, cat: 'Tech' },
+        { id: 'R2.05', name: 'Anglais', alias: '(Anglais debut S2)', coef: 9, cat: 'Lang' },
+        { id: 'R2.06', name: '2 langue vivante', alias: '(pour la plupart, Espagnol)', coef: 9, cat: 'Lang' },
+        { id: 'R2.07', name: 'Expression écrite et orale', alias: '(Expression (avec Mme. Rondet))', coef: 10, cat: 'Lang' },
+        { id: 'R2.08', name: 'Image et son (Photographie)', alias: '(avec M. Arnaud Bertrand, cours de photographie)', coef: 7, cat: 'Tech' },
+        { id: 'R2.09', name: 'Culture Numérique', alias: '(connu sous CultuNum sur EDT, avec M. Hazzuri)', coef: 7, cat: 'Tech' },
 
         // SPÉCIALITÉ INFONUM (UE 2.3 & 2.4)
-        { id: 'R2.INFONUM.12', name: 'Analyse des besoins', alias: 'Techniques d\'Enquête', coef: 10, cat: 'Tech' },
-        { id: 'R2.INFONUM.13', name: 'Bases de données documentaires', alias: 'BDD', coef: 10, cat: 'Tech' },
-        { id: 'R2.INFONUM.15', name: 'Recherches icono, audio, video', alias: 'PAO.pro', coef: 17, cat: 'Tech' },
-        { id: 'R2.INFONUM.18', name: 'Data & documents', alias: 'RGPD / Storytelling', coef: 10, cat: 'SIC' },
+        { id: 'R2.INFONUM.12', name: 'Techniques Enquête', alias: '(connu sous Analyse des Besoins, avec Mme. Bourguet)', coef: 10, cat: 'Tech' },
+        { id: 'R2.INFONUM.13', name: 'Bases de Données Documentaires', alias: '(connu sous BDD, ce cours comporte aucune note en S2)', coef: 10, cat: 'Tech' },
+        { id: 'R2.INFONUM.15', name: 'Recherches iconographiques, audio et ideo', alias: '(connu sous PAO, avec Mme. Dupouy)', coef: 17, cat: 'Tech' },
+        { id: 'R2.INFONUM.18', name: 'Data & documents (DD)', alias: '(avec M. Magnan. Inclut RGPD / Storytelling)', coef: 10, cat: 'SIC' },
         
-        { id: 'saé-analyse Si', name: '[saé] Enquête', alias: 'SAÉ - Analyse Si', coef: 18, cat: 'SAÉ' },
+        { id: 'saé-analyse Si', name: 'SAÉ - Enquete', alias: '(avec Mme. Bourguet, presentation des resultats de enquete)', coef: 18, cat: 'SAÉ' },
         
-        { id: 'R2.INFONUM.11', name: 'Recherche d\'information spécialisée (2)', alias: 'rech.info.spe(2)', coef: 4, cat: 'Tech' },
-        { id: 'R2.INFONUM.14', name: 'Veille informationnelle', alias: 'Veille', coef: 11, cat: 'Tech' },
-        { id: 'R2.INFONUM.16', name: 'Approfondissements Web et info. pro', alias: 'Informatique.pro (2) / Web', coef: 8, cat: 'Tech' },
-        { id: 'R2.INFONUM.17', name: 'Anglais Spécialisé', alias: 'anglais spe', coef: 5, cat: 'Lang' },
+        { id: 'R2.INFONUM.11', name: 'Recherche Information spécialisée', alias: '(avec M. Tsibukis)', coef: 4, cat: 'Tech' },
+        { id: 'R2.INFONUM.14', name: 'Veille informationnelle', alias: '(avec M. Slouma ; pas la SAÉ)', coef: 11, cat: 'Tech' },
+        { id: 'R2.INFONUM.16', name: 'Web et Informatique Professionelle', alias: '(uniquement INO - en controle continu)', coef: 8, cat: 'Tech' },
+        { id: 'R2.INFONUM.17', name: 'Anglais Spécialisé', alias: '(Angalsi fin S2, controle final)', coef: 5, cat: 'Lang' },
         
-        { id: 'CI4-S01', name: '[saé] Préconisations de veille', alias: 'SAÉ - Précos Veille', coef: 17, cat: 'SAÉ' },
+        { id: 'CI4-S01', name: 'SAÉ - Préconisation Veille', alias: '(fait avec M. Slouma, theme des SmartCities)', coef: 17, cat: 'SAÉ' },
 
         // TRANSVERSAL
-        { id: 'portfolio', name: 'Portfolio (S2)', alias: '', coef: 16, cat: 'SAÉ' },
-        { id: 'CI-Stage', name: 'Stage en information numérique', alias: 'Stage S2', coef: 27, cat: 'Pro' }
+        { id: 'portfolio', name: 'Portfolio', alias: '(avec M. Fisher)', coef: 16, cat: 'SAÉ' },
+        { id: 'CI-Stage', name: 'Stage en Information Numérique', alias: '(stage du S2, 1e annee)', coef: 27, cat: 'Pro' }
     ];
 
     let modules = JSON.parse(localStorage.getItem('mcalc_modules')) || defaultModules;
